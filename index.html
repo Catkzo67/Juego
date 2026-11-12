@@ -285,23 +285,23 @@ const CREW=[
 // e: energía (+produce / -consume). p: producción por sol. pr: prioridad eléctrica. un: misión que lo desbloquea.
 // fp: lado de la huella en baldosas, o [ancho en i, largo en j] si es rectangular. img: sprite. s: escala del sprite sobre la huella. dy: ajuste vertical. ph: marcador temporal.
 const B={
-  base:{n:'Base central',i:'🛰️',img:'base',fp:6,anc:{k:.521,ox:-123,oy:-17},ports:[[-1,3],[6,2],[3,-1],[2,6]],cost:0,e:-1,cap:4,pr:0,desc:'El corazón de la colonia: mando, comunicaciones y camas para 4 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
+  base:{n:'Base central',i:'🛰️',img:'base',fp:6,anc:{k:.521,ox:-123,oy:-17},ports:[[-1,3],[6,2],[3,-1],[2,6]],gate:true,cost:0,e:-1,cap:4,pr:0,desc:'El corazón de la colonia: mando, comunicaciones y camas para 4 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
   corridor:{n:'Pasillo presurizado',i:'🚇',img:'pasillo',fp:1,s:1,dy:.1,cost:3,e:0,un:0,desc:'Une los edificios para caminar sin traje. Cada 3 pasillos sube el ánimo.',fact:'Las esclusas y pasillos tienen cortinas electrostáticas que quitan el polvo de los trajes.'},
   solar:{n:'Panel solar',i:'🔆',img:'solar',fp:2,s:.95,dy:.05,cost:10,e:6,un:0,desc:'Da energía con la luz del Sol. Con tormentas de polvo produce mucho menos.',fact:'Las tormentas de polvo pueden durar semanas y tapan el Sol: los paneles solares producen mucho menos.'},
-  moxie:{n:'Planta MOXIE',i:'🫧',img:'moxie',fp:[1,3],s:1,dy:.05,cost:15,e:-3,p:{o2:6},pr:1,un:1,desc:'Fabrica oxígeno a partir del CO₂ del aire marciano.',fact:'En 2021 el experimento MOXIE del rover Perseverance fabricó oxígeno con el dióxido de carbono de Marte.'},
+  moxie:{n:'Planta MOXIE',i:'🫧',ports:[[0,3]],img:'moxie',fp:[1,3],s:1,dy:.05,cost:15,e:-3,p:{o2:6},pr:1,un:1,desc:'Fabrica oxígeno a partir del CO₂ del aire marciano.',fact:'En 2021 el experimento MOXIE del rover Perseverance fabricó oxígeno con el dióxido de carbono de Marte.'},
   ice:{n:'Extractor de hielo',i:'🧊',img:'extractor',fp:3,s:1,dy:.04,cost:15,e:-3,p:{agua:8},pr:2,un:2,need:'ice',desc:'Perfora, derrite y limpia el hielo del subsuelo. Debe tocar hielo.',fact:'Hay hielo bajo el polvo y en los polos de Marte. Para beberlo hay que extraerlo, derretirlo y purificarlo.'},
   miner:{n:'Excavadora minera',i:'🚜',img:'excavadora',fp:2,s:1,dy:.05,cost:12,e:-2,p:{mat:4},pr:8,un:3,desc:'Perfora y recoge regolito para construir. Sobre roca saca el doble.',fact:'El suelo de Marte tiene mucho óxido de hierro: por eso el planeta es rojo. Con él se fabrican ladrillos.'},
-  battery:{n:'Batería',i:'🔋',img:'bateria',fp:2,s:1,dy:.04,cost:15,e:0,store:30,pr:0,un:3,desc:'Guarda 30 de energía que sobra para cuando falte.',fact:'Guardar energía es clave para sobrevivir a la noche y a las tormentas de polvo.'},
-  bio:{n:'Bio-laboratorio',i:'🧫',img:'laboratorio',inside:'laboratorio_interior',fp:3,s:1,dy:.03,cost:20,e:-3,p:{comida:2},pr:4,un:4,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
-  farm:{n:'Invernadero',i:'🌱',img:'invernadero',fp:3,s:1,dy:.03,cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:5,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
-  shelter:{n:'Refugio de regolito',i:'⛰️',img:'refugio',fp:3,s:1.05,dy:.1,cost:25,e:0,pr:0,un:6,crater:true,desc:'Búnker medio enterrado. Protege de la radiación. ¡Se puede construir dentro de un cráter!',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
-  antenna:{n:'Antena',i:'📡',img:'antena',fp:2,s:.8,dy:.03,cost:20,e:-1,pr:5,un:7,desc:'Habla con la Tierra y guía a las naves con nuevos colonos.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
-  habitat:{n:'Hábitat',i:'🏠',img:'habitat',inside:'habitat_interior',fp:3,s:1,dy:.03,cost:30,e:-2,cap:6,pr:2,un:8,desc:'Casa para 6 colonos. Sobre un tubo de lava caben 12.',fact:'Los tubos de lava son cuevas que dejaron los volcanes. Protegen de la radiación y de los micrometeoritos.'},
-  mess:{n:'Comedor',i:'🍽️',img:'comedor',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:8,desc:'Cocina y sala común. Comer juntos sube mucho el ánimo.',fact:'La convivencia en espacios pequeños es difícil. Compartir comidas ayuda a trabajar en equipo.'},
-  gym:{n:'Gimnasio',i:'🏋️',img:'gimnasio',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:8,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
-  repair:{n:'Taller de robots',i:'🦾',img:'taller',fp:2,s:1,dy:.03,cost:25,e:-2,pr:7,un:9,desc:'Sus robots limpian el polvo de los paneles y arreglan averías solos.',fact:'Los robots con sensores LiDAR hacen los trabajos más peligrosos fuera de la base.'},
-  vfarm:{n:'Granja vertical',i:'🥬',img:'granja',fp:3,s:1,dy:.03,cost:45,e:-6,p:{comida:16,agua:-3},pr:3,un:9,req:'farm',desc:'Torres hidropónicas con luz LED. Mucha comida en poco espacio.',fact:'Las granjas verticales reciclan casi toda el agua y pueden cultivar con luz LED día y noche.'},
-  reactor:{n:'Microrreactor nuclear',i:'⚛️',img:'reactor',fp:3,s:.88,dy:.03,cost:60,e:25,un:9,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
+  battery:{n:'Batería',i:'🔋',ports:[[0,2]],img:'bateria',fp:2,s:1,dy:.04,cost:15,e:0,store:30,pr:0,un:3,desc:'Guarda 30 de energía que sobra para cuando falte.',fact:'Guardar energía es clave para sobrevivir a la noche y a las tormentas de polvo.'},
+  bio:{n:'Bio-laboratorio',i:'🧫',ports:[[3,1]],img:'laboratorio',inside:'laboratorio_interior',fp:3,s:1,dy:.03,cost:20,e:-3,p:{comida:2},pr:4,un:4,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
+  farm:{n:'Invernadero',i:'🌱',ports:[[1,3]],img:'invernadero',fp:3,s:1,dy:.03,cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:5,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
+  shelter:{n:'Refugio de regolito',i:'⛰️',ports:[[1,3],[3,1]],img:'refugio',fp:3,s:1.05,dy:.1,cost:25,e:0,pr:0,un:6,crater:true,desc:'Búnker medio enterrado. Protege de la radiación. ¡Se puede construir dentro de un cráter!',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
+  antenna:{n:'Antena',i:'📡',ports:[[1,2],[2,1]],img:'antena',fp:2,s:.8,dy:.03,cost:20,e:-1,pr:5,un:7,desc:'Habla con la Tierra y guía a las naves con nuevos colonos.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
+  habitat:{n:'Hábitat',i:'🏠',ports:[[1,3],[3,1]],img:'habitat',inside:'habitat_interior',fp:3,s:1,dy:.03,cost:30,e:-2,cap:6,pr:2,un:8,desc:'Casa para 6 colonos. Sobre un tubo de lava caben 12.',fact:'Los tubos de lava son cuevas que dejaron los volcanes. Protegen de la radiación y de los micrometeoritos.'},
+  mess:{n:'Comedor',i:'🍽️',ports:[[1,-1]],img:'comedor',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:8,desc:'Cocina y sala común. Comer juntos sube mucho el ánimo.',fact:'La convivencia en espacios pequeños es difícil. Compartir comidas ayuda a trabajar en equipo.'},
+  gym:{n:'Gimnasio',i:'🏋️',ports:[[2,0],[1,-1]],img:'gimnasio',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:8,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
+  repair:{n:'Taller de robots',i:'🦾',ports:[[1,-1]],img:'taller',fp:2,s:1,dy:.03,cost:25,e:-2,pr:7,un:9,desc:'Sus robots limpian el polvo de los paneles y arreglan averías solos.',fact:'Los robots con sensores LiDAR hacen los trabajos más peligrosos fuera de la base.'},
+  vfarm:{n:'Granja vertical',i:'🥬',ports:[[1,3]],img:'granja',fp:3,s:1,dy:.03,cost:45,e:-6,p:{comida:16,agua:-3},pr:3,un:9,req:'farm',desc:'Torres hidropónicas con luz LED. Mucha comida en poco espacio.',fact:'Las granjas verticales reciclan casi toda el agua y pueden cultivar con luz LED día y noche.'},
+  reactor:{n:'Microrreactor nuclear',i:'⚛️',ports:[[2,3]],img:'reactor',fp:3,s:.88,dy:.03,cost:60,e:25,un:9,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
   shield:{n:'Escudo magnético',i:'🧲',img:'escudo',fp:3,s:1,dy:.04,cost:90,e:-8,pr:5,un:10,desc:'Crea un paraguas magnético que desvía la radiación del Sol.',fact:'Marte no tiene un campo magnético global como la Tierra. Un escudo artificial desvía las partículas del Sol.'}
 };
 const dim=t=>{const f=B[t].fp;return Array.isArray(f)?f:[f,f]};
@@ -459,8 +459,8 @@ function validSpot(t,i0,j0){
   }
   if(b.need==='ice'&&!ice)return {ok:false,why:'Tiene que tocar al menos una baldosa de hielo ❄️.'};
   if(t==='corridor'){ // a la base solo se llega por los extremos de sus brazos
-    for(const [a,c] of [[1,0],[-1,0],[0,1],[0,-1]]){const o=inMap(i0+a,j0+c)?OCC[idx(i0+a,j0+c)]:-1;if(o<0)continue;const nb=S.blds[o],P=B[nb.t].ports;
-      if(P&&!P.some(([pi,pj])=>nb.i+pi===i0&&nb.j+pj===j0))return {ok:false,why:'A la base solo se conectan pasillos por el extremo de sus brazos (marcados en dorado).'}}
+    for(const [a,c] of [[1,0],[-1,0],[0,1],[0,-1]]){const o=inMap(i0+a,j0+c)?OCC[idx(i0+a,j0+c)]:-1;if(o<0)continue;const nb=S.blds[o],P=B[nb.t].ports||[];
+      if(B[nb.t].gate&&!P.some(([pi,pj])=>nb.i+pi===i0&&nb.j+pj===j0))return {ok:false,why:'A la base solo se conectan pasillos por el extremo de sus brazos (marcados en dorado).'}}
   }
   if(t!=='corridor'){ // margen de una baldosa entre edificios distintos (los iguales y los pasillos sí pueden ir pegados)
     for(let j=j0-1;j<=j0+h;j++)for(let i=i0-1;i<=i0+w;i++){
@@ -763,22 +763,17 @@ function spriteBox(b,t,sp){ // rectángulo del sprite en coordenadas de mundo
 }
 // Calibración de las imágenes de pasillo: centro del anillo de un extremo (px de la imagen), escala y borde de baldosa al que corresponde.
 const TUBE_UP=12, TUBE_F=1.25;   // altura del eje del tubo sobre el suelo y alargamiento para que los tramos empalmen
-const CAL={pasillo:{k:.289,a:[23.8,80.6],at:[-16,24]},pasillo_v:{k:.1387,a:[23.6,55.8],at:[-16,8]},cruce:{k:.313,a:[72.1,63.9],at:[0,16]}};
+const CAL={pasillo:{k:.289,a:[23.8,80.6],at:[-16,24]},pasillo_v:{k:.1387,a:[23.6,55.8],at:[-16,8]},cruce:{k:.40,a:[72.1,63.9],at:[0,20],f:1}};
 function corridorRect(b,name){
-  const c=CAL[name],sp=IMG[name],[X,Y]=tileTop(b.i,b.j),cx=X,cy=Y+TH/2-TUBE_UP;
+  const c=CAL[name],sp=IMG[name],[X,Y]=tileTop(b.i,b.j),cx=X,cy=Y+TH/2-TUBE_UP,F=c.f||TUBE_F;
   const x=X+c.at[0]-c.a[0]*c.k,y=Y+c.at[1]-c.a[1]*c.k-TUBE_UP;
-  return {x:cx+(x-cx)*TUBE_F,y:cy+(y-cy)*TUBE_F,w:sp.w*c.k*TUBE_F,h:sp.h*c.k*TUBE_F};
+  return {x:cx+(x-cx)*F,y:cy+(y-cy)*F,w:sp.w*c.k*F,h:sp.h*c.k*F};
 }
-function corridorShape(b){ // orienta el pasillo según con qué está unido de verdad
-  const dirs=[[1,0,'i'],[-1,0,'i'],[0,1,'j'],[0,-1,'j']],cor={i:0,j:0},bld={i:0,j:0};
-  for(const [a,c,ax] of dirs){const ii=b.i+a,jj=b.j+c;if(!inMap(ii,jj))continue;const k=OCC[idx(ii,jj)];if(k<0)continue;const nb=S.blds[k];
-    if(nb.t==='corridor'){cor[ax]++;continue}
-    const P=B[nb.t].ports;
-    if(P){if(P.some(([pi,pj])=>nb.i+pi===b.i&&nb.j+pj===b.j))cor[ax]++;continue} // la base solo por sus conectores
-    bld[ax]++;}
-  // un edificio de al lado solo cuenta si el pasillo llega de frente (misma dirección que sus tramos), nunca si solo pasa por su lateral
-  const hasI=cor.i>0||(bld.i>0&&cor.j===0), hasJ=cor.j>0||(bld.j>0&&cor.i===0&&!(bld.i>0&&cor.j===0));
-  if(hasI&&hasJ)return 'cross';return hasI?'alongI':'straight';
+function corridorShape(b){ // un pasillo solo se une a otros pasillos y a las puertas de los edificios
+  const cn={i:0,j:0};
+  for(const [a,c,ax] of [[1,0,'i'],[-1,0,'i'],[0,1,'j'],[0,-1,'j']]){const ii=b.i+a,jj=b.j+c;if(!inMap(ii,jj))continue;const k=OCC[idx(ii,jj)];if(k<0)continue;const nb=S.blds[k];
+    if(nb.t==='corridor'||(B[nb.t].ports||[]).some(([pi,pj])=>nb.i+pi===b.i&&nb.j+pj===b.j))cn[ax]++}
+  if(cn.i&&cn.j)return 'cross';return cn.i?'alongI':'straight';
 }
 // Orden de pintado isométrico: un objeto va detrás si queda entero "antes" en i o en j y comparte franja en el otro eje.
 function depthSort(items){
