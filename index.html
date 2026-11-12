@@ -6,179 +6,176 @@
 <!--ARTIFACT-START-->
 <title>Misión Ares 2050</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="theme-color" content="#170c0d">
+<meta name="theme-color" content="#120d16">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Nunito:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Nunito:wght@600;700;800&display=swap">
 <style>
-/* Layout: one-screen mobile console — resource HUD on top, crater grid in the middle, action bar at the bottom; dialogs rise as bottom sheets. */
+/* Layout: one-screen mobile console. Isometric crater map fills the screen; navy/cream module-style HUD floats on top, action bar at the bottom, dialogs rise as bottom sheets. */
 :root{
-  --night:#170c0d;      /* cielo marciano nocturno */
-  --panel:#2a1716;      /* consola */
-  --panel-2:#3a201d;
-  --line:#5a332c;
-  --rust:#d0582c;       /* óxido de hierro: acento */
-  --dust:#f0b27a;       /* polvo iluminado */
-  --ink:#fbeee4;        /* texto */
-  --muted:#c49c8a;
-  --o2:#62d3e3;         /* oxígeno / hielo */
-  --good:#7fd48a;
-  --warn:#f2c14e;
-  --bad:#ff6b5a;
-  --soil-a:#9a4a2c; --soil-b:#7c3a24; --ice:#9fd8e6; --rock:#6c4a3e;
-  --display:"Chakra Petch", "Trebuchet MS", system-ui, sans-serif;
+  --night:#120d16;      /* cielo marciano */
+  --navy:#222a4c;       /* casco de los módulos */
+  --navy-2:#2e3866;
+  --navy-3:#3c4880;
+  --cream:#e9e4d6;      /* paneles blancos de los módulos */
+  --gold:#d8ab4c;       /* ribete dorado */
+  --ink:#f5f1e8;
+  --muted:#aab2cc;
+  --rust:#c8552b;       /* suelo marciano */
+  --glass:#8fd8ec;      /* cúpulas y oxígeno */
+  --good:#86d98f; --warn:#f2c14e; --bad:#ff6b5a;
+  --display:"Pixelify Sans", "Courier New", monospace;
   --body:"Nunito", "Segoe UI", system-ui, sans-serif;
+  --bevel: inset 0 2px 0 rgba(255,255,255,.12), inset 0 -3px 0 rgba(0,0,0,.35);
   color-scheme: dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{height:100%;margin:0}
-body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:15px;overflow:hidden;
-  padding-left:max(0px, env(safe-area-inset-left,0px));padding-right:max(0px, env(safe-area-inset-right,0px));
-  user-select:none;-webkit-user-select:none}
+body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:15px;overflow:hidden;user-select:none;-webkit-user-select:none}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-button:focus-visible{outline:2px solid var(--dust);outline-offset:2px}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0}
 .screen{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
 .gutter{padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
-h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.02em}
-.btn{background:var(--rust);color:#fff;font-family:var(--display);font-weight:700;font-size:1.05rem;letter-spacing:.06em;
-  text-transform:uppercase;padding:14px 22px;border-radius:14px;box-shadow:0 4px 0 #8a3418;transition:transform .08s}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8a3418}
-.btn.ghost{background:transparent;border:2px solid var(--line);box-shadow:none;color:var(--dust)}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.02em;font-weight:700}
+.btn{background:var(--gold);color:var(--navy);font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:.04em;
+  padding:13px 22px;border-radius:6px;border:2px solid #f6dc9a;box-shadow:var(--bevel),0 4px 0 #7a5a1c;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:var(--bevel),0 1px 0 #7a5a1c}
+.btn.ghost{background:var(--navy-2);color:var(--cream);border-color:var(--cream);box-shadow:var(--bevel),0 4px 0 #11152a}
 .btn[disabled]{opacity:.4;pointer-events:none}
+.panel{background:var(--navy);border:2px solid var(--cream);border-radius:6px;box-shadow:var(--bevel),0 0 0 2px #0d1022}
 
 /* ---------- Pantallas de historia ---------- */
-#title,#story,#crew,#travel,#end{justify-content:center;align-items:center;text-align:center;gap:18px;padding-block:24px}
-.logo{font-family:var(--display);font-weight:700;line-height:.9}
-.logo .y{display:block;font-size:1rem;letter-spacing:.35em;color:var(--dust);margin-bottom:8px}
-.logo .n{display:block;font-size:clamp(3rem,16vw,5.5rem);color:var(--ink);text-shadow:0 0 30px rgba(208,88,44,.6)}
-.tag{color:var(--muted);max-width:30ch;line-height:1.5}
+#title,#story,#crew,#travel,#end{justify-content:center;align-items:center;text-align:center;gap:16px;padding-block:24px}
+.heroImg{width:min(360px,86vw);filter:drop-shadow(0 16px 20px rgba(0,0,0,.6))}
+.logo{font-family:var(--display);font-weight:700;line-height:.95}
+.logo .y{display:block;font-size:.95rem;letter-spacing:.3em;color:var(--gold);margin-bottom:6px}
+.logo .n{display:block;font-size:clamp(2.8rem,14vw,5rem);color:var(--cream);text-shadow:0 4px 0 var(--navy),0 0 24px rgba(200,85,43,.55)}
+.tag{color:var(--muted);max-width:32ch;line-height:1.5;margin:0}
 .stack{display:flex;flex-direction:column;gap:12px;width:min(320px,100%)}
-#storyArt{width:min(260px,70vw);height:min(260px,70vw)}
-.storyText{max-width:32ch;font-size:1.12rem;line-height:1.55;min-height:7.5em}
+#storyArt{width:min(260px,68vw);height:min(260px,68vw)}
+.storyText{max-width:32ch;font-size:1.1rem;line-height:1.55;min-height:7.5em;margin:0}
 .dots{display:flex;gap:8px}
-.dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}
-.dots i.on{background:var(--rust)}
+.dots i{width:10px;height:10px;background:var(--navy-3)}
+.dots i.on{background:var(--gold)}
 #crew{justify-content:flex-start;overflow-y:auto}
-#crew h2{font-size:1.5rem;margin-top:8px}
+#crew h2{font-size:1.6rem;margin-top:8px}
 .field{display:flex;flex-direction:column;gap:6px;width:min(360px,100%);text-align:left}
 .field label{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
-.field input{font:inherit;font-size:1.1rem;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);user-select:text}
+.field input{font:inherit;font-size:1.1rem;padding:12px 14px;border-radius:6px;border:2px solid var(--cream);background:var(--navy);color:var(--ink);user-select:text}
 .crewGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(420px,100%)}
-.crewCard{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:12px 10px;text-align:left;display:flex;flex-direction:column;gap:4px}
+.crewCard{background:var(--navy);border:2px solid var(--navy-3);border-radius:6px;padding:12px 10px;text-align:left;display:flex;flex-direction:column;gap:4px;box-shadow:var(--bevel)}
 .crewCard .face{font-size:2rem}
-.crewCard b{font-family:var(--display);font-size:.98rem}
+.crewCard b{font-family:var(--display);font-size:1.02rem}
 .crewCard span{font-size:.8rem;color:var(--muted);line-height:1.35}
-.crewCard.sel{border-color:var(--rust);background:var(--panel-2);box-shadow:0 0 0 3px rgba(208,88,44,.25)}
-.hint{font-size:.85rem;color:var(--muted)}
+.crewCard.sel{border-color:var(--gold);background:var(--navy-2)}
+.hint{font-size:.85rem;color:var(--muted);margin:0}
 #travelArt{width:min(340px,90vw);height:150px}
-.bar{width:min(320px,85vw);height:12px;background:var(--panel);border-radius:8px;overflow:hidden;border:1px solid var(--line)}
-.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rust),var(--dust))}
-.fact{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;max-width:34ch;line-height:1.5;font-size:.95rem;text-align:left}
-.fact b{color:var(--o2);font-family:var(--display);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:4px}
+.bar{width:min(320px,85vw);height:14px;background:var(--navy);border:2px solid var(--cream);border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,var(--gold) 0 10px,#b88a32 10px 12px)}
+.fact{background:var(--navy-2);border:2px solid var(--navy-3);border-radius:6px;padding:12px 14px;max-width:34ch;line-height:1.5;font-size:.95rem;text-align:left}
+.fact b{color:var(--glass);font-family:var(--display);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
 
 /* ---------- Juego ---------- */
 #game{gap:0}
-.hud{padding-top:8px;padding-bottom:6px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(var(--night),rgba(23,12,13,.6))}
+#mapCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;z-index:0;cursor:grab}
+.hud{position:relative;z-index:2;padding-top:8px;padding-bottom:8px;display:flex;flex-direction:column;gap:6px;
+  background:linear-gradient(rgba(18,13,22,.96),rgba(18,13,22,.82));border-bottom:2px solid var(--navy-3)}
 .hudTop{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.sol{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:.04em}
-.sol small{display:block;font-size:.62rem;letter-spacing:.2em;color:var(--muted);font-weight:500}
+.sol{font-family:var(--display);font-weight:700;font-size:1.4rem;letter-spacing:.04em;line-height:1}
+.sol small{display:block;font-family:var(--body);font-size:.62rem;letter-spacing:.16em;color:var(--muted);font-weight:800;margin-top:3px}
 .status{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.pill{font-size:.72rem;font-weight:800;padding:4px 9px;border-radius:99px;background:var(--panel-2);border:1px solid var(--line);white-space:nowrap}
+.pill{font-size:.72rem;font-weight:800;padding:4px 9px;border-radius:4px;background:var(--navy-2);border:1px solid var(--navy-3);white-space:nowrap}
 .pill.storm{background:#5c3a1c;border-color:var(--warn);color:var(--warn)}
-.pill.cold{background:#1c3a44;border-color:var(--o2);color:var(--o2)}
+.pill.cold{background:#1c3a44;border-color:var(--glass);color:var(--glass)}
 .res{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-.chip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 6px;display:flex;flex-direction:column;align-items:flex-start;min-width:0}
-.chip .k{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.chip .v{font-family:var(--display);font-weight:700;font-size:1rem;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
-.chip .d{font-size:.68rem;font-weight:800;font-variant-numeric:tabular-nums}
+.chip{background:var(--navy);border:1px solid var(--navy-3);border-radius:5px;padding:3px 6px;display:flex;flex-direction:column;align-items:flex-start;min-width:0;box-shadow:var(--bevel)}
+.chip .k{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-weight:800}
+.chip .v{font-family:var(--display);font-weight:700;font-size:1.08rem;font-variant-numeric:tabular-nums;line-height:1.05;white-space:nowrap}
+.chip .v .ic{font-style:normal;font-size:.8em;margin-right:3px}
+.chip .d{font-size:.66rem;font-weight:800;font-variant-numeric:tabular-nums}
 .chip.low{border-color:var(--bad);animation:blink 1s infinite}
 .up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--muted)}
-@keyframes blink{50%{background:#4a1c18}}
+@keyframes blink{50%{background:#4a1c28}}
 .meters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .meter{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:800;color:var(--muted)}
-.meter .track{flex:1;height:8px;border-radius:6px;background:var(--panel);overflow:hidden;border:1px solid var(--line)}
+.meter .track{flex:1;height:9px;background:var(--navy);overflow:hidden;border:1px solid var(--navy-3)}
 .meter .track i{display:block;height:100%;transition:width .4s}
-.mission{margin-top:2px;display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:7px 10px;text-align:left;width:100%}
-.mission .num{font-family:var(--display);font-weight:700;color:var(--night);background:var(--dust);border-radius:8px;padding:2px 7px;font-size:.8rem}
-.mission .txt{font-size:.85rem;line-height:1.3;flex:1;min-width:0}
-.mission .txt small{display:block;color:var(--muted);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase}
-.mapwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-block:6px;position:relative}
-.map{display:grid;grid-template-columns:repeat(6,var(--ts,48px));grid-auto-rows:var(--ts,48px);gap:4px;padding:8px;border-radius:26px;
-  background:radial-gradient(ellipse at 50% 40%,rgba(240,178,122,.12),transparent 70%),rgba(60,24,18,.55);
-  box-shadow:inset 0 0 0 2px rgba(240,178,122,.15),inset 0 8px 30px rgba(0,0,0,.5)}
-.tile{position:relative;border-radius:10px;display:grid;place-items:center;font-size:calc(var(--ts,48px)*.52);line-height:1;
-  background:radial-gradient(circle at 30% 25%,var(--soil-a),var(--soil-b));box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
-.tile.ice{background:radial-gradient(circle at 30% 25%,#c9eef5,#6fb3c6 70%,#4d8aa0)}
-.tile.rock{background:radial-gradient(circle at 30% 25%,#8a6457,var(--rock))}
-.tile.crater{background:radial-gradient(circle,#3b1b12 30%,#6b3220 55%,var(--soil-b) 72%);box-shadow:none}
-.tile.tube{background:radial-gradient(circle at 50% 60%,#1a0b08 25%,#5a2b1d 60%,var(--soil-b))}
-.tile .terr{font-size:.55em;opacity:.55}
-.tile.sel{outline:3px solid var(--dust);outline-offset:1px;z-index:2}
-.tile.b{background:radial-gradient(circle at 30% 25%,#5a3a33,#3a2420);box-shadow:inset 0 0 0 2px rgba(240,178,122,.35),0 3px 0 rgba(0,0,0,.35)}
-.tile.b.ice{box-shadow:inset 0 0 0 2px var(--o2),0 3px 0 rgba(0,0,0,.35)}
-.tile.b.tube{box-shadow:inset 0 0 0 2px var(--warn),0 3px 0 rgba(0,0,0,.35)}
-.tile .flag{position:absolute;right:-3px;top:-3px;font-size:calc(var(--ts,48px)*.26);background:var(--night);border-radius:50%;padding:2px;line-height:1}
-.tile.off>.ic{filter:grayscale(1) brightness(.6)}
-.tile.new{animation:pop .45s ease-out}
-@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
-.float{position:absolute;pointer-events:none;font-family:var(--display);font-weight:700;color:var(--good);font-size:1rem;animation:rise 1.2s ease-out forwards;z-index:5;text-shadow:0 2px 4px #000}
+.mission{display:flex;align-items:center;gap:10px;background:var(--navy-2);border:2px solid var(--cream);border-radius:6px;padding:6px 10px;text-align:left;width:100%;box-shadow:var(--bevel)}
+.mission .num{font-family:var(--display);font-weight:700;color:var(--navy);background:var(--gold);border-radius:3px;padding:2px 7px;font-size:.85rem}
+.mission .txt{font-size:.85rem;line-height:1.3;flex:1;min-width:0;font-weight:700}
+.mission .txt small{display:block;color:var(--muted);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}
+.mapwrap{flex:1;min-height:0;position:relative}
+.mapTools{position:absolute;right:max(12px, env(safe-area-inset-right,0px));top:12px;display:flex;flex-direction:column;gap:8px;z-index:2}
+.mapTools button{width:44px;height:44px;font-family:var(--display);font-size:1.4rem;font-weight:700;display:grid;place-items:center}
+.placeBar{position:absolute;left:0;right:0;bottom:10px;z-index:3;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.placeBar .panel{padding:10px 12px;display:flex;align-items:center;gap:10px}
+.placeBar img{width:52px;height:40px;object-fit:contain}
+.placeBar .msg{flex:1;font-size:.86rem;line-height:1.3;font-weight:700}
+.placeBar .msg b{font-family:var(--display);font-size:1rem;display:block}
+.placeBar .row .btn{font-size:1rem}
+.actions{position:relative;z-index:2;display:flex;gap:8px;align-items:stretch;padding-top:8px;padding-bottom:max(10px, env(safe-area-inset-bottom,0px));
+  background:linear-gradient(rgba(18,13,22,.82),rgba(18,13,22,.96));border-top:2px solid var(--navy-3)}
+.iconBtn{background:var(--navy);border:2px solid var(--navy-3);border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:1.25rem;min-width:58px;box-shadow:var(--bevel)}
+.iconBtn small{font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.iconBtn.build{border-color:var(--gold)}
+.next{flex:1;font-size:1rem;padding-inline:8px;white-space:nowrap}
+.float{position:fixed;pointer-events:none;font-family:var(--display);font-weight:700;font-size:1.1rem;animation:rise 1.2s ease-out forwards;z-index:5;text-shadow:0 2px 0 #000}
 @keyframes rise{to{transform:translateY(-40px);opacity:0}}
-.actions{display:flex;gap:8px;align-items:stretch;padding-top:6px;padding-bottom:max(10px, env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(23,12,13,.6),var(--night))}
-.iconBtn{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:1.3rem;min-width:62px}
-.iconBtn small{font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.next{flex:1;font-size:1.1rem}
 
 /* ---------- Hojas / modales ---------- */
-.veil{position:fixed;inset:0;background:rgba(10,4,5,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.veil{position:fixed;inset:0;background:rgba(8,6,14,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
 @keyframes fade{from{opacity:0}}
-.sheet{background:var(--panel);border-top:2px solid var(--line);border-radius:22px 22px 0 0;width:min(560px,100%);max-height:86%;overflow-y:auto;
-  padding-top:16px;padding-bottom:max(18px, env(safe-area-inset-bottom,0px));animation:up .25s ease-out;display:flex;flex-direction:column;gap:12px}
+.sheet{background:var(--navy);border:2px solid var(--cream);border-bottom:0;border-radius:10px 10px 0 0;width:min(560px,100%);max-height:86%;overflow-y:auto;
+  padding-top:16px;padding-bottom:max(18px, env(safe-area-inset-bottom,0px));animation:up .25s ease-out;display:flex;flex-direction:column;gap:12px;box-shadow:0 -6px 0 #0d1022}
 @keyframes up{from{transform:translateY(40px);opacity:.4}}
-.sheet h2{font-size:1.3rem}
+.sheet h2{font-size:1.4rem}
 .sheetHead{display:flex;align-items:center;gap:12px}
 .sheetHead .big{font-size:2.4rem}
 .sheetHead p{margin:2px 0 0;color:var(--muted);font-size:.85rem}
-.close{margin-left:auto;font-size:1.4rem;width:40px;height:40px;border-radius:50%;background:var(--panel-2)}
+.close{margin-left:auto;font-size:1.3rem;width:40px;height:40px;border-radius:6px;background:var(--navy-2);border:2px solid var(--navy-3);flex:none}
+.bimg{display:block;width:100%;max-height:200px;object-fit:contain;background:radial-gradient(ellipse at 50% 70%,rgba(200,85,43,.35),transparent 70%);border-radius:6px}
 .buildGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.card{background:var(--panel-2);border:2px solid var(--line);border-radius:14px;padding:10px;text-align:left;display:flex;flex-direction:column;gap:4px;min-width:0}
-.card .top{display:flex;align-items:center;gap:8px}
-.card .top .e{font-size:1.7rem}
-.card b{font-family:var(--display);font-size:.92rem;line-height:1.15}
-.card .stats{font-size:.75rem;font-weight:800;display:flex;flex-wrap:wrap;gap:4px 8px}
-.card .why{font-size:.72rem;color:var(--warn);font-weight:700}
-.card .desc{font-size:.76rem;color:var(--muted);line-height:1.35}
+.card{background:var(--navy-2);border:2px solid var(--navy-3);border-radius:6px;padding:8px;text-align:left;display:flex;flex-direction:column;gap:4px;min-width:0;box-shadow:var(--bevel)}
+.card .thumb{height:64px;display:grid;place-items:center;font-size:2.2rem;background:radial-gradient(ellipse at 50% 80%,rgba(200,85,43,.3),transparent 70%)}
+.card .thumb img{max-height:64px;max-width:100%;object-fit:contain}
+.card b{font-family:var(--display);font-size:1rem;line-height:1.1}
+.card .stats{font-size:.74rem;font-weight:800;display:flex;flex-wrap:wrap;gap:3px 8px}
+.card .why{font-size:.72rem;color:var(--warn);font-weight:800}
+.card .desc{font-size:.75rem;color:var(--muted);line-height:1.35}
 .card.no{opacity:.5}
-.card:not(.no):active{border-color:var(--rust)}
+.card:not(.no):active{border-color:var(--gold)}
+.tagTemp{font-size:.6rem;font-weight:800;letter-spacing:.1em;color:var(--navy);background:var(--muted);padding:1px 5px;border-radius:3px;align-self:flex-start}
 .row{display:flex;gap:8px;flex-wrap:wrap}
-.row .btn{flex:1;font-size:.9rem;padding:12px 10px}
+.row .btn{flex:1;font-size:1rem;padding:12px 10px}
 .info{line-height:1.5;margin:0}
 .statline{display:flex;flex-wrap:wrap;gap:6px}
-.statline span{background:var(--panel-2);border-radius:8px;padding:4px 8px;font-size:.8rem;font-weight:800}
+.statline span{background:var(--navy-2);border-radius:4px;padding:4px 8px;font-size:.8rem;font-weight:800}
 .event .big{font-size:3rem}
-.opt{background:var(--panel-2);border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;font-weight:700;line-height:1.35}
-.opt:active{border-color:var(--rust)}
-.opt small{display:block;color:var(--muted);font-weight:600;font-size:.78rem;margin-top:2px}
-.opt.right{border-color:var(--good);background:#1f3a24}
-.opt.wrong{border-color:var(--bad);background:#3a1f1c}
-.sec{font-family:var(--display);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dust);margin-top:4px}
+.opt{background:var(--navy-2);border:2px solid var(--navy-3);border-radius:6px;padding:12px 14px;text-align:left;font-weight:800;line-height:1.35;box-shadow:var(--bevel)}
+.opt:active{border-color:var(--gold)}
+.opt small{display:block;color:var(--muted);font-weight:700;font-size:.78rem;margin-top:2px}
+.opt.right{border-color:var(--good);background:#1f3a2c}
+.opt.wrong{border-color:var(--bad);background:#3a1f28}
+.sec{font-family:var(--display);font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-top:4px}
 .mlist{display:flex;flex-direction:column;gap:6px}
-.mlist div{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;line-height:1.35;padding:6px 8px;border-radius:10px;background:var(--panel-2)}
+.mlist div{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;line-height:1.35;padding:6px 8px;border-radius:5px;background:var(--navy-2)}
 .mlist div.done{opacity:.6}
-.mlist div.cur{outline:2px solid var(--rust)}
+.mlist div.cur{outline:2px solid var(--gold)}
 .log{display:flex;flex-direction:column;gap:4px;font-size:.84rem;line-height:1.4;color:var(--muted)}
 .log b{color:var(--ink)}
-.toast{position:fixed;left:50%;top:42%;transform:translateX(-50%);z-index:30;background:var(--panel-2);border:2px solid var(--dust);
-  border-radius:14px;padding:10px 16px;font-weight:800;max-width:min(90vw,360px);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fade .2s}
-.solflash{position:fixed;inset:0;z-index:15;display:grid;place-items:center;pointer-events:none;font-family:var(--display);font-weight:700;font-size:3rem;
-  color:var(--dust);text-shadow:0 0 30px var(--rust);animation:flash 1s forwards}
+.toast{position:fixed;left:50%;top:44%;transform:translateX(-50%);z-index:30;background:var(--navy);border:2px solid var(--gold);
+  border-radius:6px;padding:10px 16px;font-weight:800;max-width:min(90vw,360px);text-align:center;box-shadow:0 6px 0 #0d1022,0 10px 30px rgba(0,0,0,.5);animation:fade .2s}
+.solflash{position:fixed;inset:0;z-index:15;display:grid;place-items:center;pointer-events:none;font-family:var(--display);font-weight:700;font-size:3.4rem;
+  color:var(--cream);text-shadow:0 4px 0 var(--navy),0 0 30px var(--rust);animation:flash 1s forwards}
 @keyframes flash{0%{opacity:0;transform:scale(.8)}25%{opacity:1;transform:scale(1)}100%{opacity:0}}
-#end h1{font-size:2.2rem}
+#end h1{font-size:2.3rem}
 .endStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(340px,100%)}
-.endStats div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}
-.endStats b{display:block;font-family:var(--display);font-size:1.5rem}
+.endStats div{background:var(--navy);border:2px solid var(--navy-3);border-radius:6px;padding:10px}
+.endStats b{display:block;font-family:var(--display);font-size:1.6rem}
 .endStats span{font-size:.75rem;color:var(--muted)}
-@media (max-height:640px){.res .chip .k{display:none}.mission{padding:5px 8px}.mission .txt small{display:none}}
+@media (max-height:680px){.res .chip .k{display:none}.mission .txt small{display:none}.heroImg{width:min(260px,70vw)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -186,7 +183,8 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 
 <!-- Portada -->
 <section class="screen gutter" id="title">
-  <div class="logo"><span class="y">PROYECTO ARES · 2050</span><span class="n">MISIÓN<br>MARTE</span></div>
+  <img class="heroImg" src="assets/base.png" alt="Base central de la colonia">
+  <div class="logo"><span class="y">PROYECTO ARES · 2050</span><span class="n">MISIÓN MARTE</span></div>
   <p class="tag">Dirige a la primera tripulación y convierte un cráter rojo y helado en el nuevo hogar de la humanidad.</p>
   <div class="stack">
     <button class="btn" id="bNew">Nueva misión</button>
@@ -225,17 +223,29 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 <section class="screen" id="game" hidden>
   <header class="hud gutter">
     <div class="hudTop">
-      <div class="sol" id="solLbl">SOL 1<small>DÍA MARCIANO</small></div>
+      <div class="sol" id="solLbl">SOL 1</div>
       <div class="status" id="statusPills"></div>
     </div>
     <div class="res" id="res"></div>
     <div class="meters" id="meters"></div>
     <button class="mission" id="missionBtn"></button>
   </header>
-  <main class="mapwrap gutter" id="mapwrap"><div class="map" id="map"></div></main>
-  <footer class="actions gutter">
+  <main class="mapwrap" id="mapwrap">
+    <canvas id="mapCanvas" aria-label="Mapa isométrico del cráter. Arrastra para moverte y pellizca para hacer zoom."></canvas>
+    <div class="mapTools">
+      <button class="panel" id="zIn" aria-label="Acercar">+</button>
+      <button class="panel" id="zOut" aria-label="Alejar">−</button>
+      <button class="panel" id="zHome" aria-label="Centrar en la base" style="font-size:1.1rem">⌂</button>
+    </div>
+    <div class="placeBar gutter" id="placeBar" hidden>
+      <div class="panel"><img id="pbImg" alt=""><div class="msg" id="pbMsg"></div></div>
+      <div class="row"><button class="btn ghost" id="pbCancel">✕ Cancelar</button><button class="btn" id="pbOk">✓ Construir</button></div>
+    </div>
+  </main>
+  <footer class="actions gutter" id="actions">
     <button class="iconBtn" id="bLog">📜<small>Diario</small></button>
-    <button class="btn next" id="bNext">Siguiente sol ▸</button>
+    <button class="iconBtn build" id="bBuild">🏗️<small>Construir</small></button>
+    <button class="btn next" id="bNext">Nuevo sol ▸</button>
     <button class="iconBtn" id="bMenu">⚙️<small>Menú</small></button>
   </footer>
 </section>
@@ -259,53 +269,69 @@ const $=s=>document.querySelector(s);
 const rnd=n=>Math.floor(Math.random()*n);
 const pick=a=>a[rnd(a.length)];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const COLS=6, ROWS=8, SAVE='ares2050-save';
+const N=30, TW=64, TH=32, SAVE='ares2050-iso';
+const OX=N*TW/2+TW/2, OY=TH;                 // origen del mapa en el lienzo del terreno
+const WORLD_W=N*TW+TW, WORLD_H=N*TH+TH*2+24;
 
 /* ================= DATOS ================= */
 const CREW=[
   {id:'ing',face:'👩‍🔧',name:'Ingeniera Vega',role:'Energía',txt:'Los paneles solares dan un 25% más de energía.'},
   {id:'bot',face:'👨‍🌾',name:'Botánico Ruiz',role:'Cultivos',txt:'Los cultivos producen un 25% más de comida.'},
   {id:'med',face:'👩‍⚕️',name:'Doctora Amaya',role:'Salud',txt:'La tripulación se recupera más rápido y sufre menos daño.'},
-  {id:'geo',face:'🧑‍🔬',name:'Geólogo Tanaka',role:'Minerales',txt:'Los robots mineros sacan un 25% más de materiales.'},
+  {id:'geo',face:'🧑‍🔬',name:'Geólogo Tanaka',role:'Minerales',txt:'Los rovers mineros sacan un 25% más de materiales.'},
   {id:'psi',face:'🧑‍🏫',name:'Psicóloga Nkosi',role:'Ánimo',txt:'Ayuda a que el equipo no se sienta solo ni triste.'}
 ];
 
-// e: energía (+ produce, - consume). p: producción por sol. pr: prioridad (menor = se alimenta antes)
+// e: energía (+produce / -consume). p: producción por sol. pr: prioridad eléctrica. un: misión que lo desbloquea.
+// fp: lado de la huella en baldosas. img: sprite. s: escala del sprite sobre la huella. dy: ajuste vertical. ph: marcador temporal.
 const B={
-  lander:{n:'Módulo de aterrizaje',i:'🛖',cost:0,e:-1,cap:4,pr:0,desc:'Vuestra primera casa. Caben 4 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
-  solar:{n:'Panel solar',i:'🔆',cost:10,e:6,un:0,desc:'Da energía con la luz del Sol. Con tormentas de polvo produce mucho menos.',fact:'Las tormentas de polvo pueden durar semanas y tapan el Sol: los paneles solares producen mucho menos.'},
-  moxie:{n:'Planta MOXIE',i:'🫧',cost:15,e:-3,p:{o2:6},pr:1,un:1,desc:'Fabrica oxígeno a partir del CO₂ del aire marciano.',fact:'En 2021 el experimento MOXIE del rover Perseverance fabricó oxígeno con el dióxido de carbono de Marte.'},
-  ice:{n:'Extractor de hielo',i:'🧊',cost:15,e:-3,p:{agua:8},pr:2,un:2,need:'ice',desc:'Derrite y limpia el hielo del subsuelo para obtener agua. Solo sobre hielo.',fact:'Hay hielo bajo el polvo y en los polos de Marte. Para beberlo hay que extraerlo, derretirlo y purificarlo.'},
-  miner:{n:'Robot minero',i:'🤖',cost:12,e:-2,p:{mat:4},pr:8,un:3,rockBonus:true,desc:'Excava regolito para construir. Sobre roca saca el doble.',fact:'El suelo de Marte tiene mucho óxido de hierro: por eso el planeta es rojo. Con él se fabrican ladrillos.'},
-  battery:{n:'Batería',i:'🔋',cost:15,e:0,store:30,pr:0,un:3,desc:'Guarda 30 de energía que sobra para cuando falte.',fact:'Guardar energía es clave para sobrevivir a la noche y a las tormentas de polvo.'},
-  bio:{n:'Bio-laboratorio',i:'🧫',cost:20,e:-3,p:{comida:2},pr:4,un:4,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
-  farm:{n:'Invernadero',i:'🌱',cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:5,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
-  shelter:{n:'Refugio de regolito',i:'⛰️',cost:25,e:0,pr:0,un:6,desc:'Búnker cubierto con 3 a 5 metros de suelo. Protege de la radiación.',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
-  antenna:{n:'Antena',i:'📡',cost:20,e:-1,pr:5,un:7,desc:'Habla con la Tierra y guía a las naves con nuevos colonos.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
-  habitat:{n:'Hábitat',i:'🏠',cost:30,e:-2,cap:6,pr:2,un:8,desc:'Casa para 6 colonos. En un tubo de lava caben 12.',fact:'Los tubos de lava son cuevas que dejaron los volcanes. Protegen de la radiación y de los micrometeoritos.'},
-  gym:{n:'Gimnasio',i:'🏋️',cost:20,e:-2,pr:6,un:8,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
-  repair:{n:'Robot de mantenimiento',i:'🦾',cost:25,e:-2,pr:7,un:9,desc:'Limpia el polvo de los paneles y arregla averías solo.',fact:'Los robots con sensores LiDAR hacen los trabajos más peligrosos fuera de la base.'},
-  reactor:{n:'Microrreactor nuclear',i:'⚛️',cost:60,e:25,un:10,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
-  shield:{n:'Escudo magnético',i:'🧲',cost:90,e:-8,pr:5,un:11,desc:'Crea un paraguas magnético que desvía la radiación del Sol.',fact:'Marte no tiene un campo magnético global como la Tierra. Un escudo artificial desvía las partículas del Sol.'}
+  base:{n:'Base central',i:'🛰️',img:'base',fp:3,s:1.08,dy:.05,cost:0,e:-1,cap:4,pr:0,desc:'El corazón de la colonia: mando, comunicaciones y camas para 4 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
+  corridor:{n:'Pasillo presurizado',i:'🚇',img:'pasillo',fp:1,s:1.1,dy:.14,cost:3,e:0,un:0,desc:'Une los edificios para caminar sin traje. Cada 3 pasillos sube el ánimo.',fact:'Las esclusas y pasillos tienen cortinas electrostáticas que quitan el polvo de los trajes.'},
+  solar:{n:'Panel solar',i:'🔆',img:'solar',fp:1,s:1.45,dy:.08,cost:10,e:6,un:0,desc:'Da energía con la luz del Sol. Con tormentas de polvo produce mucho menos.',fact:'Las tormentas de polvo pueden durar semanas y tapan el Sol: los paneles solares producen mucho menos.'},
+  moxie:{n:'Planta MOXIE',i:'🫧',img:'moxie',fp:1,s:1.25,dy:.1,cost:15,e:-3,p:{o2:6},pr:1,un:1,desc:'Fabrica oxígeno a partir del CO₂ del aire marciano.',fact:'En 2021 el experimento MOXIE del rover Perseverance fabricó oxígeno con el dióxido de carbono de Marte.'},
+  ice:{n:'Extractor de hielo',i:'🧊',img:'extractor',fp:2,s:1.2,dy:.06,cost:15,e:-3,p:{agua:8},pr:2,un:2,need:'ice',desc:'Perfora, derrite y limpia el hielo del subsuelo. Debe tocar hielo.',fact:'Hay hielo bajo el polvo y en los polos de Marte. Para beberlo hay que extraerlo, derretirlo y purificarlo.'},
+  miner:{n:'Rover minero',i:'🚙',img:'rover',fp:1,s:1.3,dy:.08,cost:12,e:-2,p:{mat:4},pr:8,un:3,desc:'Recoge regolito para construir. Sobre roca saca el doble.',fact:'El suelo de Marte tiene mucho óxido de hierro: por eso el planeta es rojo. Con él se fabrican ladrillos.'},
+  battery:{n:'Batería',i:'🔋',ph:'🔋',fp:1,cost:15,e:0,store:30,pr:0,un:3,desc:'Guarda 30 de energía que sobra para cuando falte.',fact:'Guardar energía es clave para sobrevivir a la noche y a las tormentas de polvo.'},
+  bio:{n:'Bio-laboratorio',i:'🧫',img:'laboratorio',fp:2,s:1.02,dy:.04,cost:20,e:-3,p:{comida:2},pr:4,un:4,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
+  farm:{n:'Invernadero',i:'🌱',img:'invernadero',fp:2,s:1.12,dy:.05,cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:5,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
+  shelter:{n:'Refugio de regolito',i:'⛰️',img:'refugio',fp:2,s:1.3,dy:.14,cost:25,e:0,pr:0,un:6,crater:true,desc:'Búnker medio enterrado. Protege de la radiación. ¡Se puede construir dentro de un cráter!',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
+  antenna:{n:'Antena',i:'📡',ph:'📡',fp:1,cost:20,e:-1,pr:5,un:7,desc:'Habla con la Tierra y guía a las naves con nuevos colonos.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
+  habitat:{n:'Hábitat',i:'🏠',img:'habitat',inside:'habitat_interior',fp:2,s:1.12,dy:.05,cost:30,e:-2,cap:6,pr:2,un:8,desc:'Casa para 6 colonos. Sobre un tubo de lava caben 12.',fact:'Los tubos de lava son cuevas que dejaron los volcanes. Protegen de la radiación y de los micrometeoritos.'},
+  mess:{n:'Comedor',i:'🍽️',img:'comedor',fp:2,s:1.1,dy:.05,cost:20,e:-2,pr:6,un:8,desc:'Cocina y sala común. Comer juntos sube mucho el ánimo.',fact:'La convivencia en espacios pequeños es difícil. Compartir comidas ayuda a trabajar en equipo.'},
+  gym:{n:'Gimnasio',i:'🏋️',ph:'🏋️',fp:2,cost:20,e:-2,pr:6,un:8,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
+  repair:{n:'Taller de robots',i:'🦾',img:'taller',fp:2,s:1.02,dy:.04,cost:25,e:-2,pr:7,un:9,desc:'Sus robots limpian el polvo de los paneles y arreglan averías solos.',fact:'Los robots con sensores LiDAR hacen los trabajos más peligrosos fuera de la base.'},
+  vfarm:{n:'Granja vertical',i:'🥬',img:'granja',fp:2,s:1.08,dy:.05,cost:45,e:-6,p:{comida:16,agua:-3},pr:3,un:9,req:'farm',desc:'Torres hidropónicas con luz LED. Mucha comida en poco espacio.',fact:'Las granjas verticales reciclan casi toda el agua y pueden cultivar con luz LED día y noche.'},
+  reactor:{n:'Microrreactor nuclear',i:'⚛️',ph:'⚛️',fp:2,cost:60,e:25,un:10,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
+  shield:{n:'Escudo magnético',i:'🧲',ph:'🧲',fp:2,cost:90,e:-8,pr:5,un:11,desc:'Crea un paraguas magnético que desvía la radiación del Sol.',fact:'Marte no tiene un campo magnético global como la Tierra. Un escudo artificial desvía las partículas del Sol.'}
 };
-const BUILD_ORDER=['solar','moxie','ice','miner','battery','bio','farm','shelter','antenna','habitat','gym','repair','reactor','shield'];
+const BUILD_ORDER=['solar','corridor','moxie','ice','miner','battery','bio','farm','shelter','antenna','habitat','mess','gym','repair','vfarm','reactor','shield'];
+const MANIFEST=[
+  'Kevlar y Vectran para cúpulas inflables y juntas herméticas.',
+  'Películas de ETFE y aerogeles de sílice: aislamiento transparente.',
+  'Aleaciones de titanio-aluminio para tanques de oxígeno y metano.',
+  'Celdas solares de perovskita-silicio, ligeras y flexibles.',
+  'Procesadores protegidos contra la radiación para los robots.',
+  'Semillas y cepas de microorganismos liofilizados del “Arca”.',
+  'Catalizadores de rutenio y níquel para fabricar combustible.',
+  'Fibra óptica para llevar la luz del Sol al subsuelo.'
+];
 
 const TERR={
-  soil:{n:'Suelo marciano',g:'',t:'Polvo rojo y rocas. Aquí puedes construir casi todo.'},
+  soil:{n:'Suelo marciano',g:'🟤',t:'Polvo rojo y rocas. Aquí puedes construir casi todo.'},
   ice:{n:'Hielo subterráneo',g:'❄️',t:'Bajo el polvo hay hielo. ¡Perfecto para un extractor de agua!'},
-  rock:{n:'Roca rica en minerales',g:'🪨',t:'Un robot minero aquí saca el doble de materiales.'},
-  tube:{n:'Tubo de lava',g:'🕳️',t:'Una cueva volcánica. Un hábitat aquí aloja al doble de colonos.'},
-  crater:{n:'Cráter pequeño',g:'',t:'Un agujero de un meteorito. Aquí no se puede construir.'}
+  rock:{n:'Roca con minerales',g:'🪨',t:'Un rover minero aquí saca el doble de materiales.'},
+  tube:{n:'Tubo de lava',g:'🕳️',t:'Una cueva volcánica. Un hábitat encima aloja al doble de colonos.'},
+  crater:{n:'Cráter',g:'🌑',t:'Un agujero de meteorito. Solo cabe un refugio de regolito.'}
 };
 
 const MISSIONS=[
-  {t:'Construye un segundo panel solar',h:'Toca una casilla vacía y elige Panel solar.',ok:s=>count(s,'solar')>=2,r:10},
+  {t:'Construye un segundo panel solar',h:'Pulsa Construir, elige Panel solar y colócalo en el mapa.',ok:s=>count(s,'solar')>=2,r:10},
   {t:'Fabrica oxígeno con una planta MOXIE',h:'Sin oxígeno nadie puede respirar. ¡Es urgente!',ok:s=>count(s,'moxie')>=1,r:10},
-  {t:'Saca agua del hielo',h:'Pon un extractor sobre una casilla azul con hielo.',ok:s=>count(s,'ice')>=1,r:10},
-  {t:'Pon a trabajar un robot minero',h:'Los materiales sirven para construir. Mejor sobre roca.',ok:s=>count(s,'miner')>=1,r:10},
+  {t:'Saca agua del hielo',h:'El extractor debe tocar alguna baldosa azul de hielo.',ok:s=>count(s,'ice')>=1,r:10},
+  {t:'Pon a trabajar un rover minero',h:'Los materiales sirven para construir. Mejor sobre roca gris.',ok:s=>count(s,'miner')>=1,r:10},
   {t:'Limpia el suelo con un bio-laboratorio',h:'Las bacterias quitan los percloratos tóxicos.',ok:s=>count(s,'bio')>=1,r:15},
   {t:'Cultiva comida en un invernadero',h:'La comida que trajisteis de la Tierra se acabará.',ok:s=>count(s,'farm')>=1,r:15},
-  {t:'Construye un refugio contra la radiación',h:'Las tormentas solares son peligrosas.',ok:s=>count(s,'shelter')>=1,r:15},
+  {t:'Construye un refugio contra la radiación',h:'Las tormentas solares son peligrosas. Cabe en un cráter.',ok:s=>count(s,'shelter')>=1,r:15},
   {t:'Instala una antena para llamar a más colonos',h:'Cada 6 soles llegará una nave si tienes antena.',ok:s=>count(s,'antenna')>=1,r:15},
   {t:'Llega a 10 colonos',h:'Construye hábitats para que tengan dónde vivir.',ok:s=>s.pop>=10,r:25},
   {t:'Activa un microrreactor nuclear',h:'Energía constante, haya tormenta o no.',ok:s=>count(s,'reactor')>=1,r:30},
@@ -332,7 +358,7 @@ const QUIZ=[
 const STORY=[
   {art:'earth',t:'Año 2050. La Tierra está en apuros: hace demasiado calor, el aire está sucio y cada vez hay menos recursos.'},
   {art:'mars',t:'La humanidad necesita un nuevo hogar. Las miradas apuntan al planeta rojo: Marte.'},
-  {art:'robots',t:'Durante años, robots y bacterias especiales han preparado un cráter con hielo para recibir a las primeras personas.'},
+  {art:'robots',t:'Durante años, rovers y bacterias especiales han preparado un gran cráter con hielo para recibir a las primeras personas.'},
   {art:'ship',t:'Ahora te toca a ti. Eres el comandante de la tripulación que fundará la primera colonia en Marte.'}
 ];
 const TRAVEL_FACTS=[
@@ -343,54 +369,115 @@ const TRAVEL_FACTS=[
   'Los mensajes a la Tierra tardan cada vez más en llegar mientras nos alejamos.'
 ];
 
+/* ================= SPRITES ================= */
+const IMG={};
+const IMG_NAMES=['base','pasillo','cruce','solar','moxie','extractor','rover','laboratorio','invernadero','refugio','habitat','habitat_interior','comedor','taller','granja','cajas'];
+const imgSrc=n=>`assets/${n}.png`;
+function mkSprite(src){
+  const sp={ok:false,w:1,h:1,img:null,dim:null,mask:null};
+  const im=new Image();im.onload=()=>{sp.img=im;sp.w=im.naturalWidth;sp.h=im.naturalHeight;sp.ok=true;bake(sp)};im.src=src;return sp;
+}
+function bake(sp){ // versión oscurecida (apagado) + máscara alfa para tocar con precisión
+  const c=document.createElement('canvas');c.width=sp.w;c.height=sp.h;const x=c.getContext('2d');
+  x.drawImage(sp.img,0,0);
+  try{const d=x.getImageData(0,0,sp.w,sp.h).data;sp.mask=new Uint8Array(sp.w*sp.h);for(let i=0;i<sp.w*sp.h;i++)sp.mask[i]=d[i*4+3]>40?1:0}catch(e){sp.mask=null}
+  x.globalCompositeOperation='source-atop';x.fillStyle='rgba(16,18,40,.62)';x.fillRect(0,0,sp.w,sp.h);sp.dim=c;
+}
+IMG_NAMES.forEach(n=>IMG[n]=mkSprite(imgSrc(n)));
+// Marcadores temporales: caja isométrica con los colores de los módulos y el icono del edificio.
+function placeholder(emoji,fp){
+  const k=2,w=fp*TW*k,hh=Math.round(fp*20*k),h=w/2+hh+10*k;
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+  const top=10*k, mid=top+w/4, bot=top+w/2;
+  const P=(pts,f)=>{x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.fillStyle=f;x.fill()};
+  const L=[0,mid],R=[w,mid],T=[w/2,top],D=[w/2,bot];
+  P([L,D,[D[0],D[1]+hh],[L[0],L[1]+hh]],'#cfc9ba');
+  P([D,R,[R[0],R[1]+hh],[D[0],D[1]+hh]],'#a7a193');
+  P([[L[0],L[1]+hh*.7],[D[0],D[1]+hh*.7],[D[0],D[1]+hh],[L[0],L[1]+hh]],'#2e3866');
+  P([[D[0],D[1]+hh*.7],[R[0],R[1]+hh*.7],[R[0],R[1]+hh],[D[0],D[1]+hh]],'#222a4c');
+  P([T,R,D,L],'#ebe6d8');
+  x.strokeStyle='#1a1f3a';x.lineWidth=2*k;x.beginPath();x.moveTo(L[0],L[1]);x.lineTo(T[0],T[1]);x.lineTo(R[0],R[1]);x.lineTo(R[0],R[1]+hh);x.lineTo(D[0],D[1]+hh);x.lineTo(L[0],L[1]+hh);x.closePath();x.stroke();
+  x.beginPath();x.moveTo(L[0],L[1]);x.lineTo(D[0],D[1]);x.lineTo(R[0],R[1]);x.moveTo(D[0],D[1]);x.lineTo(D[0],D[1]+hh);x.stroke();
+  x.font=`${Math.round(w*.26)}px serif`;x.textAlign='center';x.textBaseline='middle';x.fillText(emoji,w/2,mid-2*k);
+  x.setLineDash([4*k,3*k]);x.strokeStyle='rgba(216,171,76,.9)';x.lineWidth=k;x.strokeRect(k,k,w-2*k,h-2*k);
+  const sp={ok:true,w,h,img:c,ph:true};bake(sp);sp.url=c.toDataURL();return sp;
+}
+const SPR={};
+for(const k in B){const b=B[k];SPR[k]=b.ph?placeholder(b.ph,b.fp):IMG[b.img]}
+const thumb=k=>{const b=B[k];return b.ph?SPR[k].url:imgSrc(b.img)};
+
 /* ================= ESTADO ================= */
-let S=null;          // partida
-let sel=-1;          // casilla seleccionada
-let pickedCrew=[];
-let sound=true;
-function count(s,t){return s.tiles.filter(x=>x.b===t).length}
-function has(s,id){return s.crew.includes(id)}
+let S=null, pickedCrew=[], sound=true;
+let selB=-1;                 // edificio seleccionado
+let placing=null;            // {t,i,j}
+const count=(s,t)=>s.blds.filter(b=>b.t===t).length;
+const has=(s,id)=>s.crew.includes(id);
+const idx=(i,j)=>j*N+i;
+const inMap=(i,j)=>i>=0&&j>=0&&i<N&&j<N;
+
+function hash(i,j){let h=(i*374761393+j*668265263)^0x5bd1e995;h=Math.imul(h^(h>>>13),1274126177);return ((h^(h>>>16))>>>0)/4294967296}
 
 function newGame(name,crew){
-  const tiles=[];
-  for(let i=0;i<COLS*ROWS;i++)tiles.push({t:'soil',b:null,on:true,broken:false});
-  const L=3*COLS+2; // módulo de aterrizaje
-  const free=()=>{let i;do{i=rnd(COLS*ROWS)}while(tiles[i].t!=='soil'||Math.abs(i-L)<=1||Math.abs(i-L-COLS)<=1||Math.abs(i-L+COLS)<=1);return i};
-  // hielo cerca garantizado
-  tiles[L+COLS*2-1].t='ice';
-  for(let k=0;k<4;k++)tiles[free()].t='ice';
-  tiles[L-COLS*2+2].t='rock';
-  for(let k=0;k<4;k++)tiles[free()].t='rock';
-  for(let k=0;k<2;k++)tiles[free()].t='tube';
-  for(let k=0;k<3;k++)tiles[free()].t='crater';
-  tiles[L].b='lander';tiles[L+1].b='solar';tiles[L+1].t='soil';
-  return {v:1,name:name||'Comandante',crew,sol:1,pop:4,o2:22,agua:24,comida:32,mat:45,bat:10,salud:90,moral:70,
-    storm:0,cold:0,dirty:0,mission:0,tiles,log:[],facts:[],won:false,lastShip:1,stats:{built:2,quiz:0,events:0}};
+  const map=new Array(N*N).fill('soil');
+  const B0=[13,13];  // base 3×3 en el centro
+  const near=(i,j,d)=>Math.abs(i-(B0[0]+1))<=d&&Math.abs(j-(B0[1]+1))<=d;
+  const blob=(ci,cj,r,type)=>{for(let j=cj-3;j<=cj+3;j++)for(let i=ci-3;i<=ci+3;i++){if(!inMap(i,j))continue;const d=Math.hypot(i-ci,j-cj)+hash(i,j)*.9;if(d<r&&map[idx(i,j)]==='soil'&&!near(i,j,2))map[idx(i,j)]=type}};
+  const craters=[];
+  for(let k=0;k<9;k++){let x,y,r,tries=0;do{x=2+Math.random()*(N-4);y=2+Math.random()*(N-4);r=1.2+Math.random()*2.2;tries++}
+    while(tries<60&&(Math.hypot(x-14.5,y-14.5)<r+5||craters.some(c=>Math.hypot(c.x-x,c.y-y)<c.r+r+1)));
+    craters.push({x,y,r});
+    for(let j=0;j<N;j++)for(let i=0;i<N;i++)if(Math.hypot(i+.5-x,j+.5-y)<r-.25)map[idx(i,j)]='crater';}
+  blob(14,19,2.2,'ice');blob(19,14,2,'rock');
+  for(let k=0;k<5;k++)blob(rnd(N),rnd(N),1.5+Math.random()*1.8,'ice');
+  for(let k=0;k<6;k++)blob(rnd(N),rnd(N),1.3+Math.random()*1.5,'rock');
+  for(let k=0;k<4;k++){const i=rnd(N-2)+1,j=rnd(N-2)+1;if(map[idx(i,j)]==='soil'&&!near(i,j,3))map[idx(i,j)]='tube'}
+  map[idx(17,11)]='tube';
+  const blds=[{id:1,t:'base',i:B0[0],j:B0[1],on:true,broken:false},{id:2,t:'solar',i:16,j:14,on:true,broken:false}];
+  map[idx(16,14)]='soil';
+  const crates=[[12,17],[18,11],[10,13],[17,17],[13,10]].map(([i,j])=>({i,j}));
+  crates.forEach(c=>{map[idx(c.i,c.j)]='soil'});
+  return {v:2,name:name||'Comandante',crew,sol:1,pop:4,o2:22,agua:24,comida:32,mat:45,bat:10,salud:90,moral:70,
+    storm:0,cold:0,dirty:0,mission:0,map,craters,blds,nextId:3,crates,log:[],facts:[],won:false,lastShip:1,stats:{built:2,quiz:0,events:0}};
+}
+
+/* ---------- ocupación del mapa ---------- */
+const OCC=new Int32Array(N*N);
+function rebuildOcc(){OCC.fill(-1);S.blds.forEach((b,k)=>{const f=B[b.t].fp;for(let j=b.j;j<b.j+f;j++)for(let i=b.i;i<b.i+f;i++)OCC[idx(i,j)]=k})}
+function footprint(b){const f=B[b.t].fp,a=[];for(let j=b.j;j<b.j+f;j++)for(let i=b.i;i<b.i+f;i++)a.push(S.map[idx(i,j)]);return a}
+function validSpot(t,i0,j0){
+  const b=B[t],f=b.fp;let ice=false;
+  for(let j=j0;j<j0+f;j++)for(let i=i0;i<i0+f;i++){
+    if(!inMap(i,j))return {ok:false,why:'Se sale del mapa.'};
+    if(OCC[idx(i,j)]>=0)return {ok:false,why:'Ya hay un edificio aquí.'};
+    if(S.crates.some(c=>c.i===i&&c.j===j))return {ok:false,why:'Recoge primero la caja de carga.'};
+    const tt=S.map[idx(i,j)];
+    if(tt==='crater'&&!b.crater)return {ok:false,why:'No se puede construir dentro de un cráter.'};
+    if(tt==='ice')ice=true;
+  }
+  if(b.need==='ice'&&!ice)return {ok:false,why:'Tiene que tocar al menos una baldosa de hielo ❄️.'};
+  return {ok:true,why:''};
 }
 
 /* ================= SIMULACIÓN ================= */
+const poweredHas=(s,type)=>s.blds.some(b=>b.t===type&&b.on&&!b.broken);
 function solarFactor(s){
   let f=1;
   if(s.storm>0)f*=has(s,'ing')?0.35:0.3;
   if(s.dirty>0)f*=0.5;
-  if(count(s,'repair')&&poweredHas(s,'repair'))f=Math.min(1,f*1.6);
+  if(poweredHas(s,'repair'))f=Math.min(1,f*1.6);
   return f;
-}
-function poweredHas(s,type){ // aproximación (sin recursión): existe uno encendido y sano
-  return s.tiles.some(t=>t.b===type&&t.on&&!t.broken);
 }
 function flows(s){
   const f={eProd:0,eDem:0,heat:0,powered:new Set(),unpowered:new Set(),d:{o2:0,agua:0,comida:0,mat:0},cap:0,batMax:20,heatOk:true};
-  const sf=solarFactor(s);
-  const cons=[];
-  s.tiles.forEach((t,i)=>{
-    if(!t.b)return;const b=B[t.b];
-    if(b.cap&&!t.broken)f.cap+=b.cap*(t.b==='habitat'&&t.t==='tube'?2:1);
+  const sf=solarFactor(s),cons=[];
+  s.blds.forEach((t,k)=>{
+    const b=B[t.t];
+    if(b.cap&&!t.broken)f.cap+=b.cap*(t.t==='habitat'&&footprint(t).includes('tube')?2:1);
     if(b.store&&!t.broken)f.batMax+=b.store;
     if(t.broken||!t.on)return;
-    if(b.e>0){f.eProd+=t.b==='solar'?b.e*sf*(has(s,'ing')?1.25:1):b.e;f.powered.add(i)}
-    else if(b.e===0)f.powered.add(i);
-    else cons.push({i,e:-b.e,pr:b.pr||9});
+    if(b.e>0){f.eProd+=t.t==='solar'?b.e*sf*(has(s,'ing')?1.25:1):b.e;f.powered.add(k)}
+    else if(b.e===0)f.powered.add(k);
+    else cons.push({k,e:-b.e,pr:b.pr??9});
   });
   f.eProd=Math.round(f.eProd*10)/10;
   f.heat=Math.ceil(s.pop*0.25*(s.cold>0?2:1));
@@ -398,22 +485,22 @@ function flows(s){
   if(avail<0){f.heatOk=false;avail=0}
   cons.sort((a,b)=>a.pr-b.pr);
   f.eDem=f.heat;
-  for(const c of cons){f.eDem+=c.e;if(avail>=c.e){avail-=c.e;f.powered.add(c.i)}else f.unpowered.add(c.i)}
+  for(const c of cons){f.eDem+=c.e;if(avail>=c.e){avail-=c.e;f.powered.add(c.k)}else f.unpowered.add(c.k)}
   f.batNext=Math.min(f.batMax,Math.round(avail));
   const mf=s.moral<30?0.75:1;
-  f.powered.forEach(i=>{
-    const t=s.tiles[i],b=B[t.b];if(!b.p)return;
-    for(const k in b.p){
-      let v=b.p[k];
+  f.powered.forEach(k=>{
+    const t=s.blds[k],b=B[t.t];if(!b.p)return;
+    for(const r in b.p){
+      let v=b.p[r];
       if(v>0){
         v*=mf;
-        if(k==='comida'&&t.b==='farm'&&has(s,'bot'))v*=1.25;
-        if(k==='mat'){if(t.t==='rock')v*=2;if(has(s,'geo'))v*=1.25}
+        if(r==='comida'&&(t.t==='farm'||t.t==='vfarm')&&has(s,'bot'))v*=1.25;
+        if(r==='mat'){if(footprint(t).includes('rock'))v*=2;if(has(s,'geo'))v*=1.25}
       }
-      f.d[k]+=v;
+      f.d[r]+=v;
     }
   });
-  for(const k in f.d)f.d[k]=Math.round(f.d[k]);
+  for(const r in f.d)f.d[r]=Math.round(f.d[r]);
   f.d.o2-=s.pop;f.d.agua-=s.pop;f.d.comida-=s.pop;
   return f;
 }
@@ -431,39 +518,32 @@ function nextSol(){
   if(short)s.salud-=dmg*short;
   if(!f.heatOk){s.salud-=has(s,'med')?6:9;msgs.push('No hay energía para la calefacción. ¡Hace muchísimo frío!')}
   if(!short&&f.heatOk)s.salud+=2+(has(s,'med')?2:0);
-  const gym=s.tiles.some((t,i)=>t.b==='gym'&&f.powered.has(i));
-  const shield=s.tiles.some((t,i)=>t.b==='shield'&&f.powered.has(i));
-  if(gym){s.salud+=3;s.moral+=3}
-  if(shield)s.moral+=2;
+  const on=t=>s.blds.some((b,k)=>b.t===t&&f.powered.has(k));
+  if(on('gym')){s.salud+=3;s.moral+=3}
+  if(on('mess'))s.moral+=3;
+  if(on('shield'))s.moral+=2;
+  s.moral+=Math.min(3,Math.floor(count(s,'corridor')/3));
   if(has(s,'psi'))s.moral+=2;
   if(s.pop>f.cap){s.moral-=6;msgs.push('Hay más colonos que camas. El equipo está incómodo.')}
   if(s.salud<40)s.moral-=3;
   s.moral+=(60-s.moral)*0.06;
   s.salud=clamp(Math.round(s.salud),0,100);s.moral=clamp(Math.round(s.moral),0,100);
   if(f.unpowered.size)msgs.push(`${f.unpowered.size} edificio(s) se quedaron sin energía.`);
-  // tiempo
   if(s.storm>0){s.storm--;if(!s.storm)msgs.push('La tormenta de polvo ha terminado. ¡Vuelve el Sol!')}
   if(s.cold>0)s.cold--;
   if(s.dirty>0)s.dirty--;
-  if(count(s,'repair')&&poweredHas(s,'repair')){
-    const br=s.tiles.find(t=>t.broken);if(br){br.broken=false;msgs.push('El robot de mantenimiento ha arreglado una avería.')}
-  }
+  if(poweredHas(s,'repair')){const br=s.blds.find(t=>t.broken);if(br){br.broken=false;msgs.push('Los robots del taller han arreglado una avería.')}}
   s.sol++;
   addLog(`Sol ${s.sol}: `+(msgs.length?msgs.join(' '):'Todo funciona con normalidad.'));
-  flashSol();
-  floatDeltas(before);
+  flashSol();floatDeltas(before);
   if(short||!f.heatOk)beep(180,.25,'sawtooth');else beep(520,.08);
-  // misiones
   checkMissions();
-  // derrota
   if(s.salud<=0){save();return endGame(false)}
-  // eventos
   const q=[];
-  if(count(s,'antenna')&&poweredHas(s,'antenna')&&s.sol-s.lastShip>=6){s.lastShip=s.sol;q.push(evShip())}
+  if(poweredHas(s,'antenna')&&s.sol-s.lastShip>=6){s.lastShip=s.sol;q.push(evShip())}
   else if(s.sol>=3&&Math.random()<0.4){const e=randomEvent();if(e)q.push(e)}
   if(msgs.length&&!q.length&&(short||!f.heatOk))toast(msgs[0]);
-  save();render();
-  runQueue(q);
+  save();render();runQueue(q);
 }
 
 function checkMissions(){
@@ -477,12 +557,17 @@ function checkMissions(){
 }
 
 /* ================= EVENTOS ================= */
+function dropCrates(n){
+  const b=S.blds.find(b=>b.t==='base')||S.blds[0];let tries=0;
+  while(n>0&&tries<200){tries++;const i=b.i+1+rnd(13)-6,j=b.j+1+rnd(13)-6;
+    if(inMap(i,j)&&OCC[idx(i,j)]<0&&S.map[idx(i,j)]!=='crater'&&!S.crates.some(c=>c.i===i&&c.j===j)){S.crates.push({i,j});n--}}
+}
 function evShip(){
   const n=2+rnd(3),space=flows(S).cap-S.pop;
-  return {i:'🚀',t:'¡Llega una nave de la Tierra!',x:`Una nave trae a ${n} nuevos colonos con provisiones. Tienes sitio para ${Math.max(0,space)} personas más.`,
+  return {i:'🚀',t:'¡Llega una nave de la Tierra!',x:`Una nave trae a ${n} nuevos colonos y cajas de carga. Tienes sitio para ${Math.max(0,space)} personas más.`,
     fact:'En 2050 las naves de carga pueden aterrizar con más de 150 toneladas gracias a la retropropulsión.',
     o:[
-      {l:`Recibir a los ${n} colonos`,s:space>=n?'Traen comida y materiales.':'Ojo: no hay camas para todos.',fx:s=>{s.pop+=n;s.comida+=n*5;s.mat+=n*4;return `¡Bienvenidos! Ya sois ${s.pop} en Marte. Traen ${n*5} de comida y ${n*4} materiales.`}},
+      {l:`Recibir a los ${n} colonos`,s:space>=n?'Traen comida y cajas de carga.':'Ojo: no hay camas para todos.',fx:s=>{s.pop+=n;s.comida+=n*5;dropCrates(2);return `¡Bienvenidos! Ya sois ${s.pop} en Marte. Traen ${n*5} de comida y han dejado 2 cajas de carga en el mapa.`}},
       {l:'Pedirles que esperen al próximo viaje',s:'Así preparas más hábitats.',fx:s=>{s.lastShip=s.sol-3;return 'La nave volverá en unos soles. Aprovecha para construir.'}}
     ]};
 }
@@ -491,7 +576,7 @@ const EVENTS=[
     fact:'Las tormentas de polvo en Marte pueden cubrir todo el planeta y durar semanas o meses.',
     o:[{l:'Apagar lo que no sea imprescindible',s:'Toca los edificios para encender o apagar.',fx:s=>{s.storm=3+rnd(3);return `La tormenta durará unos ${s.storm} soles. Consejo: las baterías y el reactor nuclear ayudan mucho.`}}]})},
   {w:2,c:s=>s.sol>5,mk:()=>{
-    const safe=count(S,'shelter')>0, shield=S.tiles.some(t=>t.b==='shield'&&t.on&&!t.broken);
+    const safe=count(S,'shelter')>0, shield=poweredHas(S,'shield');
     if(shield)return {i:'☀️',t:'Tormenta solar',x:'El Sol ha lanzado una ola de partículas, pero el escudo magnético la desvía. ¡Nadie corre peligro!',fact:'Un escudo magnético crea un “paraguas” que desvía las partículas cargadas del viento solar.',o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
     return {i:'☢️',t:'¡Alerta de tormenta solar!',x:'El Sol ha lanzado una ola de radiación peligrosa que llegará pronto.',
       fact:'Marte no tiene un campo magnético global, así que la radiación del Sol llega hasta el suelo.',
@@ -499,7 +584,7 @@ const EVENTS=[
         {l:'Todos al refugio de regolito',s:'Seguros, pero hoy no se trabaja.',fx:s=>{s.mat=Math.max(0,s.mat-5);return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}},
         {l:'Seguir trabajando fuera',s:'Arriesgado...',fx:s=>{s.salud-=has(s,'med')?14:20;return 'La radiación ha afectado a la tripulación. La salud baja.'}}
       ]:[
-        {l:'Esconderse dentro del módulo',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=has(s,'med')?10:15;return 'Las paredes del módulo protegen poco. Necesitas un refugio de regolito.'}}
+        {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=has(s,'med')?10:15;return 'Las paredes de la base protegen poco. Necesitas un refugio de regolito.'}}
       ]}}},
   {w:2,c:()=>true,mk:()=>({i:'💨',t:'¡Fuga de aire!',x:'Una junta de una esclusa pierde aire. Un mensaje a la Tierra tardaría unos 20 minutos en llegar y otros 20 en volver.',
     fact:'Por el retraso en las comunicaciones, los astronautas deben saber resolver problemas sin ayuda de la Tierra.',
@@ -514,7 +599,7 @@ const EVENTS=[
       {l:'Hacer una noche de juegos en equipo',s:'Gasta 3 de comida extra.',fx:s=>{s.comida=Math.max(0,s.comida-3);s.moral+=8;return '¡Qué risas! El equipo está más unido.'}},
       {l:'Seguir trabajando como siempre',fx:s=>{s.moral-=12;return 'El equipo está más triste. Cuidar las emociones también es importante.'}}
     ]})},
-  {w:2,c:s=>s.tiles.some(t=>t.b==='solar'),mk:()=>({i:'🟫',t:'Polvo sobre los paneles',x:'El polvo fino se ha pegado a los paneles solares y producen la mitad.',
+  {w:2,c:s=>s.blds.some(t=>t.t==='solar'),mk:()=>({i:'🟫',t:'Polvo sobre los paneles',x:'El polvo fino se ha pegado a los paneles solares y producen la mitad.',
     fact:'El polvo marciano se acumula sobre los equipos y afecta su funcionamiento.',
     o:[
       {l:'Salir a limpiarlos con un paseo espacial',s:'Un poco de cansancio y radiación.',fx:s=>{s.salud-=4;return 'Paneles limpios. ¡Buen trabajo!'}},
@@ -523,15 +608,16 @@ const EVENTS=[
   {w:2,c:s=>!s.cold,mk:()=>({i:'🥶',t:'Ola de frío extremo',x:'Esta noche la temperatura bajará muchísimo. La calefacción gastará el doble de energía durante 2 soles.',
     fact:'En Marte la temperatura puede bajar hasta unos -153 °C. Sin calefacción no se puede sobrevivir.',
     o:[{l:'Entendido, revisaré la energía',fx:s=>{s.cold=2;return 'Comprueba que produces suficiente energía para la calefacción.'}}]})},
-  {w:2,c:s=>s.tiles.filter(t=>t.b&&t.b!=='lander').length>2,mk:()=>{
-    const list=S.tiles.map((t,i)=>i).filter(i=>S.tiles[i].b&&S.tiles[i].b!=='lander'&&!S.tiles[i].broken);const i=pick(list);const nm=B[S.tiles[i].b].n;
+  {w:2,c:s=>s.blds.filter(t=>t.t!=='base'&&t.t!=='corridor').length>2,mk:()=>{
+    const list=S.blds.filter(b=>!['base','corridor'].includes(b.t)&&!b.broken);if(!list.length)return null;const tb=pick(list),id=tb.id,nm=B[tb.t].n;
     return {i:'☄️',t:'¡Micrometeorito!',x:`Una pequeña roca del espacio ha golpeado tu ${nm}. Está averiado.`,
       fact:'La atmósfera de Marte es tan fina que muchas rocas pequeñas del espacio llegan al suelo.',
-      o:[{l:'Vaya... habrá que repararlo',s:'Tócalo en el mapa para arreglarlo.',fx:s=>{s.tiles[i].broken=true;sel=-1;return `El ${nm} no funciona hasta que lo repares (o lo haga un robot de mantenimiento).`}}]}}},
-  {w:1,c:s=>s.tiles.some(t=>t.t==='soil'&&!t.b),mk:()=>({i:'🔭',t:'¡El rover encontró hielo!',x:'Un dron ha detectado un nuevo depósito de hielo enterrado.',
+      o:[{l:'Vaya... habrá que repararlo',s:'Tócalo en el mapa para arreglarlo.',fx:s=>{const b=s.blds.find(b=>b.id===id);if(b){b.broken=true;focusTile(b.i,b.j)}return `El ${nm} no funciona hasta que lo repares (o lo hagan los robots del taller).`}}]}}},
+  {w:1,c:()=>true,mk:()=>({i:'🔭',t:'¡Un dron encontró hielo!',x:'Un dron ha detectado un nuevo depósito de hielo enterrado cerca de la base.',
     fact:'Los glaciares de Marte están cubiertos de polvo y roca, que impiden que el hielo desaparezca.',
-    o:[{l:'¡Marcarlo en el mapa!',fx:s=>{const l=s.tiles.map((t,i)=>i).filter(i=>s.tiles[i].t==='soil'&&!s.tiles[i].b);const i=pick(l);s.tiles[i].t='ice';return 'Una nueva casilla de hielo aparece en tu cráter.'}}]})},
-  {w:1,c:()=>true,mk:()=>({i:'💎',t:'Rocas valiosas',x:'Un robot ha encontrado un trozo de roca llena de metales.',
+    o:[{l:'¡Marcarlo en el mapa!',fx:s=>{const b=s.blds.find(b=>b.t==='base')||s.blds[0];let i,j,t=0;do{i=b.i+1+rnd(17)-8;j=b.j+1+rnd(17)-8;t++}while(t<100&&!(inMap(i,j)&&s.map[idx(i,j)]==='soil'&&OCC[idx(i,j)]<0));
+      [[0,0],[1,0],[0,1],[-1,0],[0,-1]].forEach(([a,c])=>{if(inMap(i+a,j+c)&&s.map[idx(i+a,j+c)]==='soil')s.map[idx(i+a,j+c)]='ice'});terrainDirty=true;focusTile(i,j);return 'Ha aparecido un nuevo depósito de hielo azul en tu cráter.'}}]})},
+  {w:1,c:()=>true,mk:()=>({i:'💎',t:'Rocas valiosas',x:'Un rover ha encontrado un trozo de roca llena de metales.',
     fact:'El regolito tiene hierro, aluminio, magnesio, titanio y azufre.',
     o:[{l:'Recoger los minerales',fx:s=>{s.mat+=15;return '+15 materiales para construir.'}}]})},
   {w:4,c:()=>true,mk:()=>{const q=pick(QUIZ);return {quiz:q,i:'🛰️',t:'Pregunta del control de misión',x:q.q}}}
@@ -543,10 +629,170 @@ function randomEvent(){
 }
 function runQueue(q){if(!q.length)return;const e=q.shift();S.stats.events++;showEvent(e,()=>runQueue(q))}
 
-/* ================= RENDER ================= */
+/* ================= MAPA ISOMÉTRICO ================= */
+const mc=$('#mapCanvas'),mx=mc.getContext('2d');
+const cam={x:OX,y:OY+N*TH/2,z:1.2};
+let terrain=null,terrainDirty=true,VW=0,VH=0,DPR=1;
+const tileTop=(i,j)=>[OX+(i-j)*TW/2,OY+(i+j)*TH/2];
+function worldToTile(X,Y){const a=(X-OX)/(TW/2),b=(Y-OY)/(TH/2);return [Math.floor((a+b)/2),Math.floor((b-a)/2)]}
+const toWorld=(x,y)=>[(x-VW/2)/cam.z+cam.x,(y-VH/2)/cam.z+cam.y];
+function resizeMap(){
+  const r=$('#mapwrap').getBoundingClientRect();DPR=Math.min(2,devicePixelRatio||1);
+  VW=r.width;VH=r.height;mc.width=Math.round(VW*DPR);mc.height=Math.round(VH*DPR);
+}
+const PAL={
+  soil:[[176,82,46],[160,72,40],[190,96,56],[146,64,36]],
+  ice:[[206,232,238],[178,214,226],[226,242,246],[150,196,212]],
+  rock:[[128,98,86],[110,84,74],[146,116,100],[92,70,62]],
+  tube:[[150,66,38],[130,58,34],[170,80,48],[120,52,30]],
+  crater:[[120,52,30],[104,44,26],[136,62,36],[92,38,22]]
+};
+const rgb=(c,m=1)=>`rgb(${c[0]*m|0},${c[1]*m|0},${c[2]*m|0})`;
+function diamond(x,X,Y,inset=0){x.beginPath();x.moveTo(X,Y+inset);x.lineTo(X+TW/2-inset*2,Y+TH/2);x.lineTo(X,Y+TH-inset);x.lineTo(X-TW/2+inset*2,Y+TH/2);x.closePath()}
+function buildTerrain(){
+  terrain=terrain||document.createElement('canvas');terrain.width=WORLD_W;terrain.height=WORLD_H;
+  const x=terrain.getContext('2d');x.clearRect(0,0,WORLD_W,WORLD_H);x.imageSmoothingEnabled=false;
+  // canto del "tablero" (borde del cráter)
+  const [lx,ly]=tileTop(0,N),[bx,by]=tileTop(N,N),[rx,ry]=tileTop(N,0);
+  x.fillStyle='#5a2616';x.beginPath();x.moveTo(lx,ly+TH/2);x.lineTo(bx,by);x.lineTo(bx,by+22);x.lineTo(lx,ly+TH/2+22);x.fill();
+  x.fillStyle='#3e190e';x.beginPath();x.moveTo(bx,by);x.lineTo(rx+TW/2,ry+TH/2);x.lineTo(rx+TW/2,ry+TH/2+22);x.lineTo(bx,by+22);x.fill();
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){
+    const t=S.map[idx(i,j)],[X,Y]=tileTop(i,j),pal=PAL[t],h=hash(i,j);
+    const m=.9+.12*Math.sin(i*.35+j*.2)*Math.cos(j*.3-i*.1)+(h-.5)*.06;
+    diamond(x,X,Y);x.fillStyle=rgb(pal[0],m);x.fill();
+    x.save();diamond(x,X,Y);x.clip();
+    for(let k=0;k<18;k++){const a=hash(i*7+k,j*13-k),b=hash(i*3-k,j*5+k*7);x.fillStyle=rgb(pal[1+(k%3)],m);x.fillRect((X-TW/2+a*TW)|0,(Y+b*TH)|0,2+(k%2)*2,2)}
+    if(t==='rock'){for(let k=0;k<3;k++){const a=hash(i+k*31,j),b=hash(i,j+k*17);const px=(X-14+a*28)|0,py=(Y+8+b*14)|0;
+      x.fillStyle='#4d3a33';x.fillRect(px,py+3,8,3);x.fillStyle='#9c8476';x.fillRect(px,py,8,3);x.fillStyle='#c0a898';x.fillRect(px+1,py,3,1)}}
+    if(t==='ice'){x.fillStyle='rgba(255,255,255,.7)';for(let k=0;k<4;k++){const a=hash(i*11+k,j*3),b=hash(i*5,j*9+k);x.fillRect((X-16+a*32)|0,(Y+6+b*20)|0,4,1)}}
+    if(t==='tube'){x.fillStyle='#1a0905';x.beginPath();x.ellipse(X,Y+TH/2+1,13,6,0,0,7);x.fill();x.fillStyle='#d27a4a';x.fillRect(X-13,Y+TH/2+5,26,2);x.fillStyle='#4a1d10';x.fillRect(X-9,Y+TH/2-4,18,3)}
+    x.restore();
+    x.strokeStyle='rgba(0,0,0,.10)';x.lineWidth=1;diamond(x,X,Y);x.stroke();
+    x.strokeStyle='rgba(255,220,180,.06)';x.beginPath();x.moveTo(X-TW/2+1,Y+TH/2);x.lineTo(X,Y+1);x.lineTo(X+TW/2-1,Y+TH/2);x.stroke();
+  }
+  // cráteres: hoyo con pared iluminada y borde elevado
+  for(const c of S.craters){
+    const X=OX+(c.x-c.y)*TW/2,Y=OY+(c.x+c.y)*TH/2,rx=c.r*TW*.707,ry=c.r*TH*.707;
+    x.save();
+    x.fillStyle='rgba(60,22,12,.55)';x.beginPath();x.ellipse(X,Y,rx+6,ry+4,0,0,7);x.fill();
+    const g=x.createRadialGradient(X,Y+ry*.3,ry*.2,X,Y,rx);g.addColorStop(0,'#5e2817');g.addColorStop(.7,'#7a351f');g.addColorStop(1,'#3c170c');
+    x.fillStyle=g;x.beginPath();x.ellipse(X,Y,rx,ry,0,0,7);x.fill();
+    x.fillStyle='rgba(0,0,0,.3)';x.beginPath();x.ellipse(X,Y-ry*.12,rx*.9,ry*.7,0,Math.PI,0);x.fill();
+    x.strokeStyle='#e09a68';x.lineWidth=3;x.beginPath();x.ellipse(X,Y,rx,ry,0,.15,Math.PI-.15);x.stroke();
+    x.strokeStyle='#3a160b';x.lineWidth=3;x.beginPath();x.ellipse(X,Y,rx,ry,0,Math.PI+.1,-.1);x.stroke();
+    for(let k=0;k<14;k++){const a=hash(k,c.x*10|0)*Math.PI*2,rr=.3+hash(c.y*10|0,k)*.55;x.fillStyle=k%2?'#8c4126':'#4a1c0f';x.fillRect((X+Math.cos(a)*rx*rr)|0,(Y+Math.sin(a)*ry*rr)|0,3,2)}
+    x.restore();
+  }
+  terrainDirty=false;
+}
+function spriteBox(b,t,sp){ // rectángulo del sprite en coordenadas de mundo
+  const d=B[t],f=d.fp;sp=sp||SPR[t];
+  const [X]=tileTop(b.i,b.j),Ybot=OY+(b.i+b.j+2*f)*TH/2;
+  const w=f*TW*(d.s||1),h=w*sp.h/sp.w;
+  return {x:X-w/2,y:Ybot+(d.dy||0)*h-h,w,h};
+}
+function corridorShape(b){ // orienta el pasillo según sus vecinos
+  const me=OCC[idx(b.i,b.j)];
+  const nb=(i,j)=>inMap(i,j)&&OCC[idx(i,j)]>=0&&OCC[idx(i,j)]!==me;
+  const ai=nb(b.i-1,b.j)||nb(b.i+1,b.j), aj=nb(b.i,b.j-1)||nb(b.i,b.j+1);
+  if(ai&&aj)return 'cross';return ai?'flip':'straight';
+}
+function drawFoot(i0,j0,f,fill,stroke){
+  for(let j=j0;j<j0+f;j++)for(let i=i0;i<i0+f;i++){if(!inMap(i,j))continue;const [X,Y]=tileTop(i,j);diamond(mx,X,Y,1);mx.fillStyle=fill;mx.fill();if(stroke){mx.strokeStyle=stroke;mx.lineWidth=2/cam.z;mx.stroke()}}
+}
+let flowsCache=null;
+function drawMap(t){
+  if(!S||!VW)return;
+  if(terrainDirty)buildTerrain();
+  const x=mx;x.setTransform(DPR,0,0,DPR,0,0);x.clearRect(0,0,VW,VH);
+  x.save();x.translate(VW/2,VH/2);x.scale(cam.z,cam.z);x.translate(-cam.x,-cam.y);
+  x.imageSmoothingEnabled=cam.z<1;x.drawImage(terrain,0,0);
+  x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';
+  if(selB>=0&&S.blds[selB]){const b=S.blds[selB];drawFoot(b.i,b.j,B[b.t].fp,'rgba(216,171,76,.28)','rgba(246,220,154,.9)')}
+  const f=flowsCache||(flowsCache=flows(S));
+  const items=S.blds.map((b,k)=>({k,b,d:b.i+b.j+2*B[b.t].fp}));
+  S.crates.forEach(c=>items.push({b:c,d:c.i+c.j+2,crate:true}));
+  if(placing){
+    const v=validSpot(placing.t,placing.i,placing.j);
+    drawFoot(placing.i,placing.j,B[placing.t].fp,v.ok?'rgba(134,217,143,.35)':'rgba(255,107,90,.35)',v.ok?'#86d98f':'#ff6b5a');
+    items.push({b:placing,d:placing.i+placing.j+2*B[placing.t].fp+.5,ghost:true});
+  }
+  items.sort((a,b)=>a.d-b.d||a.b.i-b.b.i);
+  for(const it of items){
+    if(it.crate){const sp=IMG.cajas;if(!sp.ok)continue;const [X,Y]=tileTop(it.b.i,it.b.j);const w=TW*.62,h=w*sp.h/sp.w,bob=Math.sin(t*3+it.b.i)*1.5;
+      x.fillStyle='rgba(0,0,0,.25)';x.beginPath();x.ellipse(X,Y+TH*.62,w*.45,w*.18,0,0,7);x.fill();
+      x.drawImage(sp.img,X-w/2,Y+TH*.75-h+bob,w,h);
+      x.fillStyle='rgba(246,220,154,'+(.55+Math.sin(t*4)*.35)+')';x.beginPath();x.arc(X,Y+TH*.75-h-6+bob,3.2,0,7);x.fill();continue}
+    const b=it.b;let sp=SPR[b.t],flip=false;
+    if(b.t==='corridor'&&!it.ghost){const sh=corridorShape(b);if(sh==='cross')sp=IMG.cruce;flip=sh==='flip'}
+    if(!sp||!sp.ok)continue;
+    const r=spriteBox(b,b.t,sp);
+    const off=!it.ghost&&(b.broken||!b.on||f.unpowered.has(it.k));
+    if(it.ghost)x.globalAlpha=.72+Math.sin(t*6)*.12;
+    const src=off&&sp.dim?sp.dim:sp.img;
+    if(flip){x.save();x.translate(r.x+r.w/2,0);x.scale(-1,1);x.drawImage(src,-r.w/2,r.y,r.w,r.h);x.restore()}
+    else x.drawImage(src,r.x,r.y,r.w,r.h);
+    x.globalAlpha=1;
+    if(!it.ghost){
+      let flag='';if(b.broken)flag='🔧';else if(!b.on)flag='⏸️';else if(f.unpowered.has(it.k))flag='⚡';
+      if(flag){const fx=r.x+r.w/2,fy=r.y+4;x.fillStyle='#120d16';x.strokeStyle='#e9e4d6';x.lineWidth=2;x.beginPath();x.arc(fx,fy,11,0,7);x.fill();x.stroke();
+        x.font='13px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(flag,fx,fy+1)}
+    }
+  }
+  x.restore();
+  if(S.storm>0){x.fillStyle='rgba(200,120,60,.22)';x.fillRect(0,0,VW,VH);x.fillStyle='rgba(240,178,122,.45)';
+    for(const d of dust){d.x+=d.v*.004;if(d.x>1.05)d.x=-.05;x.fillRect(d.x*VW,d.y*VH+Math.sin(t+d.y*9)*8,d.r*1.6,d.r)}}
+}
+function clampCam(){cam.z=clamp(cam.z,.45,3);cam.x=clamp(cam.x,0,WORLD_W);cam.y=clamp(cam.y,0,WORLD_H)}
+function focusTile(i,j){const [X,Y]=tileTop(i,j);cam.x=X;cam.y=Y+TH/2}
+function focusBase(){const b=S.blds.find(b=>b.t==='base')||S.blds[0];const [X,Y]=tileTop(b.i+1,b.j+1);cam.x=X;cam.y=Y-10;
+  cam.z=clamp(Math.min(VW/520,VH/400),.8,1.8)}
+function zoomAt(f,sx,sy){const [wx,wy]=toWorld(sx,sy);cam.z=clamp(cam.z*f,.45,3);const [nx,ny]=toWorld(sx,sy);cam.x+=wx-nx;cam.y+=wy-ny;clampCam()}
+
+/* ---------- toques, arrastre y pellizco ---------- */
+const ptrs=new Map();let drag=null,pinch=null;
+const pos=e=>{const r=mc.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}};
+mc.addEventListener('pointerdown',e=>{try{mc.setPointerCapture(e.pointerId)}catch(_){}const p=pos(e);ptrs.set(e.pointerId,p);
+  if(ptrs.size===1)drag={sx:p.x,sy:p.y,cx:cam.x,cy:cam.y,moved:false};
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:cam.z};if(drag)drag.moved=true}});
+mc.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;const p=pos(e);ptrs.set(e.pointerId,p);
+  if(ptrs.size===2&&pinch){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);zoomAt(pinch.z*d/pinch.d/cam.z,(a.x+b.x)/2,(a.y+b.y)/2);return}
+  if(drag&&ptrs.size===1){const dx=p.x-drag.sx,dy=p.y-drag.sy;if(Math.hypot(dx,dy)>8)drag.moved=true;
+    if(drag.moved){cam.x=drag.cx-dx/cam.z;cam.y=drag.cy-dy/cam.z;clampCam();mc.style.cursor='grabbing'}}});
+const endPtr=e=>{if(!ptrs.has(e.pointerId))return;const p=pos(e);ptrs.delete(e.pointerId);
+  if(ptrs.size<2)pinch=null;
+  if(ptrs.size===0){if(drag&&!drag.moved&&e.type==='pointerup')tapMap(p.x,p.y);drag=null;mc.style.cursor='grab'}
+  else if(ptrs.size===1){const q=[...ptrs.values()][0];drag={sx:q.x,sy:q.y,cx:cam.x,cy:cam.y,moved:true}}};
+mc.addEventListener('pointerup',endPtr);mc.addEventListener('pointercancel',endPtr);
+mc.addEventListener('wheel',e=>{e.preventDefault();const p=pos(e);zoomAt(e.deltaY<0?1.12:1/1.12,p.x,p.y)},{passive:false});
+$('#zIn').onclick=()=>zoomAt(1.25,VW/2,VH/2);
+$('#zOut').onclick=()=>zoomAt(1/1.25,VW/2,VH/2);
+$('#zHome').onclick=()=>{focusBase();clampCam()};
+
+function hitBuilding(wx,wy){
+  const order=S.blds.map((b,k)=>({b,k,d:b.i+b.j+2*B[b.t].fp})).sort((a,b)=>b.d-a.d);
+  for(const o of order){if(o.b.t==='corridor')continue;const sp=SPR[o.b.t];if(!sp.ok)continue;const r=spriteBox(o.b,o.b.t);
+    if(wx<r.x||wy<r.y||wx>r.x+r.w||wy>r.y+r.h)continue;
+    if(sp.mask){const px=((wx-r.x)/r.w*sp.w)|0,py=((wy-r.y)/r.h*sp.h)|0;if(!sp.mask[py*sp.w+px])continue}
+    return o.k}
+  return -1;
+}
+function tapMap(sx,sy){
+  if($('#veil'))return;
+  const [wx,wy]=toWorld(sx,sy),[ti,tj]=worldToTile(wx,wy);
+  if(placing){const f=B[placing.t].fp;placing.i=ti-Math.floor((f-1)/2);placing.j=tj-Math.floor((f-1)/2);updatePlaceBar();beep(400,.03);return}
+  const ci=S.crates.findIndex(c=>c.i===ti&&c.j===tj);
+  if(ci>=0)return openCrate(ci);
+  let k=hitBuilding(wx,wy);
+  if(k<0&&inMap(ti,tj))k=OCC[idx(ti,tj)];
+  if(k>=0){selB=k;return openBuilding(k)}
+  if(inMap(ti,tj))openTile(ti,tj);
+}
+
+/* ================= RENDER HUD ================= */
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
 function render(){
-  const s=S,f=flows(s);
+  const s=S,f=flows(s);flowsCache=f;
   $('#solLbl').innerHTML=`SOL ${s.sol}<small>${s.name.toUpperCase()} · ${s.pop} EN MARTE</small>`;
   const pills=[];
   if(s.storm)pills.push(`<span class="pill storm">🌪️ Tormenta ${s.storm}</span>`);
@@ -555,52 +801,30 @@ function render(){
   if(!pills.length)pills.push(`<span class="pill">☀️ Despejado</span>`);
   $('#statusPills').innerHTML=pills.join('');
   const days=k=>f.d[k]<0?Math.floor(s[k]/-f.d[k]):99;
-  const chip=(k,lab,ic,val,dv,low)=>`<div class="chip${low?' low':''}"><span class="k">${ic} ${lab}</span><span class="v">${val}</span><span class="d ${dv>0?'up':dv<0?'down':'flat'}">${dv>0?'+':''}${dv}/sol</span></div>`;
+  const chip=(lab,ic,val,dv,low)=>`<div class="chip${low?' low':''}"><span class="k">${lab}</span><span class="v"><i class="ic">${ic}</i>${val}</span><span class="d ${dv>0?'up':dv<0?'down':'flat'}">${dv>0?'+':''}${dv}/sol</span></div>`;
   const eNet=Math.round((f.eProd-f.eDem)*10)/10;
   $('#res').innerHTML=
-    chip('o2','Oxígeno','🫁',s.o2,f.d.o2,days('o2')<3)+
-    chip('agua','Agua','💧',s.agua,f.d.agua,days('agua')<3)+
-    chip('comida','Comida','🍞',s.comida,f.d.comida,days('comida')<3)+
-    chip('mat','Material','🧱',s.mat,f.d.mat,false)+
-    `<div class="chip${eNet<0&&s.bat<5?' low':''}"><span class="k">⚡ Energía</span><span class="v">${f.eProd}/${f.eDem}</span><span class="d ${eNet>=0?'up':'down'}">${eNet>=0?'sobra':'falta'} ${Math.abs(eNet)}</span></div>`+
-    `<div class="chip"><span class="k">🔋 Batería</span><span class="v">${s.bat}</span><span class="d flat">máx ${f.batMax}</span></div>`+
-    `<div class="chip${s.pop>f.cap?' low':''}"><span class="k">👥 Colonos</span><span class="v">${s.pop}/${f.cap}</span><span class="d flat">camas</span></div>`+
-    `<div class="chip"><span class="k">🔥 Calor</span><span class="v">${f.heat}</span><span class="d ${s.cold?'down':'flat'}">${s.cold?'¡doble!':'energía'}</span></div>`;
+    chip('Oxígeno','🫁',s.o2,f.d.o2,days('o2')<3)+
+    chip('Agua','💧',s.agua,f.d.agua,days('agua')<3)+
+    chip('Comida','🍞',s.comida,f.d.comida,days('comida')<3)+
+    chip('Material','🧱',s.mat,f.d.mat,false)+
+    `<div class="chip${eNet<0&&s.bat<5?' low':''}"><span class="k">Energía</span><span class="v"><i class="ic">⚡</i>${f.eProd}/${f.eDem}</span><span class="d ${eNet>=0?'up':'down'}">${eNet>=0?'sobra':'falta'} ${Math.abs(eNet)}</span></div>`+
+    `<div class="chip"><span class="k">Batería</span><span class="v"><i class="ic">🔋</i>${s.bat}</span><span class="d flat">máx ${f.batMax}</span></div>`+
+    `<div class="chip${s.pop>f.cap?' low':''}"><span class="k">Colonos</span><span class="v"><i class="ic">👥</i>${s.pop}/${f.cap}</span><span class="d flat">camas</span></div>`+
+    `<div class="chip"><span class="k">Calor</span><span class="v"><i class="ic">🔥</i>${f.heat}</span><span class="d ${s.cold?'down':'flat'}">${s.cold?'¡doble!':'energía'}</span></div>`;
   const col=v=>v>60?'var(--good)':v>30?'var(--warn)':'var(--bad)';
   $('#meters').innerHTML=`<div class="meter">❤️ Salud<span class="track"><i style="width:${s.salud}%;background:${col(s.salud)}"></i></span>${s.salud}</div>
     <div class="meter">😊 Ánimo<span class="track"><i style="width:${s.moral}%;background:${col(s.moral)}"></i></span>${s.moral}</div>`;
   const m=MISSIONS[Math.min(s.mission,MISSIONS.length-1)];
   $('#missionBtn').innerHTML=s.mission>=MISSIONS.length?`<span class="num">★</span><span class="txt"><small>Colonia completada</small>¡Sigue haciendo crecer tu ciudad!</span>`:
     `<span class="num">${s.mission+1}/${MISSIONS.length}</span><span class="txt"><small>Misión</small>${m.t}</span><span>›</span>`;
-  const map=$('#map');
-  map.innerHTML=s.tiles.map((t,i)=>{
-    let cls='tile '+t.t+(t.b?' b':'')+(i===sel?' sel':'');
-    let inner='',flag='';
-    if(t.b){
-      const off=t.broken||!t.on||f.unpowered.has(i);
-      if(off)cls+=' off';
-      inner=`<span class="ic">${B[t.b].i}</span>`;
-      if(t.broken)flag='🔧';else if(!t.on)flag='⏸️';else if(f.unpowered.has(i))flag='⚡';
-    }else inner=`<span class="terr">${TERR[t.t].g}</span>`;
-    return `<button class="${cls}" data-i="${i}" aria-label="${t.b?B[t.b].n:TERR[t.t].n}">${inner}${flag?`<span class="flag">${flag}</span>`:''}</button>`;
-  }).join('');
-  sizeMap();
-}
-function sizeMap(){
-  const w=$('#mapwrap');if(!w||w.offsetParent===null&&$('#game').hidden)return;
-  const cs=getComputedStyle(w);
-  const W=w.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-16;
-  const H=w.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-16;
-  const ts=Math.max(30,Math.floor(Math.min((W-4*(COLS-1))/COLS,(H-4*(ROWS-1))/ROWS,76)));
-  $('#map').style.setProperty('--ts',ts+'px');
 }
 function floatDeltas(before){
-  const host=$('#res');const r=host.getBoundingClientRect();
+  const r=$('#res').getBoundingClientRect();
   ['o2','agua','comida','mat'].forEach((k,j)=>{
     const d=S[k]-before[k];if(!d)return;
     const el=document.createElement('div');el.className='float';el.textContent=(d>0?'+':'')+d;
-    el.style.color=d>0?'var(--good)':'var(--bad)';
-    el.style.left=(r.left+r.width*(j+.6)/4)+'px';el.style.top=(r.top+10)+'px';el.style.position='fixed';
+    el.style.color=d>0?'var(--good)':'var(--bad)';el.style.left=(r.left+r.width*(j+.6)/4)+'px';el.style.top=(r.top+10)+'px';
     document.body.appendChild(el);setTimeout(()=>el.remove(),1300);
   });
 }
@@ -623,58 +847,87 @@ function sheet(html,onClose){
 function closeSheet(){const v=$('#veil');if(v)v.remove()}
 const costTxt=b=>{const p=[];if(b.e>0)p.push(`<span class="up">+${b.e}⚡</span>`);if(b.e<0)p.push(`<span class="down">${b.e}⚡</span>`);
   if(b.p)for(const k in b.p){const ic={o2:'🫁',agua:'💧',comida:'🍞',mat:'🧱'}[k];p.push(`<span class="${b.p[k]>0?'up':'down'}">${b.p[k]>0?'+':''}${b.p[k]}${ic}</span>`)}
-  if(b.cap)p.push(`<span class="up">+${b.cap}👥</span>`);if(b.store)p.push(`<span class="up">+${b.store}🔋</span>`);return p.join('')};
+  if(b.cap)p.push(`<span class="up">+${b.cap}👥</span>`);if(b.store)p.push(`<span class="up">+${b.store}🔋</span>`);
+  p.push(`<span class="flat">${b.fp}×${b.fp}</span>`);return p.join('')};
 
-function openTile(i){
-  const t=S.tiles[i];sel=i;render();
-  if(t.b)return openBuilding(i);
-  const T=TERR[t.t];
-  if(t.t==='crater'){sheet(`<div class="sheetHead"><span class="big">🕳️</span><div><h2>${T.n}</h2><p>${T.t}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>`,()=>{sel=-1;render()});return}
+function buildMenu(ti,tj,head){
   const cards=BUILD_ORDER.map(k=>{
-    const b=B[k];let why='';
-    if(S.mission<b.un)why=`🔒 Se desbloquea en la misión ${b.un+1}`;
-    else if(b.need&&t.t!==b.need)why='Necesita una casilla de hielo ❄️';
+    const b=B[k];let why='';const locked=S.mission<b.un;
+    if(locked)why=`🔒 Se desbloquea en la misión ${b.un+1}`;
     else if(b.req&&!count(S,b.req))why=`Necesita un ${B[b.req].n}`;
     else if(S.mat<b.cost)why=`Faltan ${b.cost-S.mat} 🧱`;
-    const locked=S.mission<b.un;
     return `<button class="card${why?' no':''}" data-b="${k}" ${why?'data-why="'+why+'"':''}>
-      <span class="top"><span class="e">${locked?'❔':b.i}</span><b>${locked?'???':b.n}</b></span>
+      <span class="thumb">${locked?'❔':`<img src="${thumb(k)}" alt="">`}</span>
+      <b>${locked?'???':b.n}</b>${b.ph&&!locked?'<span class="tagTemp">IMAGEN PROVISIONAL</span>':''}
       <span class="stats"><span>🧱 ${b.cost}</span>${locked?'':costTxt(b)}</span>
       ${why?`<span class="why">${why}</span>`:`<span class="desc">${b.desc}</span>`}</button>`}).join('');
-  const v=sheet(`<div class="sheetHead"><span class="big">${T.g||'🟤'}</span><div><h2>${T.n}</h2><p>${T.t}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
-    <div class="sec">¿Qué quieres construir? · tienes ${S.mat} 🧱</div><div class="buildGrid">${cards}</div>`,()=>{sel=-1;render()});
+  const v=sheet(`${head}<div class="sec">¿Qué quieres construir? · tienes ${S.mat} 🧱</div><div class="buildGrid">${cards}</div>`);
   v.querySelectorAll('.card').forEach(c=>c.onclick=()=>{
     if(c.dataset.why){toast(c.dataset.why);beep(160,.1);return}
-    build(i,c.dataset.b);
+    startPlacing(c.dataset.b,ti,tj);
   });
 }
-function build(i,k){
-  const b=B[k];S.mat-=b.cost;Object.assign(S.tiles[i],{b:k,on:true,broken:false});S.stats.built++;
-  learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);closeSheet();sel=-1;beep(440,.08);setTimeout(()=>beep(660,.1),90);
+function openTile(i,j){
+  const T=TERR[S.map[idx(i,j)]];
+  buildMenu(i,j,`<div class="sheetHead"><span class="big">${T.g}</span><div><h2>${T.n}</h2><p>${T.t}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>`);
+}
+function openBuildMenu(){
+  if(placing)return;
+  const [wx,wy]=toWorld(VW/2,VH/2),[i,j]=worldToTile(wx,wy);
+  buildMenu(clamp(i,0,N-1),clamp(j,0,N-1),`<div class="sheetHead"><span class="big">🏗️</span><div><h2>Construir</h2><p>Elige un edificio y colócalo en el mapa.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>`);
+}
+function startPlacing(t,ti,tj){
+  closeSheet();selB=-1;const f=B[t].fp;
+  placing={t,i:ti-Math.floor((f-1)/2),j:tj-Math.floor((f-1)/2)};
+  const [X,Y]=tileTop(placing.i+f/2,placing.j+f/2);cam.x=X;cam.y=Y;clampCam();
+  $('#placeBar').hidden=false;$('#actions').style.visibility='hidden';$('#pbImg').src=thumb(t);updatePlaceBar();
+}
+function updatePlaceBar(){
+  const b=B[placing.t],v=validSpot(placing.t,placing.i,placing.j);
+  $('#pbMsg').innerHTML=`<b>${b.n} · ${b.cost} 🧱</b>${v.ok?'Buen sitio. Toca el mapa para moverlo o pulsa Construir.':`<span style="color:var(--bad)">${v.why}</span> Toca otra zona del mapa.`}`;
+  $('#pbOk').disabled=!v.ok;
+}
+function stopPlacing(){placing=null;$('#placeBar').hidden=true;$('#actions').style.visibility=''}
+$('#pbCancel').onclick=stopPlacing;
+$('#pbOk').onclick=()=>{if(!placing)return;const {t,i,j}=placing;if(!validSpot(t,i,j).ok)return;stopPlacing();build(t,i,j)};
+function build(k,i,j){
+  const b=B[k];if(S.mat<b.cost){toast(`Faltan ${b.cost-S.mat} 🧱`);return}
+  S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false});S.stats.built++;rebuildOcc();
+  learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
-  const el=document.querySelector(`.tile[data-i="${i}"]`);if(el)el.classList.add('new');
   toast(`${b.i} ${b.n}<br><small style="font-weight:600">${b.fact}</small>`);
   save();
 }
-function openBuilding(i){
-  const t=S.tiles[i],b=B[t.b],f=flows(S);
+function openCrate(ci){
+  const item=pick(MANIFEST);
+  const v=sheet(`<div class="sheetHead"><img src="${imgSrc('cajas')}" alt="" style="width:56px"><div><h2>Caja de carga</h2><p>Enviada desde la Tierra</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <div class="fact" style="max-width:none"><b>Contenido</b>${item}</div>
+    <p class="info">Solo se envían desde la Tierra los materiales que todavía no se pueden fabricar en Marte.</p>
+    <div class="stack" style="width:100%"><button class="btn" id="cOk">Abrir caja (+10 🧱)</button></div>`);
+  v.querySelector('#cOk').onclick=()=>{S.crates.splice(ci,1);S.mat+=10;learn('Carga desde la Tierra: '+item);beep(700,.08);setTimeout(()=>beep(900,.1),80);closeSheet();render();save();toast('📦 +10 🧱')};
+}
+function openBuilding(k){
+  const t=S.blds[k],b=B[t.t],f=flows(S);
   let st='✅ Funcionando';
-  if(t.broken)st='🔧 Averiado';else if(!t.on)st='⏸️ Apagado';else if(f.unpowered.has(i))st='⚡ Sin energía suficiente';
+  if(t.broken)st='🔧 Averiado';else if(!t.on)st='⏸️ Apagado';else if(f.unpowered.has(k))st='⚡ Sin energía suficiente';
   const btns=[];
   if(t.broken)btns.push(`<button class="btn" id="bRep">Reparar (${Math.ceil(b.cost/2)} 🧱)</button>`);
-  else if(b.e<0&&t.b!=='lander')btns.push(`<button class="btn ${t.on?'ghost':''}" id="bTog">${t.on?'Apagar':'Encender'}</button>`);
-  if(t.b!=='lander')btns.push(`<button class="btn ghost" id="bDel">Desmontar (+${Math.floor(b.cost/2)} 🧱)</button>`);
-  let cap='';if(b.cap)cap=`<span>👥 Camas: ${b.cap*(t.b==='habitat'&&t.t==='tube'?2:1)}</span>`;
-  const v=sheet(`<div class="sheetHead"><span class="big">${b.i}</span><div><h2>${b.n}</h2><p>${st} · sobre ${TERR[t.t].n.toLowerCase()}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
-    <p class="info">${b.desc}</p><div class="statline">${costTxt(b).replace(/<span class="(up|down)">/g,'<span class="$1">')}${cap}</div>
-    <div class="fact"><b>¿Sabías que…?</b>${b.fact}</div>
+  else if(b.e<0&&t.t!=='base')btns.push(`<button class="btn ${t.on?'ghost':''}" id="bTog">${t.on?'Apagar':'Encender'}</button>`);
+  if(t.t!=='base')btns.push(`<button class="btn ghost" id="bDel">Desmontar (+${Math.floor(b.cost/2)} 🧱)</button>`);
+  const fpT=footprint(t);
+  let cap='';if(b.cap)cap=`<span>👥 Camas: ${b.cap*(t.t==='habitat'&&fpT.includes('tube')?2:1)}</span>`;
+  const pic=b.ph?SPR[t.t].url:imgSrc(b.inside||b.img);
+  const v=sheet(`<div class="sheetHead"><div><h2>${b.n}</h2><p>${st}${b.inside?' · vista interior':''}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <img class="bimg" src="${pic}" alt="${b.n}">${b.ph?'<span class="tagTemp">IMAGEN PROVISIONAL</span>':''}
+    <p class="info">${b.desc}</p><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
+    <div class="fact" style="max-width:none"><b>¿Sabías que…?</b>${b.fact}</div>
     ${b.e<0?'<p class="hint">Si falta energía, primero se apagan los edificios menos importantes. Apagar algo deja más energía para el oxígeno y el agua.</p>':''}
-    <div class="row">${btns.join('')}</div>`,()=>{sel=-1;render()});
-  const tog=v.querySelector('#bTog');if(tog)tog.onclick=()=>{t.on=!t.on;beep(t.on?600:300,.06);save();openBuilding(i);render();sel=i};
-  const rep=v.querySelector('#bRep');if(rep)rep.onclick=()=>{const c=Math.ceil(b.cost/2);if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;t.broken=false;beep(700,.1);save();closeSheet();sel=-1;render();toast('🔧 ¡Reparado!')};
+    <div class="row">${btns.join('')}</div>`,()=>{selB=-1});
+  const tog=v.querySelector('#bTog');if(tog)tog.onclick=()=>{t.on=!t.on;beep(t.on?600:300,.06);save();render();openBuilding(k)};
+  const rep=v.querySelector('#bRep');if(rep)rep.onclick=()=>{const c=Math.ceil(b.cost/2);if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;t.broken=false;beep(700,.1);save();closeSheet();selB=-1;render();toast('🔧 ¡Reparado!')};
   const del=v.querySelector('#bDel');if(del)del.onclick=()=>{
     if(!del.dataset.sure){del.dataset.sure=1;del.textContent='¿Seguro? Toca otra vez';return}
-    S.mat+=Math.floor(b.cost/2);Object.assign(t,{b:null,on:true,broken:false});save();closeSheet();sel=-1;render();};
+    S.mat+=Math.floor(b.cost/2);S.blds.splice(k,1);rebuildOcc();save();closeSheet();selB=-1;render();};
 }
 function showEvent(e,done){
   learn(e.fact);
@@ -720,12 +973,12 @@ function openMenu(){
   const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Menú</h2></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <div class="sec">Cómo jugar</div>
     <div class="log" style="color:var(--ink)">
-      <div>1. Toca una casilla vacía para <b>construir</b>. Toca un edificio para verlo, apagarlo o repararlo.</div>
-      <div>2. Cada colono gasta cada sol <b>1 de oxígeno, 1 de agua y 1 de comida</b>. ¡Que no se acaben!</div>
-      <div>3. Casi todos los edificios gastan <b>energía ⚡</b>. Si no hay suficiente, algunos se apagan.</div>
-      <div>4. La <b>batería 🔋</b> guarda la energía que sobra para las tormentas.</div>
-      <div>5. Pulsa <b>Siguiente sol</b> para que pase un día marciano.</div>
-      <div>6. Cumple las misiones y llega a <b>30 colonos</b> para ganar.</div>
+      <div>1. <b>Arrastra</b> el mapa para moverte y <b>pellizca</b> (o usa + y −) para hacer zoom.</div>
+      <div>2. Pulsa <b>Construir</b> o toca el suelo, elige un edificio y colócalo. Toca un edificio para verlo, apagarlo o repararlo.</div>
+      <div>3. Cada colono gasta cada sol <b>1 de oxígeno, 1 de agua y 1 de comida</b>. ¡Que no se acaben!</div>
+      <div>4. Casi todos los edificios gastan <b>energía ⚡</b>. Si no hay suficiente, algunos se apagan. La <b>batería 🔋</b> guarda la que sobra.</div>
+      <div>5. Recoge las <b>cajas de carga 📦</b> del mapa para conseguir materiales.</div>
+      <div>6. Pulsa <b>Siguiente sol</b> para que pase un día marciano. Cumple las misiones y llega a <b>30 colonos</b> para ganar.</div>
     </div>
     <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
     <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
@@ -735,7 +988,7 @@ function openMenu(){
   v.querySelector('#mTitle').onclick=()=>{closeSheet();toTitle()};
 }
 function endGame(win){
-  closeSheet();show('end');
+  closeSheet();stopPlacing();show('end');
   $('#endIcon').textContent=win?'🏙️':'🪦';
   $('#endTitle').textContent=win?'¡Colonia autosuficiente!':'Misión fallida';
   $('#endText').textContent=win?`¡Enhorabuena, ${S.name}! Gracias a tus decisiones, ${S.pop} personas viven en Marte con oxígeno, agua, comida y energía propios. La humanidad tiene un nuevo hogar.`
@@ -748,7 +1001,7 @@ function endGame(win){
 }
 
 /* ================= FLUJO DE PANTALLAS ================= */
-function toTitle(){show('title');let has=false;try{has=!!localStorage.getItem(SAVE)}catch(e){}$('#bCont').hidden=!(has||S)}
+function toTitle(){stopPlacing();show('title');let h=false;try{h=!!localStorage.getItem(SAVE)}catch(e){}$('#bCont').hidden=!(h||S)}
 let storyI=0;
 function startStory(){storyI=0;show('story');drawStory()}
 function drawStory(){
@@ -771,52 +1024,54 @@ function startCrew(){
 let travelT0=0;
 function startTravel(){
   const name=$('#cmdName').value.trim()||'Comandante';
-  S=newGame(name,pickedCrew.slice());
+  S=newGame(name,pickedCrew.slice());terrainDirty=true;
   addLog(`Sol 1: ¡Aterrizaje completado! La tripulación de ${S.name} llega al cráter.`);
-  learn(B.lander.fact);
+  learn(B.base.fact);
   show('travel');travelT0=performance.now();$('#bLand').disabled=true;let fi=0;
   $('#travelFact').innerHTML=`<b>Dato del viaje</b>${TRAVEL_FACTS[0]}`;
   const iv=setInterval(()=>{if(skyMode!=='travel')return clearInterval(iv);fi=(fi+1)%TRAVEL_FACTS.length;$('#travelFact').innerHTML=`<b>Dato del viaje</b>${TRAVEL_FACTS[fi]}`},2600);
   beep(120,.6,'sawtooth');
 }
 function startGame(){
-  show('game');sel=-1;render();requestAnimationFrame(()=>{sizeMap();render()});
+  show('game');selB=-1;stopPlacing();rebuildOcc();terrainDirty=true;render();
+  resizeMap();focusBase();clampCam();
   if(S.sol===1&&S.log.length<=1)setTimeout(()=>sheet(`<div class="sheetHead"><span class="big">👩‍🚀</span><div><h2>¡Bienvenido a Marte, ${S.name}!</h2><p>Sol 1 · Cráter preparado por los robots</p></div></div>
-    <p class="info">Este cráter tiene <b>hielo azul ❄️</b>, <b>rocas con minerales 🪨</b> y hasta <b>tubos de lava 🕳️</b>. Vuestro módulo 🛖 y un panel solar 🔆 ya funcionan.</p>
-    <p class="info">El oxígeno que trajisteis solo dura unos pocos soles. ¡Mira arriba tus recursos y sigue las misiones!</p>
-    <div class="fact" style="max-width:none"><b>Consejo</b>Toca una casilla vacía para construir. Cuando estés listo, pulsa “Siguiente sol”.</div>
+    <img class="bimg" src="${imgSrc('base')}" alt="Base central">
+    <p class="info">Este cráter tiene <b>hielo azul</b>, <b>rocas grises con minerales</b>, <b>tubos de lava</b> y cráteres pequeños. La base central y un panel solar ya funcionan, y hay <b>cajas de carga 📦</b> esperando cerca.</p>
+    <p class="info">El oxígeno que trajisteis solo dura unos pocos soles. ¡Sigue las misiones!</p>
+    <div class="fact" style="max-width:none"><b>Controles</b>Arrastra para mover la cámara y pellizca para hacer zoom. Pulsa Construir para colocar edificios.</div>
     <div class="stack" style="width:100%"><button class="btn" data-close>¡A trabajar!</button></div>`),400);
 }
 function save(){try{if(S)localStorage.setItem(SAVE,JSON.stringify(S))}catch(e){}}
-function load(){try{const r=localStorage.getItem(SAVE);if(r){const s=JSON.parse(r);if(s&&s.v===1)return s}}catch(e){}return null}
+function load(){try{const r=localStorage.getItem(SAVE);if(r){const s=JSON.parse(r);if(s&&s.v===2)return s}}catch(e){}return null}
 
 $('#bNew').onclick=()=>{initAudio();startStory()};
 $('#bCont').onclick=()=>{initAudio();if(!S)S=load();if(S)startGame()};
 $('#bStory').onclick=()=>{beep(500,.04);if(storyI<STORY.length-1){storyI++;drawStory()}else startCrew()};
 $('#bLaunch').onclick=()=>startTravel();
 $('#bLand').onclick=()=>startGame();
-$('#bNext').onclick=()=>{if(!$('#veil'))nextSol()};
+$('#bNext').onclick=()=>{if(!$('#veil')&&!placing)nextSol()};
+$('#bBuild').onclick=openBuildMenu;
 $('#bLog').onclick=openLog;
 $('#bMenu').onclick=openMenu;
 $('#missionBtn').onclick=openLog;
-$('#map').addEventListener('click',e=>{const b=e.target.closest('.tile');if(b)openTile(+b.dataset.i)});
 $('#bEndMain').onclick=()=>{S=null;try{localStorage.removeItem(SAVE)}catch(e){}toTitle()};
 $('#bEndKeep').onclick=()=>startGame();
-window.addEventListener('resize',()=>{if(!$('#game').hidden)sizeMap()});
+window.addEventListener('resize',()=>{if(!$('#game').hidden){resizeMap();clampCam()}});
 
 /* ================= SONIDO ================= */
 let AC=null;
 function initAudio(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
 function beep(fr,d,type){
   if(!sound||!AC)return;try{const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.value=fr;
-  g.gain.setValueAtTime(.06,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d+.02)}catch(e){}
+  g.gain.setValueAtTime(.05,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d+.02)}catch(e){}
 }
 
 /* ================= CIELO Y DIBUJOS ================= */
 const sky=$('#sky'),cx=sky.getContext('2d');
-let skyMode='title',storyArt='earth',stars=[],dust=[];
+let skyMode='title',storyArt='earth',stars=[];const dust=[];
 function resizeSky(){const r=devicePixelRatio||1;sky.width=innerWidth*r;sky.height=innerHeight*r;cx.setTransform(r,0,0,r,0,0);
-  stars=Array.from({length:120},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.2,p:Math.random()*6}))}
+  stars=Array.from({length:120},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()<.2?2:1,p:Math.random()*6}))}
 resizeSky();addEventListener('resize',resizeSky);
 for(let i=0;i<90;i++)dust.push({x:Math.random(),y:Math.random(),v:.2+Math.random()*.8,r:1+Math.random()*2.5});
 function planet(c,x,y,r,kind,t){
@@ -827,7 +1082,7 @@ function planet(c,x,y,r,kind,t){
   c.save();c.beginPath();c.arc(x,y,r,0,7);c.clip();
   if(kind==='earth'){
     c.fillStyle='#8a7a4c';for(let i=0;i<5;i++){c.beginPath();c.ellipse(x+Math.cos(i*1.9+t*.1)*r*.5,y+Math.sin(i*2.3)*r*.5,r*.28,r*.16,i,0,7);c.fill()}
-    c.fillStyle='rgba(150,120,90,.45)';c.fillRect(x-r,y-r,r*2,r*2); // contaminación
+    c.fillStyle='rgba(150,120,90,.45)';c.fillRect(x-r,y-r,r*2,r*2);
     c.fillStyle='rgba(200,170,120,.25)';for(let i=0;i<4;i++){c.beginPath();c.ellipse(x+Math.sin(t*.3+i)*r*.6,y-r*.6+i*r*.4,r*.7,r*.1,0,0,7);c.fill()}
   }else{
     c.fillStyle='rgba(80,25,12,.45)';[[-.3,-.2,.18],[.25,.1,.12],[-.05,.4,.09],[.4,-.35,.07]].forEach(([a,b,s])=>{c.beginPath();c.arc(x+a*r,y+b*r,s*r,0,7);c.fill()});
@@ -838,9 +1093,10 @@ function planet(c,x,y,r,kind,t){
 function rocket(c,x,y,s,ang,t){
   c.save();c.translate(x,y);c.rotate(ang);c.scale(s,s);
   c.fillStyle=`rgba(255,${150+Math.sin(t*20)*60|0},60,.9)`;c.beginPath();c.moveTo(-6,18);c.lineTo(0,34+Math.sin(t*25)*5);c.lineTo(6,18);c.fill();
-  c.fillStyle='#e9ddd3';c.beginPath();c.moveTo(0,-26);c.quadraticCurveTo(10,-10,9,18);c.lineTo(-9,18);c.quadraticCurveTo(-10,-10,0,-26);c.fill();
-  c.fillStyle='#d0582c';c.beginPath();c.moveTo(-9,8);c.lineTo(-16,22);c.lineTo(-8,18);c.fill();c.beginPath();c.moveTo(9,8);c.lineTo(16,22);c.lineTo(8,18);c.fill();
-  c.fillStyle='#62d3e3';c.beginPath();c.arc(0,-6,4,0,7);c.fill();
+  c.fillStyle='#e9e4d6';c.beginPath();c.moveTo(0,-26);c.quadraticCurveTo(10,-10,9,18);c.lineTo(-9,18);c.quadraticCurveTo(-10,-10,0,-26);c.fill();
+  c.fillStyle='#2e3866';c.fillRect(-9,4,18,5);
+  c.fillStyle='#222a4c';c.beginPath();c.moveTo(-9,8);c.lineTo(-16,22);c.lineTo(-8,18);c.fill();c.beginPath();c.moveTo(9,8);c.lineTo(16,22);c.lineTo(8,18);c.fill();
+  c.fillStyle='#8fd8ec';c.beginPath();c.arc(0,-6,4,0,7);c.fill();
   c.restore();
 }
 function drawStoryArt(t){
@@ -849,14 +1105,12 @@ function drawStoryArt(t){
   if(storyArt==='earth'){planet(c,m,m,W*.36,'earth',t);c.fillStyle='rgba(255,120,60,.18)';c.beginPath();c.arc(m,m,W*.42,0,7);c.fill()}
   else if(storyArt==='mars'){c.fillStyle='rgba(208,88,44,.18)';c.beginPath();c.arc(m,m,W*.45,0,7);c.fill();planet(c,m,m,W*.36,'mars',t)}
   else if(storyArt==='robots'){
-    c.fillStyle='#c4562a';c.beginPath();c.ellipse(m,W*.7,W*.48,W*.18,0,0,7);c.fill();
-    c.fillStyle='#7c3a24';c.beginPath();c.ellipse(m,W*.72,W*.32,W*.09,0,0,7);c.fill();
-    c.fillStyle='#9fd8e6';c.beginPath();c.ellipse(m+W*.1,W*.73,W*.08,W*.03,0,0,7);c.fill();
-    // cúpula
-    c.strokeStyle='rgba(240,178,122,.8)';c.lineWidth=4;c.fillStyle='rgba(98,211,227,.15)';c.beginPath();c.arc(m-W*.08,W*.7,W*.13,Math.PI,0);c.fill();c.stroke();
-    // robots
-    for(let i=0;i<3;i++){const x=m-W*.35+((t*30+i*120)%(W*.7)),y=W*.62+Math.sin(t*3+i)*3;c.fillStyle='#e9ddd3';c.fillRect(x-14,y-12,28,16);c.fillStyle='#2a1716';c.beginPath();c.arc(x-8,y+6,6,0,7);c.arc(x+8,y+6,6,0,7);c.fill();c.fillStyle='#62d3e3';c.fillRect(x-4,y-20,8,8)}
-    c.font=`${W*.1}px serif`;c.textAlign='center';c.fillText('🦠',m+W*.28,W*.4+Math.sin(t*2)*8);
+    c.fillStyle='#c4562a';c.beginPath();c.moveTo(0,W*.62);c.lineTo(m,W*.4);c.lineTo(W,W*.62);c.lineTo(m,W*.84);c.closePath();c.fill();
+    c.fillStyle='#b8d8e4';c.beginPath();c.moveTo(m*.6,W*.7);c.lineTo(m*.9,W*.62);c.lineTo(m*1.1,W*.7);c.lineTo(m*.8,W*.77);c.fill();
+    const rf=IMG.refugio,rv=IMG.rover;
+    if(rf.ok){const w=W*.55;c.drawImage(rf.img,m-w*.35,W*.36,w,w*rf.h/rf.w)}
+    if(rv.ok){const w=W*.26,p=(t*.12)%1;c.drawImage(rv.img,W*.05+p*W*.5,W*.62-w*rv.h/rv.w*.6+Math.sin(t*6)*2,w,w*rv.h/rv.w)}
+    c.font=`${W*.1}px serif`;c.textAlign='center';c.fillText('🦠',m+W*.32,W*.3+Math.sin(t*2)*8);
   }else{
     planet(c,W*.2,W*.8,W*.16,'earth',t);planet(c,W*.82,W*.2,W*.12,'mars',t);
     const p=(t*.15)%1;rocket(c,W*.2+p*W*.6,W*.8-p*W*.6,2.2,Math.PI/4,t);
@@ -865,7 +1119,7 @@ function drawStoryArt(t){
 function drawTravel(t){
   const cv=$('#travelArt'),c=cv.getContext('2d'),W=cv.width,H=cv.height;c.clearRect(0,0,W,H);
   const p=Math.min(1,(performance.now()-travelT0)/7000);
-  c.strokeStyle='rgba(240,178,122,.35)';c.setLineDash([6,10]);c.lineWidth=3;c.beginPath();c.moveTo(70,H*.7);c.quadraticCurveTo(W/2,-20,W-70,H*.6);c.stroke();c.setLineDash([]);
+  c.strokeStyle='rgba(216,171,76,.45)';c.setLineDash([6,10]);c.lineWidth=3;c.beginPath();c.moveTo(70,H*.7);c.quadraticCurveTo(W/2,-20,W-70,H*.6);c.stroke();c.setLineDash([]);
   planet(c,70,H*.7,46,'earth',t);planet(c,W-70,H*.6,36,'mars',t);
   const q=1-p,x=q*q*70+2*q*p*W/2+p*p*(W-70),y=q*q*H*.7+2*q*p*(-20)+p*p*H*.6;
   const dx=2*q*(W/2-70)+2*p*(W-70-W/2),dy=2*q*(-20-H*.7)+2*p*(H*.6+20);
@@ -877,22 +1131,22 @@ function loop(now){
   const t=now/1000,W=innerWidth,H=innerHeight;
   const storm=skyMode==='game'&&S&&S.storm>0;
   const g=cx.createLinearGradient(0,0,0,H);
-  if(skyMode==='game'){g.addColorStop(0,storm?'#3a2214':'#1d0f12');g.addColorStop(1,storm?'#6b3a1c':'#3a1a14')}
-  else{g.addColorStop(0,'#0c0709');g.addColorStop(1,'#241112')}
+  if(skyMode==='game'){g.addColorStop(0,storm?'#3a2214':'#140e1c');g.addColorStop(1,storm?'#5b3420':'#2a1420')}
+  else{g.addColorStop(0,'#0b0812');g.addColorStop(1,'#25111a')}
   cx.fillStyle=g;cx.fillRect(0,0,W,H);
-  for(const s of stars){cx.globalAlpha=(storm?.15:.5)+Math.sin(t*1.5+s.p)*.3;cx.fillStyle='#fbeee4';cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill()}
+  for(const s of stars){cx.globalAlpha=Math.max(0,(storm?.15:.55)+Math.sin(t*1.5+s.p)*.3);cx.fillStyle='#f5f1e8';cx.fillRect(s.x|0,s.y|0,s.r,s.r)}
   cx.globalAlpha=1;
-  if(storm){cx.fillStyle='rgba(240,178,122,.35)';for(const d of dust){d.x+=d.v*.004;if(d.x>1.05)d.x=-.05;cx.beginPath();cx.arc(d.x*W,d.y*H+Math.sin(t+d.y*9)*8,d.r,0,7);cx.fill()}}
-  if(skyMode==='title'){planet(cx,W*.5,H+Math.min(W,H)*.25,Math.min(W,H)*.6,'mars',t)}
+  if(skyMode==='title')planet(cx,W*.5,H+Math.min(W,H)*.25,Math.min(W,H)*.6,'mars',t);
   if(skyMode==='story')drawStoryArt(t);
   if(skyMode==='travel')drawTravel(t);
+  if(skyMode==='game')drawMap(t);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
 /* ================= ARRANQUE ================= */
 function start(data){
-  if(data&&data.S){S=data.S;startGame();return}
+  if(data&&data.S&&data.S.v===2){S=data.S;startGame();return}
   toTitle();
 }
 window.claude?.hot?.snapshot?.(()=>({S:skyMode==='game'?S:null}));
