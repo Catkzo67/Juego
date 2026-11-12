@@ -285,7 +285,7 @@ const CREW=[
 // e: energía (+produce / -consume). p: producción por sol. pr: prioridad eléctrica. un: misión que lo desbloquea.
 // fp: lado de la huella en baldosas, o [ancho en i, largo en j] si es rectangular. img: sprite. s: escala del sprite sobre la huella. dy: ajuste vertical. ph: marcador temporal.
 const B={
-  base:{n:'Base central',i:'🛰️',img:'base',fp:6,anc:{k:.521,ox:-123,oy:-5},ports:[[-1,3],[6,2],[3,-1],[2,6]],cost:0,e:-1,cap:4,pr:0,desc:'El corazón de la colonia: mando, comunicaciones y camas para 4 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
+  base:{n:'Base central',i:'🛰️',img:'base',fp:6,anc:{k:.521,ox:-123,oy:-17},ports:[[-1,3],[6,2],[3,-1],[2,6]],cost:0,e:-1,cap:4,pr:0,desc:'El corazón de la colonia: mando, comunicaciones y camas para 4 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
   corridor:{n:'Pasillo presurizado',i:'🚇',img:'pasillo',fp:1,s:1,dy:.1,cost:3,e:0,un:0,desc:'Une los edificios para caminar sin traje. Cada 3 pasillos sube el ánimo.',fact:'Las esclusas y pasillos tienen cortinas electrostáticas que quitan el polvo de los trajes.'},
   solar:{n:'Panel solar',i:'🔆',img:'solar',fp:2,s:.95,dy:.05,cost:10,e:6,un:0,desc:'Da energía con la luz del Sol. Con tormentas de polvo produce mucho menos.',fact:'Las tormentas de polvo pueden durar semanas y tapan el Sol: los paneles solares producen mucho menos.'},
   moxie:{n:'Planta MOXIE',i:'🫧',img:'moxie',fp:[1,3],s:1,dy:.05,cost:15,e:-3,p:{o2:6},pr:1,un:1,desc:'Fabrica oxígeno a partir del CO₂ del aire marciano.',fact:'En 2021 el experimento MOXIE del rover Perseverance fabricó oxígeno con el dióxido de carbono de Marte.'},
@@ -445,7 +445,7 @@ function newGame(name,crew){
 
 /* ---------- ocupación del mapa ---------- */
 const OCC=new Int32Array(N*N);
-function rebuildOcc(){OCC.fill(-1);S.blds.forEach((b,k)=>{const [w,h]=dim(b.t);for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j))OCC[idx(i,j)]=k})}
+function rebuildOcc(){OCC.fill(-1);S.blds.forEach((b,k)=>{const [w,h]=dim(b.t);for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j))OCC[idx(i,j)]=k});if(typeof syncWalkers==='function')syncWalkers()}
 function footprint(b){const [w,h]=dim(b.t),a=[];for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j))a.push(S.map[idx(i,j)]);return a}
 function validSpot(t,i0,j0){
   const b=B[t],[w,h]=dim(t);let ice=false;
@@ -705,11 +705,67 @@ function spriteBox(b,t,sp){ // rectángulo del sprite en coordenadas de mundo
   const w=(fw+fh)/2*TW*(d.s||1)*(t==='corridor'?1:.94),h=w*sp.h/sp.w;
   return {x:X-w/2,y:Ybot+(d.dy||0)*h-h,w,h};
 }
+// Calibración de las imágenes de pasillo: centro del anillo de un extremo (px de la imagen), escala y borde de baldosa al que corresponde.
+const TUBE_UP=12, TUBE_F=1.25;   // altura del eje del tubo sobre el suelo y alargamiento para que los tramos empalmen
+const CAL={pasillo:{k:.289,a:[23.8,80.6],at:[-16,24]},pasillo_v:{k:.1387,a:[23.6,55.8],at:[-16,8]},cruce:{k:.333,a:[24.5,86.2],at:[-16,24]}};
+function corridorRect(b,name){
+  const c=CAL[name],sp=IMG[name],[X,Y]=tileTop(b.i,b.j),cx=X,cy=Y+TH/2-TUBE_UP;
+  const x=X+c.at[0]-c.a[0]*c.k,y=Y+c.at[1]-c.a[1]*c.k-TUBE_UP;
+  return {x:cx+(x-cx)*TUBE_F,y:cy+(y-cy)*TUBE_F,w:sp.w*c.k*TUBE_F,h:sp.h*c.k*TUBE_F};
+}
 function corridorShape(b){ // orienta el pasillo según sus vecinos
   const me=OCC[idx(b.i,b.j)];
   const nb=(i,j)=>inMap(i,j)&&OCC[idx(i,j)]>=0&&OCC[idx(i,j)]!==me;
   const ai=nb(b.i-1,b.j)||nb(b.i+1,b.j), aj=nb(b.i,b.j-1)||nb(b.i,b.j+1);
   if(ai&&aj)return 'cross';return ai?'alongI':'straight';
+}
+/* ---------- colonos que caminan por los pasillos ---------- */
+const WALK=[];let walkT=0;
+const SUIT_TRIM=['#d8ab4c','#e0703a','#5cc07e','#5aa0e0','#c47ad8','#e05a7a'];
+function mkColonist(trim){ // pixel art 7×12: casco, visor, traje, mochila y botas
+  const F=[["..HHH..",".HHVVH.",".HVVVH.","..HHH..",".PSSSS.","PPSTTSS",".PSSSS.",".SSTTS.","..S.S..",".S...S.",".D...D."],
+           ["..HHH..",".HHVVH.",".HVVVH.","..HHH..",".PSSSS.","PPSTTSS",".PSSSS.",".SSTTS.","..S.S..","..S.S..","..D.D.."]];
+  const C={H:'#f3efe6',V:'#8fd8ec',S:'#e2dccb',T:trim,P:'#2e3866',D:'#222a4c'};
+  return F.map(rows=>{
+    const o=document.createElement('canvas');o.width=9;o.height=13;const q=o.getContext('2d');
+    rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'){q.fillStyle='#1a1f3a';q.fillRect(x,y,3,3)}})); // contorno oscuro de 1 px
+    rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'){q.fillStyle=C[ch];q.fillRect(x+1,y+1,1,1)}}));
+    return o});
+}
+const COLONIST=SUIT_TRIM.map(mkColonist);
+let CORR=[];
+function corrNb(i,j){const o=[];for(const [a,c] of [[1,0],[-1,0],[0,1],[0,-1]]){const ii=i+a,jj=j+c;if(inMap(ii,jj)){const k=OCC[idx(ii,jj)];if(k>=0&&S.blds[k].t==='corridor')o.push([ii,jj])}}return o}
+function syncWalkers(){
+  CORR=S.blds.filter(b=>b.t==='corridor');
+  const want=Math.min(S.pop,Math.ceil(CORR.length*.7),40);
+  for(let k=WALK.length-1;k>=0;k--){const w=WALK[k],o=inMap(w.ti,w.tj)?OCC[idx(w.ti,w.tj)]:-1;if(o<0||S.blds[o].t!=='corridor')WALK.splice(k,1)}
+  while(WALK.length>want)WALK.pop();
+  while(WALK.length<want&&CORR.length){const c=pick(CORR);WALK.push({i:c.i,j:c.j,ti:c.i,tj:c.j,p:1,v:.5+Math.random()*.5,skin:rnd(COLONIST.length),hide:0,ph:Math.random()*9})}
+}
+function stepWalkers(t){
+  const dt=Math.min(.1,walkT?t-walkT:0);walkT=t;if(!S)return;
+  for(const w of WALK){
+    if(w.hide>0){w.hide-=dt;if(w.hide<=0&&CORR.length){const c=pick(CORR);Object.assign(w,{i:c.i,j:c.j,ti:c.i,tj:c.j,p:1})}continue}
+    w.p+=dt*w.v;
+    if(w.p>=1){const pi=w.i,pj=w.j;w.i=w.ti;w.j=w.tj;w.p=0;
+      // a veces entra en un edificio pegado al pasillo y sale más tarde por otro sitio
+      const nearB=[[1,0],[-1,0],[0,1],[0,-1]].some(([a,c])=>{const ii=w.i+a,jj=w.j+c;if(!inMap(ii,jj))return false;const k=OCC[idx(ii,jj)];return k>=0&&S.blds[k].t!=='corridor'});
+      if(nearB&&Math.random()<.12){w.hide=2+Math.random()*4;continue}
+      let nb=corrNb(w.i,w.j);const fwd=nb.filter(([a,c])=>a!==pi||c!==pj);if(fwd.length)nb=fwd;
+      if(nb.length){[w.ti,w.tj]=pick(nb)}else{w.ti=w.i;w.tj=w.j;w.p=-.6}
+    }
+  }
+}
+function drawWalker(x,w,t){
+  const p=clamp(w.p,0,1),fi=w.i+(w.ti-w.i)*p+.5,fj=w.j+(w.tj-w.j)*p+.5;
+  const X=OX+(fi-fj)*TW/2,Y=OY+(fi+fj)*TH/2;
+  const moving=w.ti!==w.i||w.tj!==w.j,dirX=(w.ti-w.i)-(w.tj-w.j);
+  const fr=COLONIST[w.skin][moving?((t*6+w.ph)|0)%2:1],S2=1.2,ww=fr.width*S2,hh=fr.height*S2,bob=moving&&((t*6+w.ph)|0)%2?-.6:0;
+  const fy=Y-4;  // pies sobre el suelo del tubo
+  x.save();x.imageSmoothingEnabled=false;
+  x.fillStyle='rgba(0,0,0,.28)';x.beginPath();x.ellipse(X,fy,4,1.6,0,0,7);x.fill();
+  if(dirX<0){x.translate(X,0);x.scale(-1,1);x.drawImage(fr,-ww/2,fy-hh+bob,ww,hh)}else x.drawImage(fr,X-ww/2,fy-hh+bob,ww,hh);
+  x.restore();
 }
 // Orden de pintado isométrico: un objeto va detrás si queda entero "antes" en i o en j y comparte franja en el otro eje.
 function depthSort(items){
@@ -738,23 +794,26 @@ function drawMap(t){
   const f=flowsCache||(flowsCache=flows(S));
   const items=S.blds.map((b,k)=>({k,b,d:b.i+b.j+2*B[b.t].fp}));
   S.crates.forEach(c=>items.push({b:c,d:c.i+c.j+2,crate:true}));
+  stepWalkers(t);for(const wk of WALK)if(!wk.hide)items.push({b:{i:Math.max(wk.i,wk.ti),j:Math.max(wk.j,wk.tj)},walker:wk,w:1,h:1});
   if(placing){
     const v=validSpot(placing.t,placing.i,placing.j);
     if(placing.t==='corridor')S.blds.forEach(b=>{const P=B[b.t].ports;if(P)P.forEach(([pi,pj])=>{const i=b.i+pi,j=b.j+pj;if(inMap(i,j)&&OCC[idx(i,j)]<0)drawFoot(i,j,[1,1],'rgba(216,171,76,'+(.35+Math.sin(t*5)*.2)+')','#f6dc9a')})});
     drawFoot(placing.i,placing.j,dim(placing.t),v.ok?'rgba(134,217,143,.35)':'rgba(255,107,90,.35)',v.ok?'#86d98f':'#ff6b5a');
     items.push({b:placing,d:placing.i+placing.j+2*B[placing.t].fp+.5,ghost:true});
   }
-  for(const it of items)[it.w,it.h]=it.crate?[1,1]:dim(it.b.t);
+  for(const it of items)if(!it.walker)[it.w,it.h]=it.crate?[1,1]:dim(it.b.t);
   const order=depthSort(items);
   for(const it of order){
+    if(it.walker){drawWalker(x,it.walker,t);continue}
     if(it.crate){const sp=IMG.cajas;if(!sp.ok)continue;const [X,Y]=tileTop(it.b.i,it.b.j);const w=TW*.62,h=w*sp.h/sp.w,bob=Math.sin(t*3+it.b.i)*1.5;
       x.fillStyle='rgba(0,0,0,.25)';x.beginPath();x.ellipse(X,Y+TH*.62,w*.45,w*.18,0,0,7);x.fill();
       x.drawImage(sp.img,X-w/2,Y+TH*.75-h+bob,w,h);
       x.fillStyle='rgba(246,220,154,'+(.55+Math.sin(t*4)*.35)+')';x.beginPath();x.arc(X,Y+TH*.75-h-6+bob,3.2,0,7);x.fill();continue}
     const b=it.b;let sp=SPR[b.t],flip=false;
-    if(b.t==='corridor'&&!it.ghost){const sh=corridorShape(b);if(sh==='cross')sp=IMG.cruce;else if(sh==='alongI')sp=IMG.pasillo_v}
+    let cname=null;
+    if(b.t==='corridor'){const sh=it.ghost?'straight':corridorShape(b);cname=sh==='cross'?'cruce':sh==='alongI'?'pasillo_v':'pasillo';sp=IMG[cname]}
     if(!sp||!sp.ok)continue;
-    const r=spriteBox(b,b.t,sp);
+    const r=cname?corridorRect(b,cname):spriteBox(b,b.t,sp);
     const off=!it.ghost&&(b.broken||!b.on||f.unpowered.has(it.k));
     if(it.ghost)x.globalAlpha=.72+Math.sin(t*6)*.12;
     const src=off&&sp.dim?sp.dim:sp.img;
@@ -820,7 +879,7 @@ function tapMap(sx,sy){
 /* ================= RENDER HUD ================= */
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
 function render(){
-  const s=S,f=flows(s);flowsCache=f;
+  const s=S,f=flows(s);flowsCache=f;syncWalkers();
   $('#solLbl').innerHTML=`SOL ${s.sol}<small>${s.name.toUpperCase()} · ${s.pop} EN MARTE</small>`;
   const pills=[];
   if(s.storm)pills.push(`<span class="pill storm">🌪️ Tormenta ${s.storm}</span>`);
