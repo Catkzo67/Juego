@@ -292,7 +292,7 @@ const B={
   ice:{n:'Extractor de hielo',i:'🧊',img:'extractor',fp:3,s:1,dy:.04,cost:15,e:-3,p:{agua:8},pr:2,un:2,need:'ice',desc:'Perfora, derrite y limpia el hielo del subsuelo. Debe tocar hielo.',fact:'Hay hielo bajo el polvo y en los polos de Marte. Para beberlo hay que extraerlo, derretirlo y purificarlo.'},
   miner:{n:'Excavadora minera',i:'🚜',img:'excavadora',fp:2,s:1,dy:.05,cost:12,e:-2,p:{mat:4},pr:8,un:3,desc:'Perfora y recoge regolito para construir. Sobre roca saca el doble.',fact:'El suelo de Marte tiene mucho óxido de hierro: por eso el planeta es rojo. Con él se fabrican ladrillos.'},
   battery:{n:'Batería',i:'🔋',img:'bateria',fp:2,s:1,dy:.04,cost:15,e:0,store:30,pr:0,un:3,desc:'Guarda 30 de energía que sobra para cuando falte.',fact:'Guardar energía es clave para sobrevivir a la noche y a las tormentas de polvo.'},
-  bio:{n:'Bio-laboratorio',i:'🧫',img:'laboratorio',fp:2,s:1,dy:.03,cost:20,e:-3,p:{comida:2},pr:4,un:4,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
+  bio:{n:'Bio-laboratorio',i:'🧫',img:'laboratorio',inside:'laboratorio_interior',fp:3,s:1,dy:.03,cost:20,e:-3,p:{comida:2},pr:4,un:4,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
   farm:{n:'Invernadero',i:'🌱',img:'invernadero',fp:3,s:1,dy:.03,cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:5,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
   shelter:{n:'Refugio de regolito',i:'⛰️',img:'refugio',fp:3,s:1.05,dy:.1,cost:25,e:0,pr:0,un:6,crater:true,desc:'Búnker medio enterrado. Protege de la radiación. ¡Se puede construir dentro de un cráter!',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
   antenna:{n:'Antena',i:'📡',img:'antena',fp:2,s:.8,dy:.03,cost:20,e:-1,pr:5,un:7,desc:'Habla con la Tierra y guía a las naves con nuevos colonos.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
@@ -301,8 +301,8 @@ const B={
   gym:{n:'Gimnasio',i:'🏋️',img:'gimnasio',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:8,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
   repair:{n:'Taller de robots',i:'🦾',img:'taller',fp:2,s:1,dy:.03,cost:25,e:-2,pr:7,un:9,desc:'Sus robots limpian el polvo de los paneles y arreglan averías solos.',fact:'Los robots con sensores LiDAR hacen los trabajos más peligrosos fuera de la base.'},
   vfarm:{n:'Granja vertical',i:'🥬',img:'granja',fp:3,s:1,dy:.03,cost:45,e:-6,p:{comida:16,agua:-3},pr:3,un:9,req:'farm',desc:'Torres hidropónicas con luz LED. Mucha comida en poco espacio.',fact:'Las granjas verticales reciclan casi toda el agua y pueden cultivar con luz LED día y noche.'},
-  reactor:{n:'Microrreactor nuclear',i:'⚛️',img:'reactor',fp:3,s:.88,dy:.03,cost:60,e:25,un:10,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
-  shield:{n:'Escudo magnético',i:'🧲',img:'escudo',fp:3,s:1,dy:.04,cost:90,e:-8,pr:5,un:11,desc:'Crea un paraguas magnético que desvía la radiación del Sol.',fact:'Marte no tiene un campo magnético global como la Tierra. Un escudo artificial desvía las partículas del Sol.'}
+  reactor:{n:'Microrreactor nuclear',i:'⚛️',img:'reactor',fp:3,s:.88,dy:.03,cost:60,e:25,un:9,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
+  shield:{n:'Escudo magnético',i:'🧲',img:'escudo',fp:3,s:1,dy:.04,cost:90,e:-8,pr:5,un:10,desc:'Crea un paraguas magnético que desvía la radiación del Sol.',fact:'Marte no tiene un campo magnético global como la Tierra. Un escudo artificial desvía las partículas del Sol.'}
 };
 const dim=t=>{const f=B[t].fp;return Array.isArray(f)?f:[f,f]};
 const BUILD_ORDER=['solar','corridor','moxie','ice','miner','battery','bio','farm','shelter','antenna','habitat','mess','gym','repair','vfarm','reactor','shield'];
@@ -372,7 +372,7 @@ const TRAVEL_FACTS=[
 
 /* ================= SPRITES ================= */
 const IMG={};
-const IMG_NAMES=['base','pasillo','pasillo_v','cruce','tierra','marte','solar','moxie','extractor','laboratorio','invernadero','refugio','habitat','habitat_interior','comedor','taller','granja','cajas','excavadora','bateria','antena','gimnasio','reactor','escudo'];
+const IMG_NAMES=['base','pasillo','pasillo_v','cruce','tierra','marte','solar','moxie','extractor','laboratorio','laboratorio_interior','invernadero','refugio','habitat','habitat_interior','comedor','taller','granja','cajas','excavadora','bateria','antena','gimnasio','reactor','escudo'];
 const imgSrc=n=>`assets/${n}.png`;
 function mkSprite(src){
   const sp={ok:false,w:1,h:1,img:null,dim:null,mask:null};
@@ -445,7 +445,7 @@ function newGame(name,crew){
 
 /* ---------- ocupación del mapa ---------- */
 const OCC=new Int32Array(N*N);
-function rebuildOcc(){OCC.fill(-1);S.blds.forEach((b,k)=>{const [w,h]=dim(b.t);for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j))OCC[idx(i,j)]=k});if(typeof syncWalkers==='function')syncWalkers()}
+function rebuildOcc(){OCC.fill(-1);S.blds.forEach((b,k)=>{const [w,h]=dim(b.t);for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j))OCC[idx(i,j)]=k})}
 function footprint(b){const [w,h]=dim(b.t),a=[];for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j))a.push(S.map[idx(i,j)]);return a}
 function validSpot(t,i0,j0){
   const b=B[t],[w,h]=dim(t);let ice=false;
@@ -662,32 +662,88 @@ const PAL={
 };
 const rgb=(c,m=1)=>`rgb(${c[0]*m|0},${c[1]*m|0},${c[2]*m|0})`;
 function diamond(x,X,Y,inset=0){x.beginPath();x.moveTo(X,Y+inset);x.lineTo(X+TW/2-inset*2,Y+TH/2);x.lineTo(X,Y+TH-inset);x.lineTo(X-TW/2+inset*2,Y+TH/2);x.closePath()}
+// Ruido suave (value noise) para manchas de color naturales sobre todo el cráter
+function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  const a=hash(xi,yi),b=hash(xi+1,yi),c=hash(xi,yi+1),d=hash(xi+1,yi+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v}
+const fbm=(x,y)=>vnoise(x,y)*.55+vnoise(x*2.1+17,y*2.1+9)*.3+vnoise(x*4.3+5,y*4.3+31)*.15;
+// Paletas por tipo de terreno: de oscuro a claro (pixel art con pocas tintas)
+const TONES={
+  soil:[[112,44,26],[138,56,32],[160,70,38],[178,86,48],[196,104,60],[212,128,80]],
+  rock:[[76,58,54],[96,74,66],[116,92,80],[136,110,96],[156,130,112],[178,154,134]],
+  ice:[[126,170,190],[150,192,210],[176,212,226],[200,228,238],[220,240,246],[240,250,252]]
+};
+const lerpC=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+function shelteredCraters(){ // cráteres tapados por un refugio: el refugio trae su propio hoyo dibujado
+  const out=new Set();S.blds.forEach(b=>{if(b.t!=='shelter')return;S.craters.forEach((c,k)=>{if(c.x>=b.i&&c.x<=b.i+3&&c.y>=b.j&&c.y<=b.j+3)out.add(k)})});return out}
 function buildTerrain(){
   terrain=terrain||document.createElement('canvas');terrain.width=WORLD_W;terrain.height=WORLD_H;
   const x=terrain.getContext('2d');x.clearRect(0,0,WORLD_W,WORLD_H);x.imageSmoothingEnabled=false;
-  // canto del "tablero" (borde del cráter)
+  const hidden=shelteredCraters();
+  const isCr=(i,j)=>S.map[idx(i,j)]==='crater'&&!S.craters.some((c,k)=>hidden.has(k)&&Math.hypot(i+.5-c.x,j+.5-c.y)<c.r+.3);
+  // canto del tablero (borde del gran cráter)
   const [lx,ly]=tileTop(0,N),[bx,by]=tileTop(N,N),[rx,ry]=tileTop(N,0);
   x.fillStyle='#5a2616';x.beginPath();x.moveTo(lx,ly+TH/2);x.lineTo(bx,by);x.lineTo(bx,by+22);x.lineTo(lx,ly+TH/2+22);x.fill();
   x.fillStyle='#3e190e';x.beginPath();x.moveTo(bx,by);x.lineTo(rx+TW/2,ry+TH/2);x.lineTo(rx+TW/2,ry+TH/2+22);x.lineTo(bx,by+22);x.fill();
-  for(let j=0;j<N;j++)for(let i=0;i<N;i++){
-    const t=S.map[idx(i,j)],[X,Y]=tileTop(i,j),pal=PAL[t],h=hash(i,j);
-    const m=.9+.12*Math.sin(i*.35+j*.2)*Math.cos(j*.3-i*.1)+(h-.5)*.06;
-    diamond(x,X,Y);x.fillStyle=rgb(pal[0],m);x.fill();
-    x.save();diamond(x,X,Y);x.clip();
-    for(let k=0;k<18;k++){const a=hash(i*7+k,j*13-k),b=hash(i*3-k,j*5+k*7);x.fillStyle=rgb(pal[1+(k%3)],m);x.fillRect((X-TW/2+a*TW)|0,(Y+b*TH)|0,2+(k%2)*2,2)}
-    if(t==='rock'){for(let k=0;k<3;k++){const a=hash(i+k*31,j),b=hash(i,j+k*17);const px=(X-14+a*28)|0,py=(Y+8+b*14)|0;
-      x.fillStyle='#4d3a33';x.fillRect(px,py+3,8,3);x.fillStyle='#9c8476';x.fillRect(px,py,8,3);x.fillStyle='#c0a898';x.fillRect(px+1,py,3,1)}}
-    if(t==='ice'){x.fillStyle='rgba(255,255,255,.7)';for(let k=0;k<4;k++){const a=hash(i*11+k,j*3),b=hash(i*5,j*9+k);x.fillRect((X-16+a*32)|0,(Y+6+b*20)|0,4,1)}}
-    if(t==='tube'){x.fillStyle='#1a0905';x.beginPath();x.ellipse(X,Y+TH/2+1,13,6,0,0,7);x.fill();x.fillStyle='#d27a4a';x.fillRect(X-13,Y+TH/2+5,26,2);x.fillStyle='#4a1d10';x.fillRect(X-9,Y+TH/2-4,18,3)}
-    x.restore();
-    x.strokeStyle='rgba(0,0,0,.10)';x.lineWidth=1;diamond(x,X,Y);x.stroke();
-    x.strokeStyle='rgba(255,220,180,.06)';x.beginPath();x.moveTo(X-TW/2+1,Y+TH/2);x.lineTo(X,Y+1);x.lineTo(X+TW/2-1,Y+TH/2);x.stroke();
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const [X,Y]=tileTop(i,j);diamond(x,X,Y);x.fillStyle='#a0502e';x.fill()}
+  // 1) color por píxel: manchas grandes + detalle, cuantizado en tintas y con grano de 2×2 px
+  const img=x.getImageData(0,0,WORLD_W,WORLD_H),d=img.data;
+  for(let py=0;py<WORLD_H;py+=2)for(let px=0;px<WORLD_W;px+=2){
+    const o=(py*WORLD_W+px)*4;if(!d[o+3])continue;
+    const u=(px+1-OX)/(TW/2),v=(py+1-OY)/(TH/2),fi=(u+v)/2,fj=(v-u)/2,ti=Math.floor(fi),tj=Math.floor(fj);
+    if(!inMap(ti,tj))continue;
+    let t=S.map[idx(ti,tj)];if(t==='tube')t='soil';if(t==='crater')t=isCr(ti,tj)?'crater':'soil';
+    const pal=TONES[t==='crater'?'soil':t];
+    let n=t==='ice'?fbm(fi*.45+3,fj*.45+7)*.6+fbm(fi*1.6,fj*1.6)*.4:fbm(fi*.16,fj*.16)*.55+fbm(fi*.7+40,fj*.7+40)*.45;
+    n+=(hash(px>>1,py>>1)-.5)*.16;                     // grano
+    if(t==='crater')n-=.28;
+    let k=clamp(Math.floor(n*pal.length*1.15-.4),0,pal.length-1);
+    let c=pal[k];
+    if(t==='soil'){ // zonas más rojas y zonas más pardas
+      const hue=fbm(fi*.09+90,fj*.09+12);
+      c=hue>.58?lerpC(c,[c[0]*1.08,c[1]*.82,c[2]*.72],.8):hue<.38?lerpC(c,[c[0]*.86,c[1]*.92,c[2]*.95],.8):c;
+    }
+    for(let yy=0;yy<2;yy++)for(let xx=0;xx<2;xx++){const q=((py+yy)*WORLD_W+px+xx)*4;if(d[q+3]){d[q]=c[0];d[q+1]=c[1];d[q+2]=c[2]}}
   }
-  // cráteres: hoyo con pared iluminada y borde elevado
-  for(const c of S.craters){
+  x.putImageData(img,0,0);
+  // 2) relieve: montículos, piedras, rocas y grietas de hielo (cada baldosa recortada a su rombo)
+  const R=(a,b,w,h,f)=>{x.fillStyle=f;x.fillRect(a|0,b|0,w,h)};
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){
+    let t=S.map[idx(i,j)];const [X,Y]=tileTop(i,j),h=(k)=>hash(i*31+k*7,j*17-k*13);
+    x.save();diamond(x,X,Y);x.clip();
+    if(t==='soil'||t==='tube'||(t==='crater'&&!isCr(i,j))){
+      if(h(1)<.38){ // montículo: domo pixelado con luz arriba-izquierda y sombra abajo
+        const cx=X-14+h(2)*28,cy=Y+9+h(3)*13,wv=6+((h(4)*6)|0);
+        R(cx-wv/2-1,cy+2,wv+3,2,'rgba(60,20,10,.45)');
+        R(cx-wv/2,cy-1,wv,3,'#b4633a');R(cx-wv/2+1,cy-3,wv-2,2,'#c8784a');R(cx-wv/2+2,cy-4,(wv-4)/2+1,1,'#e09868');
+      }
+      const np=2+((h(5)*4)|0);
+      for(let k=0;k<np;k++){const a=X-20+h(10+k)*40,b=Y+6+h(20+k)*20;R(a,b+1,3,1,'rgba(50,18,8,.55)');R(a,b,2,1,h(30+k)<.5?'#d68c5c':'#7a3620')}
+      if(h(6)<.18){const a=X-16+h(7)*20,b=Y+12+h(8)*8;R(a,b,10,1,'rgba(240,170,120,.35)');R(a+3,b+2,8,1,'rgba(240,170,120,.25)')} // ondas de arena
+    }
+    if(t==='rock'){
+      const nb=2+((h(1)*3)|0);
+      for(let k=0;k<nb;k++){const a=X-18+h(40+k)*30,b=Y+7+h(50+k)*16,w=5+((h(60+k)*7)|0),hh=3+((h(70+k)*3)|0);
+        R(a-1,b+hh,w+3,2,'rgba(30,18,14,.55)');           // sombra
+        R(a,b,w,hh,'#5e4840');R(a,b,w-1,hh-1,'#8a7064');R(a+1,b,w-3,1,'#b49a88');R(a+1,b+1,2,1,'#cdb6a2'); // bloque con cara iluminada
+      }
+      for(let k=0;k<6;k++)R(X-22+h(80+k)*44,Y+5+h(90+k)*22,1,1,h(95+k)<.5?'#3e2e2a':'#a88e7c');
+    }
+    if(t==='ice'){
+      x.strokeStyle='rgba(70,120,150,.7)';x.lineWidth=1;x.beginPath();
+      let a=X-16+h(1)*10,b=Y+10+h(2)*10;x.moveTo(a|0,b|0);for(let k=0;k<3;k++){a+=6+h(3+k)*8;b+=(h(6+k)-.5)*8;x.lineTo(a|0,b|0)}x.stroke(); // grieta
+      if(h(9)<.5){const c=X-10+h(10)*20,e=Y+9+h(11)*12;R(c,e+3,7,1,'rgba(60,100,130,.5)');R(c,e,6,3,'#e8f6fb');R(c+1,e,3,1,'#ffffff')} // bloque de hielo
+      for(let k=0;k<3;k++){const c=X-18+h(20+k)*36,e=Y+6+h(30+k)*20;R(c,e,1,1,'#ffffff');if(h(40+k)<.4){R(c-1,e,3,1,'rgba(255,255,255,.7)')}} // brillos
+    }
+    if(t==='tube'){x.fillStyle='#1a0905';x.beginPath();x.ellipse(X,Y+TH/2+1,13,6,0,0,7);x.fill();R(X-13,Y+TH/2+5,26,2,'#d27a4a');R(X-9,Y+TH/2-4,18,3,'#4a1d10')}
+    x.restore();
+    x.strokeStyle='rgba(0,0,0,.07)';x.lineWidth=1;diamond(x,X,Y);x.stroke();
+  }
+  // 3) cráteres: hoyo con pared iluminada y borde elevado (los tapados por un refugio no se dibujan)
+  S.craters.forEach((c,ci)=>{
+    if(hidden.has(ci))return;
     const X=OX+(c.x-c.y)*TW/2,Y=OY+(c.x+c.y)*TH/2,rx=c.r*TW*.707,ry=c.r*TH*.707;
     x.save();
-    x.fillStyle='rgba(60,22,12,.55)';x.beginPath();x.ellipse(X,Y,rx+6,ry+4,0,0,7);x.fill();
+    x.fillStyle='rgba(60,22,12,.5)';x.beginPath();x.ellipse(X,Y,rx+6,ry+4,0,0,7);x.fill();
     const g=x.createRadialGradient(X,Y+ry*.3,ry*.2,X,Y,rx);g.addColorStop(0,'#5e2817');g.addColorStop(.7,'#7a351f');g.addColorStop(1,'#3c170c');
     x.fillStyle=g;x.beginPath();x.ellipse(X,Y,rx,ry,0,0,7);x.fill();
     x.fillStyle='rgba(0,0,0,.3)';x.beginPath();x.ellipse(X,Y-ry*.12,rx*.9,ry*.7,0,Math.PI,0);x.fill();
@@ -695,7 +751,7 @@ function buildTerrain(){
     x.strokeStyle='#3a160b';x.lineWidth=3;x.beginPath();x.ellipse(X,Y,rx,ry,0,Math.PI+.1,-.1);x.stroke();
     for(let k=0;k<14;k++){const a=hash(k,c.x*10|0)*Math.PI*2,rr=.3+hash(c.y*10|0,k)*.55;x.fillStyle=k%2?'#8c4126':'#4a1c0f';x.fillRect((X+Math.cos(a)*rx*rr)|0,(Y+Math.sin(a)*ry*rr)|0,3,2)}
     x.restore();
-  }
+  });
   terrainDirty=false;
 }
 function spriteBox(b,t,sp){ // rectángulo del sprite en coordenadas de mundo
@@ -707,65 +763,22 @@ function spriteBox(b,t,sp){ // rectángulo del sprite en coordenadas de mundo
 }
 // Calibración de las imágenes de pasillo: centro del anillo de un extremo (px de la imagen), escala y borde de baldosa al que corresponde.
 const TUBE_UP=12, TUBE_F=1.25;   // altura del eje del tubo sobre el suelo y alargamiento para que los tramos empalmen
-const CAL={pasillo:{k:.289,a:[23.8,80.6],at:[-16,24]},pasillo_v:{k:.1387,a:[23.6,55.8],at:[-16,8]},cruce:{k:.333,a:[24.5,86.2],at:[-16,24]}};
+const CAL={pasillo:{k:.289,a:[23.8,80.6],at:[-16,24]},pasillo_v:{k:.1387,a:[23.6,55.8],at:[-16,8]},cruce:{k:.313,a:[72.1,63.9],at:[0,16]}};
 function corridorRect(b,name){
   const c=CAL[name],sp=IMG[name],[X,Y]=tileTop(b.i,b.j),cx=X,cy=Y+TH/2-TUBE_UP;
   const x=X+c.at[0]-c.a[0]*c.k,y=Y+c.at[1]-c.a[1]*c.k-TUBE_UP;
   return {x:cx+(x-cx)*TUBE_F,y:cy+(y-cy)*TUBE_F,w:sp.w*c.k*TUBE_F,h:sp.h*c.k*TUBE_F};
 }
-function corridorShape(b){ // orienta el pasillo según sus vecinos
-  const me=OCC[idx(b.i,b.j)];
-  const nb=(i,j)=>inMap(i,j)&&OCC[idx(i,j)]>=0&&OCC[idx(i,j)]!==me;
-  const ai=nb(b.i-1,b.j)||nb(b.i+1,b.j), aj=nb(b.i,b.j-1)||nb(b.i,b.j+1);
-  if(ai&&aj)return 'cross';return ai?'alongI':'straight';
-}
-/* ---------- colonos que caminan por los pasillos ---------- */
-const WALK=[];let walkT=0;
-const SUIT_TRIM=['#d8ab4c','#e0703a','#5cc07e','#5aa0e0','#c47ad8','#e05a7a'];
-function mkColonist(trim){ // pixel art 7×12: casco, visor, traje, mochila y botas
-  const F=[["..HHH..",".HHVVH.",".HVVVH.","..HHH..",".PSSSS.","PPSTTSS",".PSSSS.",".SSTTS.","..S.S..",".S...S.",".D...D."],
-           ["..HHH..",".HHVVH.",".HVVVH.","..HHH..",".PSSSS.","PPSTTSS",".PSSSS.",".SSTTS.","..S.S..","..S.S..","..D.D.."]];
-  const C={H:'#f3efe6',V:'#8fd8ec',S:'#e2dccb',T:trim,P:'#2e3866',D:'#222a4c'};
-  return F.map(rows=>{
-    const o=document.createElement('canvas');o.width=9;o.height=13;const q=o.getContext('2d');
-    rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'){q.fillStyle='#1a1f3a';q.fillRect(x,y,3,3)}})); // contorno oscuro de 1 px
-    rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch!=='.'){q.fillStyle=C[ch];q.fillRect(x+1,y+1,1,1)}}));
-    return o});
-}
-const COLONIST=SUIT_TRIM.map(mkColonist);
-let CORR=[];
-function corrNb(i,j){const o=[];for(const [a,c] of [[1,0],[-1,0],[0,1],[0,-1]]){const ii=i+a,jj=j+c;if(inMap(ii,jj)){const k=OCC[idx(ii,jj)];if(k>=0&&S.blds[k].t==='corridor')o.push([ii,jj])}}return o}
-function syncWalkers(){
-  CORR=S.blds.filter(b=>b.t==='corridor');
-  const want=Math.min(S.pop,Math.ceil(CORR.length*.7),40);
-  for(let k=WALK.length-1;k>=0;k--){const w=WALK[k],o=inMap(w.ti,w.tj)?OCC[idx(w.ti,w.tj)]:-1;if(o<0||S.blds[o].t!=='corridor')WALK.splice(k,1)}
-  while(WALK.length>want)WALK.pop();
-  while(WALK.length<want&&CORR.length){const c=pick(CORR);WALK.push({i:c.i,j:c.j,ti:c.i,tj:c.j,p:1,v:.5+Math.random()*.5,skin:rnd(COLONIST.length),hide:0,ph:Math.random()*9})}
-}
-function stepWalkers(t){
-  const dt=Math.min(.1,walkT?t-walkT:0);walkT=t;if(!S)return;
-  for(const w of WALK){
-    if(w.hide>0){w.hide-=dt;if(w.hide<=0&&CORR.length){const c=pick(CORR);Object.assign(w,{i:c.i,j:c.j,ti:c.i,tj:c.j,p:1})}continue}
-    w.p+=dt*w.v;
-    if(w.p>=1){const pi=w.i,pj=w.j;w.i=w.ti;w.j=w.tj;w.p=0;
-      // a veces entra en un edificio pegado al pasillo y sale más tarde por otro sitio
-      const nearB=[[1,0],[-1,0],[0,1],[0,-1]].some(([a,c])=>{const ii=w.i+a,jj=w.j+c;if(!inMap(ii,jj))return false;const k=OCC[idx(ii,jj)];return k>=0&&S.blds[k].t!=='corridor'});
-      if(nearB&&Math.random()<.12){w.hide=2+Math.random()*4;continue}
-      let nb=corrNb(w.i,w.j);const fwd=nb.filter(([a,c])=>a!==pi||c!==pj);if(fwd.length)nb=fwd;
-      if(nb.length){[w.ti,w.tj]=pick(nb)}else{w.ti=w.i;w.tj=w.j;w.p=-.6}
-    }
-  }
-}
-function drawWalker(x,w,t){
-  const p=clamp(w.p,0,1),fi=w.i+(w.ti-w.i)*p+.5,fj=w.j+(w.tj-w.j)*p+.5;
-  const X=OX+(fi-fj)*TW/2,Y=OY+(fi+fj)*TH/2;
-  const moving=w.ti!==w.i||w.tj!==w.j,dirX=(w.ti-w.i)-(w.tj-w.j);
-  const fr=COLONIST[w.skin][moving?((t*6+w.ph)|0)%2:1],S2=1.2,ww=fr.width*S2,hh=fr.height*S2,bob=moving&&((t*6+w.ph)|0)%2?-.6:0;
-  const fy=Y-4;  // pies sobre el suelo del tubo
-  x.save();x.imageSmoothingEnabled=false;
-  x.fillStyle='rgba(0,0,0,.28)';x.beginPath();x.ellipse(X,fy,4,1.6,0,0,7);x.fill();
-  if(dirX<0){x.translate(X,0);x.scale(-1,1);x.drawImage(fr,-ww/2,fy-hh+bob,ww,hh)}else x.drawImage(fr,X-ww/2,fy-hh+bob,ww,hh);
-  x.restore();
+function corridorShape(b){ // orienta el pasillo según con qué está unido de verdad
+  const dirs=[[1,0,'i'],[-1,0,'i'],[0,1,'j'],[0,-1,'j']],cor={i:0,j:0},bld={i:0,j:0};
+  for(const [a,c,ax] of dirs){const ii=b.i+a,jj=b.j+c;if(!inMap(ii,jj))continue;const k=OCC[idx(ii,jj)];if(k<0)continue;const nb=S.blds[k];
+    if(nb.t==='corridor'){cor[ax]++;continue}
+    const P=B[nb.t].ports;
+    if(P){if(P.some(([pi,pj])=>nb.i+pi===b.i&&nb.j+pj===b.j))cor[ax]++;continue} // la base solo por sus conectores
+    bld[ax]++;}
+  // un edificio de al lado solo cuenta si el pasillo llega de frente (misma dirección que sus tramos), nunca si solo pasa por su lateral
+  const hasI=cor.i>0||(bld.i>0&&cor.j===0), hasJ=cor.j>0||(bld.j>0&&cor.i===0&&!(bld.i>0&&cor.j===0));
+  if(hasI&&hasJ)return 'cross';return hasI?'alongI':'straight';
 }
 // Orden de pintado isométrico: un objeto va detrás si queda entero "antes" en i o en j y comparte franja en el otro eje.
 function depthSort(items){
@@ -794,17 +807,16 @@ function drawMap(t){
   const f=flowsCache||(flowsCache=flows(S));
   const items=S.blds.map((b,k)=>({k,b,d:b.i+b.j+2*B[b.t].fp}));
   S.crates.forEach(c=>items.push({b:c,d:c.i+c.j+2,crate:true}));
-  stepWalkers(t);for(const wk of WALK)if(!wk.hide)items.push({b:{i:Math.max(wk.i,wk.ti),j:Math.max(wk.j,wk.tj)},walker:wk,w:1,h:1});
+
   if(placing){
     const v=validSpot(placing.t,placing.i,placing.j);
     if(placing.t==='corridor')S.blds.forEach(b=>{const P=B[b.t].ports;if(P)P.forEach(([pi,pj])=>{const i=b.i+pi,j=b.j+pj;if(inMap(i,j)&&OCC[idx(i,j)]<0)drawFoot(i,j,[1,1],'rgba(216,171,76,'+(.35+Math.sin(t*5)*.2)+')','#f6dc9a')})});
     drawFoot(placing.i,placing.j,dim(placing.t),v.ok?'rgba(134,217,143,.35)':'rgba(255,107,90,.35)',v.ok?'#86d98f':'#ff6b5a');
     items.push({b:placing,d:placing.i+placing.j+2*B[placing.t].fp+.5,ghost:true});
   }
-  for(const it of items)if(!it.walker)[it.w,it.h]=it.crate?[1,1]:dim(it.b.t);
+  for(const it of items)[it.w,it.h]=it.crate?[1,1]:dim(it.b.t);
   const order=depthSort(items);
   for(const it of order){
-    if(it.walker){drawWalker(x,it.walker,t);continue}
     if(it.crate){const sp=IMG.cajas;if(!sp.ok)continue;const [X,Y]=tileTop(it.b.i,it.b.j);const w=TW*.62,h=w*sp.h/sp.w,bob=Math.sin(t*3+it.b.i)*1.5;
       x.fillStyle='rgba(0,0,0,.25)';x.beginPath();x.ellipse(X,Y+TH*.62,w*.45,w*.18,0,0,7);x.fill();
       x.drawImage(sp.img,X-w/2,Y+TH*.75-h+bob,w,h);
@@ -879,7 +891,7 @@ function tapMap(sx,sy){
 /* ================= RENDER HUD ================= */
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
 function render(){
-  const s=S,f=flows(s);flowsCache=f;syncWalkers();
+  const s=S,f=flows(s);flowsCache=f;
   $('#solLbl').innerHTML=`SOL ${s.sol}<small>${s.name.toUpperCase()} · ${s.pop} EN MARTE</small>`;
   const pills=[];
   if(s.storm)pills.push(`<span class="pill storm">🌪️ Tormenta ${s.storm}</span>`);
@@ -954,7 +966,22 @@ function buildMenu(ti,tj,head){
     startPlacing(c.dataset.b,ti,tj);
   });
 }
+function craterAt(i,j){return S.craters.find(c=>Math.hypot(i+.5-c.x,j+.5-c.y)<c.r+.3)}
+function openCrater(i,j){
+  const c=craterAt(i,j),b=B.shelter,T=TERR.crater;
+  const ci=c?Math.round(c.x-1.5):i-1,cj=c?Math.round(c.y-1.5):j-1;  // refugio 3×3 centrado en el cráter
+  const locked=S.mission<b.un,v=validSpot('shelter',ci,cj);
+  let why='';if(locked)why=`🔒 El refugio se desbloquea en la misión ${b.un+1}.`;else if(S.mat<b.cost)why=`Faltan ${b.cost-S.mat} 🧱 para construirlo.`;else if(!v.ok)why=v.why;
+  const sh=sheet(`<div class="sheetHead"><span class="big">${T.g}</span><div><h2>${T.n}</h2><p>Un hoyo perfecto para un refugio contra la radiación.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <img class="bimg" src="${imgSrc('refugio')}" alt="Refugio de regolito">
+    <p class="info">${b.desc}</p><div class="statline"><span>🧱 ${b.cost}</span><span class="flat">3×3</span></div>
+    <div class="fact" style="max-width:none"><b>¿Sabías que…?</b>${b.fact}</div>
+    ${why?`<p class="hint" style="color:var(--warn)">${why}</p>`:''}
+    <div class="row"><button class="btn" id="crB" ${why?'disabled':''}>Construir refugio aquí</button></div>`);
+  sh.querySelector('#crB').onclick=()=>{closeSheet();startPlacing('shelter',ci+1,cj+1)};
+}
 function openTile(i,j){
+  if(S.map[idx(i,j)]==='crater')return openCrater(i,j);
   const T=TERR[S.map[idx(i,j)]];
   buildMenu(i,j,`<div class="sheetHead"><span class="big">${T.g}</span><div><h2>${T.n}</h2><p>${T.t}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>`);
 }
@@ -979,7 +1006,7 @@ $('#pbCancel').onclick=stopPlacing;
 $('#pbOk').onclick=()=>{if(!placing)return;const {t,i,j}=placing;if(!validSpot(t,i,j).ok)return;stopPlacing();build(t,i,j)};
 function build(k,i,j){
   const b=B[k];if(S.mat<b.cost){toast(`Faltan ${b.cost-S.mat} 🧱`);return}
-  S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false});S.stats.built++;rebuildOcc();
+  S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false});S.stats.built++;rebuildOcc();if(k==='shelter')terrainDirty=true;
   learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
   toast(`${b.i} ${b.n}<br><small style="font-weight:600">${b.fact}</small>`);
@@ -1014,7 +1041,7 @@ function openBuilding(k){
   const rep=v.querySelector('#bRep');if(rep)rep.onclick=()=>{const c=Math.ceil(b.cost/2);if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;t.broken=false;beep(700,.1);save();closeSheet();selB=-1;render();toast('🔧 ¡Reparado!')};
   const del=v.querySelector('#bDel');if(del)del.onclick=()=>{
     if(!del.dataset.sure){del.dataset.sure=1;del.textContent='¿Seguro? Toca otra vez';return}
-    S.mat+=Math.floor(b.cost/2);S.blds.splice(k,1);rebuildOcc();save();closeSheet();selB=-1;render();};
+    if(t.t==='shelter')terrainDirty=true;S.mat+=Math.floor(b.cost/2);S.blds.splice(k,1);rebuildOcc();save();closeSheet();selB=-1;render();};
 }
 function showEvent(e,done){
   learn(e.fact);
