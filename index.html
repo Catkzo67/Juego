@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<!--ARTIFACT-START-->
+<title>Misión Ares 2050</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#170c0d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: one-screen mobile console — resource HUD on top, crater grid in the middle, action bar at the bottom; dialogs rise as bottom sheets. */
+:root{
+  --night:#170c0d;      /* cielo marciano nocturno */
+  --panel:#2a1716;      /* consola */
+  --panel-2:#3a201d;
+  --line:#5a332c;
+  --rust:#d0582c;       /* óxido de hierro: acento */
+  --dust:#f0b27a;       /* polvo iluminado */
+  --ink:#fbeee4;        /* texto */
+  --muted:#c49c8a;
+  --o2:#62d3e3;         /* oxígeno / hielo */
+  --good:#7fd48a;
+  --warn:#f2c14e;
+  --bad:#ff6b5a;
+  --soil-a:#9a4a2c; --soil-b:#7c3a24; --ice:#9fd8e6; --rock:#6c4a3e;
+  --display:"Chakra Petch", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Nunito", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:15px;overflow:hidden;
+  padding-left:max(0px, env(safe-area-inset-left,0px));padding-right:max(0px, env(safe-area-inset-right,0px));
+  user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--dust);outline-offset:2px}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.screen{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
+.gutter{padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.02em}
+.btn{background:var(--rust);color:#fff;font-family:var(--display);font-weight:700;font-size:1.05rem;letter-spacing:.06em;
+  text-transform:uppercase;padding:14px 22px;border-radius:14px;box-shadow:0 4px 0 #8a3418;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8a3418}
+.btn.ghost{background:transparent;border:2px solid var(--line);box-shadow:none;color:var(--dust)}
+.btn[disabled]{opacity:.4;pointer-events:none}
+
+/* ---------- Pantallas de historia ---------- */
+#title,#story,#crew,#travel,#end{justify-content:center;align-items:center;text-align:center;gap:18px;padding-block:24px}
+.logo{font-family:var(--display);font-weight:700;line-height:.9}
+.logo .y{display:block;font-size:1rem;letter-spacing:.35em;color:var(--dust);margin-bottom:8px}
+.logo .n{display:block;font-size:clamp(3rem,16vw,5.5rem);color:var(--ink);text-shadow:0 0 30px rgba(208,88,44,.6)}
+.tag{color:var(--muted);max-width:30ch;line-height:1.5}
+.stack{display:flex;flex-direction:column;gap:12px;width:min(320px,100%)}
+#storyArt{width:min(260px,70vw);height:min(260px,70vw)}
+.storyText{max-width:32ch;font-size:1.12rem;line-height:1.55;min-height:7.5em}
+.dots{display:flex;gap:8px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--rust)}
+#crew{justify-content:flex-start;overflow-y:auto}
+#crew h2{font-size:1.5rem;margin-top:8px}
+.field{display:flex;flex-direction:column;gap:6px;width:min(360px,100%);text-align:left}
+.field label{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.field input{font:inherit;font-size:1.1rem;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);user-select:text}
+.crewGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(420px,100%)}
+.crewCard{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:12px 10px;text-align:left;display:flex;flex-direction:column;gap:4px}
+.crewCard .face{font-size:2rem}
+.crewCard b{font-family:var(--display);font-size:.98rem}
+.crewCard span{font-size:.8rem;color:var(--muted);line-height:1.35}
+.crewCard.sel{border-color:var(--rust);background:var(--panel-2);box-shadow:0 0 0 3px rgba(208,88,44,.25)}
+.hint{font-size:.85rem;color:var(--muted)}
+#travelArt{width:min(340px,90vw);height:150px}
+.bar{width:min(320px,85vw);height:12px;background:var(--panel);border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rust),var(--dust))}
+.fact{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;max-width:34ch;line-height:1.5;font-size:.95rem;text-align:left}
+.fact b{color:var(--o2);font-family:var(--display);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:4px}
+
+/* ---------- Juego ---------- */
+#game{gap:0}
+.hud{padding-top:8px;padding-bottom:6px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(var(--night),rgba(23,12,13,.6))}
+.hudTop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sol{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:.04em}
+.sol small{display:block;font-size:.62rem;letter-spacing:.2em;color:var(--muted);font-weight:500}
+.status{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pill{font-size:.72rem;font-weight:800;padding:4px 9px;border-radius:99px;background:var(--panel-2);border:1px solid var(--line);white-space:nowrap}
+.pill.storm{background:#5c3a1c;border-color:var(--warn);color:var(--warn)}
+.pill.cold{background:#1c3a44;border-color:var(--o2);color:var(--o2)}
+.res{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 6px;display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.chip .k{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.chip .v{font-family:var(--display);font-weight:700;font-size:1rem;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
+.chip .d{font-size:.68rem;font-weight:800;font-variant-numeric:tabular-nums}
+.chip.low{border-color:var(--bad);animation:blink 1s infinite}
+.up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--muted)}
+@keyframes blink{50%{background:#4a1c18}}
+.meters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meter{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:800;color:var(--muted)}
+.meter .track{flex:1;height:8px;border-radius:6px;background:var(--panel);overflow:hidden;border:1px solid var(--line)}
+.meter .track i{display:block;height:100%;transition:width .4s}
+.mission{margin-top:2px;display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:7px 10px;text-align:left;width:100%}
+.mission .num{font-family:var(--display);font-weight:700;color:var(--night);background:var(--dust);border-radius:8px;padding:2px 7px;font-size:.8rem}
+.mission .txt{font-size:.85rem;line-height:1.3;flex:1;min-width:0}
+.mission .txt small{display:block;color:var(--muted);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase}
+.mapwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-block:6px;position:relative}
+.map{display:grid;grid-template-columns:repeat(6,var(--ts,48px));grid-auto-rows:var(--ts,48px);gap:4px;padding:8px;border-radius:26px;
+  background:radial-gradient(ellipse at 50% 40%,rgba(240,178,122,.12),transparent 70%),rgba(60,24,18,.55);
+  box-shadow:inset 0 0 0 2px rgba(240,178,122,.15),inset 0 8px 30px rgba(0,0,0,.5)}
+.tile{position:relative;border-radius:10px;display:grid;place-items:center;font-size:calc(var(--ts,48px)*.52);line-height:1;
+  background:radial-gradient(circle at 30% 25%,var(--soil-a),var(--soil-b));box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.tile.ice{background:radial-gradient(circle at 30% 25%,#c9eef5,#6fb3c6 70%,#4d8aa0)}
+.tile.rock{background:radial-gradient(circle at 30% 25%,#8a6457,var(--rock))}
+.tile.crater{background:radial-gradient(circle,#3b1b12 30%,#6b3220 55%,var(--soil-b) 72%);box-shadow:none}
+.tile.tube{background:radial-gradient(circle at 50% 60%,#1a0b08 25%,#5a2b1d 60%,var(--soil-b))}
+.tile .terr{font-size:.55em;opacity:.55}
+.tile.sel{outline:3px solid var(--dust);outline-offset:1px;z-index:2}
+.tile.b{background:radial-gradient(circle at 30% 25%,#5a3a33,#3a2420);box-shadow:inset 0 0 0 2px rgba(240,178,122,.35),0 3px 0 rgba(0,0,0,.35)}
+.tile.b.ice{box-shadow:inset 0 0 0 2px var(--o2),0 3px 0 rgba(0,0,0,.35)}
+.tile.b.tube{box-shadow:inset 0 0 0 2px var(--warn),0 3px 0 rgba(0,0,0,.35)}
+.tile .flag{position:absolute;right:-3px;top:-3px;font-size:calc(var(--ts,48px)*.26);background:var(--night);border-radius:50%;padding:2px;line-height:1}
+.tile.off>.ic{filter:grayscale(1) brightness(.6)}
+.tile.new{animation:pop .45s ease-out}
+@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.float{position:absolute;pointer-events:none;font-family:var(--display);font-weight:700;color:var(--good);font-size:1rem;animation:rise 1.2s ease-out forwards;z-index:5;text-shadow:0 2px 4px #000}
+@keyframes rise{to{transform:translateY(-40px);opacity:0}}
+.actions{display:flex;gap:8px;align-items:stretch;padding-top:6px;padding-bottom:max(10px, env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(23,12,13,.6),var(--night))}
+.iconBtn{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:1.3rem;min-width:62px}
+.iconBtn small{font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.next{flex:1;font-size:1.1rem}
+
+/* ---------- Hojas / modales ---------- */
+.veil{position:fixed;inset:0;background:rgba(10,4,5,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--panel);border-top:2px solid var(--line);border-radius:22px 22px 0 0;width:min(560px,100%);max-height:86%;overflow-y:auto;
+  padding-top:16px;padding-bottom:max(18px, env(safe-area-inset-bottom,0px));animation:up .25s ease-out;display:flex;flex-direction:column;gap:12px}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.sheet h2{font-size:1.3rem}
+.sheetHead{display:flex;align-items:center;gap:12px}
+.sheetHead .big{font-size:2.4rem}
+.sheetHead p{margin:2px 0 0;color:var(--muted);font-size:.85rem}
+.close{margin-left:auto;font-size:1.4rem;width:40px;height:40px;border-radius:50%;background:var(--panel-2)}
+.buildGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:var(--panel-2);border:2px solid var(--line);border-radius:14px;padding:10px;text-align:left;display:flex;flex-direction:column;gap:4px;min-width:0}
+.card .top{display:flex;align-items:center;gap:8px}
+.card .top .e{font-size:1.7rem}
+.card b{font-family:var(--display);font-size:.92rem;line-height:1.15}
+.card .stats{font-size:.75rem;font-weight:800;display:flex;flex-wrap:wrap;gap:4px 8px}
+.card .why{font-size:.72rem;color:var(--warn);font-weight:700}
+.card .desc{font-size:.76rem;color:var(--muted);line-height:1.35}
+.card.no{opacity:.5}
+.card:not(.no):active{border-color:var(--rust)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row .btn{flex:1;font-size:.9rem;padding:12px 10px}
+.info{line-height:1.5;margin:0}
+.statline{display:flex;flex-wrap:wrap;gap:6px}
+.statline span{background:var(--panel-2);border-radius:8px;padding:4px 8px;font-size:.8rem;font-weight:800}
+.event .big{font-size:3rem}
+.opt{background:var(--panel-2);border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;font-weight:700;line-height:1.35}
+.opt:active{border-color:var(--rust)}
+.opt small{display:block;color:var(--muted);font-weight:600;font-size:.78rem;margin-top:2px}
+.opt.right{border-color:var(--good);background:#1f3a24}
+.opt.wrong{border-color:var(--bad);background:#3a1f1c}
+.sec{font-family:var(--display);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dust);margin-top:4px}
+.mlist{display:flex;flex-direction:column;gap:6px}
+.mlist div{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;line-height:1.35;padding:6px 8px;border-radius:10px;background:var(--panel-2)}
+.mlist div.done{opacity:.6}
+.mlist div.cur{outline:2px solid var(--rust)}
+.log{display:flex;flex-direction:column;gap:4px;font-size:.84rem;line-height:1.4;color:var(--muted)}
+.log b{color:var(--ink)}
+.toast{position:fixed;left:50%;top:42%;transform:translateX(-50%);z-index:30;background:var(--panel-2);border:2px solid var(--dust);
+  border-radius:14px;padding:10px 16px;font-weight:800;max-width:min(90vw,360px);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fade .2s}
+.solflash{position:fixed;inset:0;z-index:15;display:grid;place-items:center;pointer-events:none;font-family:var(--display);font-weight:700;font-size:3rem;
+  color:var(--dust);text-shadow:0 0 30px var(--rust);animation:flash 1s forwards}
+@keyframes flash{0%{opacity:0;transform:scale(.8)}25%{opacity:1;transform:scale(1)}100%{opacity:0}}
+#end h1{font-size:2.2rem}
+.endStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(340px,100%)}
+.endStats div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}
+.endStats b{display:block;font-family:var(--display);font-size:1.5rem}
+.endStats span{font-size:.75rem;color:var(--muted)}
+@media (max-height:640px){.res .chip .k{display:none}.mission{padding:5px 8px}.mission .txt small{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<!-- Portada -->
+<section class="screen gutter" id="title">
+  <div class="logo"><span class="y">PROYECTO ARES · 2050</span><span class="n">MISIÓN<br>MARTE</span></div>
+  <p class="tag">Dirige a la primera tripulación y convierte un cráter rojo y helado en el nuevo hogar de la humanidad.</p>
+  <div class="stack">
+    <button class="btn" id="bNew">Nueva misión</button>
+    <button class="btn ghost" id="bCont" hidden>Continuar partida</button>
+  </div>
+</section>
+
+<!-- Historia -->
+<section class="screen gutter" id="story" hidden>
+  <canvas id="storyArt" width="520" height="520"></canvas>
+  <p class="storyText" id="storyText"></p>
+  <div class="dots" id="storyDots"></div>
+  <div class="stack"><button class="btn" id="bStory">Siguiente</button></div>
+</section>
+
+<!-- Tripulación -->
+<section class="screen gutter" id="crew" hidden>
+  <h2>Prepara tu tripulación</h2>
+  <div class="field"><label for="cmdName">Nombre del comandante</label><input id="cmdName" maxlength="16" placeholder="Escribe tu nombre" autocomplete="off"></div>
+  <p class="hint" id="crewHint">Elige 3 especialistas. Cada uno ayuda en algo distinto.</p>
+  <div class="crewGrid" id="crewGrid"></div>
+  <div class="stack" style="padding-bottom:20px"><button class="btn" id="bLaunch" disabled>¡Despegar!</button></div>
+</section>
+
+<!-- Viaje -->
+<section class="screen gutter" id="travel" hidden>
+  <h2 id="travelTitle">Viaje a Marte</h2>
+  <canvas id="travelArt" width="680" height="300"></canvas>
+  <div class="bar"><i id="travelBar"></i></div>
+  <p class="hint" id="travelDay">Día 0 de 90</p>
+  <div class="fact" id="travelFact"></div>
+  <div class="stack"><button class="btn" id="bLand" disabled>Aterrizar</button></div>
+</section>
+
+<!-- Juego -->
+<section class="screen" id="game" hidden>
+  <header class="hud gutter">
+    <div class="hudTop">
+      <div class="sol" id="solLbl">SOL 1<small>DÍA MARCIANO</small></div>
+      <div class="status" id="statusPills"></div>
+    </div>
+    <div class="res" id="res"></div>
+    <div class="meters" id="meters"></div>
+    <button class="mission" id="missionBtn"></button>
+  </header>
+  <main class="mapwrap gutter" id="mapwrap"><div class="map" id="map"></div></main>
+  <footer class="actions gutter">
+    <button class="iconBtn" id="bLog">📜<small>Diario</small></button>
+    <button class="btn next" id="bNext">Siguiente sol ▸</button>
+    <button class="iconBtn" id="bMenu">⚙️<small>Menú</small></button>
+  </footer>
+</section>
+
+<!-- Final -->
+<section class="screen gutter" id="end" hidden>
+  <div style="font-size:4rem" id="endIcon">🏙️</div>
+  <h1 id="endTitle">¡Colonia autosuficiente!</h1>
+  <p class="tag" id="endText"></p>
+  <div class="endStats" id="endStats"></div>
+  <div class="stack">
+    <button class="btn" id="bEndMain">Jugar otra vez</button>
+    <button class="btn ghost" id="bEndKeep" hidden>Seguir construyendo</button>
+  </div>
+</section>
+
+<script>
+(()=>{
+"use strict";
+const $=s=>document.querySelector(s);
+const rnd=n=>Math.floor(Math.random()*n);
+const pick=a=>a[rnd(a.length)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const COLS=6, ROWS=8, SAVE='ares2050-save';
+
+/* ================= DATOS ================= */
+const CREW=[
+  {id:'ing',face:'👩‍🔧',name:'Ingeniera Vega',role:'Energía',txt:'Los paneles solares dan un 25% más de energía.'},
+  {id:'bot',face:'👨‍🌾',name:'Botánico Ruiz',role:'Cultivos',txt:'Los cultivos producen un 25% más de comida.'},
+  {id:'med',face:'👩‍⚕️',name:'Doctora Amaya',role:'Salud',txt:'La tripulación se recupera más rápido y sufre menos daño.'},
+  {id:'geo',face:'🧑‍🔬',name:'Geólogo Tanaka',role:'Minerales',txt:'Los robots mineros sacan un 25% más de materiales.'},
+  {id:'psi',face:'🧑‍🏫',name:'Psicóloga Nkosi',role:'Ánimo',txt:'Ayuda a que el equipo no se sienta solo ni triste.'}
+];
+
+// e: energía (+ produce, - consume). p: producción por sol. pr: prioridad (menor = se alimenta antes)
+const B={
+  lander:{n:'Módulo de aterrizaje',i:'🛖',cost:0,e:-1,cap:4,pr:0,desc:'Vuestra primera casa. Caben 4 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
+  solar:{n:'Panel solar',i:'🔆',cost:10,e:6,un:0,desc:'Da energía con la luz del Sol. Con tormentas de polvo produce mucho menos.',fact:'Las tormentas de polvo pueden durar semanas y tapan el Sol: los paneles solares producen mucho menos.'},
+  moxie:{n:'Planta MOXIE',i:'🫧',cost:15,e:-3,p:{o2:6},pr:1,un:1,desc:'Fabrica oxígeno a partir del CO₂ del aire marciano.',fact:'En 2021 el experimento MOXIE del rover Perseverance fabricó oxígeno con el dióxido de carbono de Marte.'},
+  ice:{n:'Extractor de hielo',i:'🧊',cost:15,e:-3,p:{agua:8},pr:2,un:2,need:'ice',desc:'Derrite y limpia el hielo del subsuelo para obtener agua. Solo sobre hielo.',fact:'Hay hielo bajo el polvo y en los polos de Marte. Para beberlo hay que extraerlo, derretirlo y purificarlo.'},
+  miner:{n:'Robot minero',i:'🤖',cost:12,e:-2,p:{mat:4},pr:8,un:3,rockBonus:true,desc:'Excava regolito para construir. Sobre roca saca el doble.',fact:'El suelo de Marte tiene mucho óxido de hierro: por eso el planeta es rojo. Con él se fabrican ladrillos.'},
+  battery:{n:'Batería',i:'🔋',cost:15,e:0,store:30,pr:0,un:3,desc:'Guarda 30 de energía que sobra para cuando falte.',fact:'Guardar energía es clave para sobrevivir a la noche y a las tormentas de polvo.'},
+  bio:{n:'Bio-laboratorio',i:'🧫',cost:20,e:-3,p:{comida:2},pr:4,un:4,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
+  farm:{n:'Invernadero',i:'🌱',cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:5,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
+  shelter:{n:'Refugio de regolito',i:'⛰️',cost:25,e:0,pr:0,un:6,desc:'Búnker cubierto con 3 a 5 metros de suelo. Protege de la radiación.',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
+  antenna:{n:'Antena',i:'📡',cost:20,e:-1,pr:5,un:7,desc:'Habla con la Tierra y guía a las naves con nuevos colonos.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
+  habitat:{n:'Hábitat',i:'🏠',cost:30,e:-2,cap:6,pr:2,un:8,desc:'Casa para 6 colonos. En un tubo de lava caben 12.',fact:'Los tubos de lava son cuevas que dejaron los volcanes. Protegen de la radiación y de los micrometeoritos.'},
+  gym:{n:'Gimnasio',i:'🏋️',cost:20,e:-2,pr:6,un:8,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
+  repair:{n:'Robot de mantenimiento',i:'🦾',cost:25,e:-2,pr:7,un:9,desc:'Limpia el polvo de los paneles y arregla averías solo.',fact:'Los robots con sensores LiDAR hacen los trabajos más peligrosos fuera de la base.'},
+  reactor:{n:'Microrreactor nuclear',i:'⚛️',cost:60,e:25,un:10,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
+  shield:{n:'Escudo magnético',i:'🧲',cost:90,e:-8,pr:5,un:11,desc:'Crea un paraguas magnético que desvía la radiación del Sol.',fact:'Marte no tiene un campo magnético global como la Tierra. Un escudo artificial desvía las partículas del Sol.'}
+};
+const BUILD_ORDER=['solar','moxie','ice','miner','battery','bio','farm','shelter','antenna','habitat','gym','repair','reactor','shield'];
+
+const TERR={
+  soil:{n:'Suelo marciano',g:'',t:'Polvo rojo y rocas. Aquí puedes construir casi todo.'},
+  ice:{n:'Hielo subterráneo',g:'❄️',t:'Bajo el polvo hay hielo. ¡Perfecto para un extractor de agua!'},
+  rock:{n:'Roca rica en minerales',g:'🪨',t:'Un robot minero aquí saca el doble de materiales.'},
+  tube:{n:'Tubo de lava',g:'🕳️',t:'Una cueva volcánica. Un hábitat aquí aloja al doble de colonos.'},
+  crater:{n:'Cráter pequeño',g:'',t:'Un agujero de un meteorito. Aquí no se puede construir.'}
+};
+
+const MISSIONS=[
+  {t:'Construye un segundo panel solar',h:'Toca una casilla vacía y elige Panel solar.',ok:s=>count(s,'solar')>=2,r:10},
+  {t:'Fabrica oxígeno con una planta MOXIE',h:'Sin oxígeno nadie puede respirar. ¡Es urgente!',ok:s=>count(s,'moxie')>=1,r:10},
+  {t:'Saca agua del hielo',h:'Pon un extractor sobre una casilla azul con hielo.',ok:s=>count(s,'ice')>=1,r:10},
+  {t:'Pon a trabajar un robot minero',h:'Los materiales sirven para construir. Mejor sobre roca.',ok:s=>count(s,'miner')>=1,r:10},
+  {t:'Limpia el suelo con un bio-laboratorio',h:'Las bacterias quitan los percloratos tóxicos.',ok:s=>count(s,'bio')>=1,r:15},
+  {t:'Cultiva comida en un invernadero',h:'La comida que trajisteis de la Tierra se acabará.',ok:s=>count(s,'farm')>=1,r:15},
+  {t:'Construye un refugio contra la radiación',h:'Las tormentas solares son peligrosas.',ok:s=>count(s,'shelter')>=1,r:15},
+  {t:'Instala una antena para llamar a más colonos',h:'Cada 6 soles llegará una nave si tienes antena.',ok:s=>count(s,'antenna')>=1,r:15},
+  {t:'Llega a 10 colonos',h:'Construye hábitats para que tengan dónde vivir.',ok:s=>s.pop>=10,r:25},
+  {t:'Activa un microrreactor nuclear',h:'Energía constante, haya tormenta o no.',ok:s=>count(s,'reactor')>=1,r:30},
+  {t:'Protege la colonia con un escudo magnético',h:'Un paraguas invisible contra la radiación del Sol.',ok:s=>count(s,'shield')>=1,r:30},
+  {t:'Llega a 30 colonos: ¡ciudad autosuficiente!',h:'Más hábitats, más comida, más oxígeno y más agua.',ok:s=>s.pop>=30,r:0}
+];
+
+const QUIZ=[
+  {q:'¿De qué gas está hecho casi todo el aire de Marte?',a:['Dióxido de carbono (CO₂)','Oxígeno','Helio'],c:0,e:'Alrededor del 95% es CO₂. Por eso no se puede respirar sin casco.'},
+  {q:'Si en la Tierra pesas 40 kg, ¿cuánto pesarías en Marte?',a:['Unos 15 kg','40 kg','80 kg'],c:0,e:'La gravedad de Marte es el 38% de la de la Tierra.'},
+  {q:'¿Cuánto puede tardar un mensaje de Marte a la Tierra?',a:['Unos 20 minutos','1 segundo','3 días'],c:0,e:'Según la posición de los planetas, entre 4 y 24 minutos en un solo sentido.'},
+  {q:'¿Qué consiguió el experimento MOXIE?',a:['Fabricar oxígeno en Marte','Encontrar dinosaurios','Hacer llover'],c:0,e:'MOXIE, en el rover Perseverance, sacó oxígeno del CO₂ marciano.'},
+  {q:'¿Dónde hay agua en Marte?',a:['Hielo bajo el suelo y en los polos','En ríos que corren hoy','En nubes de lluvia'],c:0,e:'El agua está congelada, escondida bajo el polvo y en los casquetes polares.'},
+  {q:'¿Hasta qué temperatura puede bajar en Marte?',a:['Unos -153 °C','0 °C','-10 °C'],c:0,e:'Por eso las bases necesitan calefacción y buen aislamiento.'},
+  {q:'¿Por qué llega tanta radiación al suelo de Marte?',a:['No tiene campo magnético global y su aire es muy fino','Porque está más cerca del Sol','Porque es rojo'],c:0,e:'La Tierra tiene un escudo magnético y una atmósfera gruesa. Marte no.'},
+  {q:'¿Cuánto dura un día marciano (un "sol")?',a:['24 horas y 39 minutos','12 horas','Una semana'],c:0,e:'¡Casi igual que un día en la Tierra!'},
+  {q:'¿Qué sustancia tóxica tiene el suelo de Marte?',a:['Percloratos','Chocolate','Sal de mesa'],c:0,e:'Los percloratos dañan la tiroides. Hay que limpiar el suelo antes de cultivar.'},
+  {q:'¿Qué les pasa a los paneles solares en una tormenta de polvo?',a:['Producen mucha menos energía','Producen el doble','Nada'],c:0,e:'El polvo tapa el Sol y se acumula sobre los paneles.'},
+  {q:'¿Por qué los astronautas deben hacer ejercicio en Marte?',a:['Con poca gravedad se debilitan huesos y músculos','Para no aburrirse','Para calentar la base'],c:0,e:'La baja gravedad hace que el cuerpo pierda masa muscular y ósea.'},
+  {q:'En 2050, con motores nucleares, ¿cuánto dura el viaje a Marte?',a:['Entre 45 y 90 días','10 años','Un fin de semana'],c:0,e:'Antes eran unos 9 meses. Viajar más rápido reduce la radiación que recibe la tripulación.'},
+  {q:'¿Por qué Marte es de color rojo?',a:['Su suelo tiene mucho óxido de hierro','Porque hace calor','Por la lava'],c:0,e:'El óxido de hierro es como la herrumbre de un clavo viejo.'}
+];
+
+const STORY=[
+  {art:'earth',t:'Año 2050. La Tierra está en apuros: hace demasiado calor, el aire está sucio y cada vez hay menos recursos.'},
+  {art:'mars',t:'La humanidad necesita un nuevo hogar. Las miradas apuntan al planeta rojo: Marte.'},
+  {art:'robots',t:'Durante años, robots y bacterias especiales han preparado un cráter con hielo para recibir a las primeras personas.'},
+  {art:'ship',t:'Ahora te toca a ti. Eres el comandante de la tripulación que fundará la primera colonia en Marte.'}
+];
+const TRAVEL_FACTS=[
+  'Con propulsión nuclear el viaje dura entre 45 y 90 días. Antes se tardaba unos 9 meses.',
+  'En la nave no hay gravedad. La tripulación hace ejercicio cada día para no perder músculo.',
+  'Pasar mucho tiempo en un espacio pequeño es difícil. ¡El trabajo en equipo es fundamental!',
+  'La nave tiene una zona protegida para refugiarse si hay una tormenta solar.',
+  'Los mensajes a la Tierra tardan cada vez más en llegar mientras nos alejamos.'
+];
+
+/* ================= ESTADO ================= */
+let S=null;          // partida
+let sel=-1;          // casilla seleccionada
+let pickedCrew=[];
+let sound=true;
+function count(s,t){return s.tiles.filter(x=>x.b===t).length}
+function has(s,id){return s.crew.includes(id)}
+
+function newGame(name,crew){
+  const tiles=[];
+  for(let i=0;i<COLS*ROWS;i++)tiles.push({t:'soil',b:null,on:true,broken:false});
+  const L=3*COLS+2; // módulo de aterrizaje
+  const free=()=>{let i;do{i=rnd(COLS*ROWS)}while(tiles[i].t!=='soil'||Math.abs(i-L)<=1||Math.abs(i-L-COLS)<=1||Math.abs(i-L+COLS)<=1);return i};
+  // hielo cerca garantizado
+  tiles[L+COLS*2-1].t='ice';
+  for(let k=0;k<4;k++)tiles[free()].t='ice';
+  tiles[L-COLS*2+2].t='rock';
+  for(let k=0;k<4;k++)tiles[free()].t='rock';
+  for(let k=0;k<2;k++)tiles[free()].t='tube';
+  for(let k=0;k<3;k++)tiles[free()].t='crater';
+  tiles[L].b='lander';tiles[L+1].b='solar';tiles[L+1].t='soil';
+  return {v:1,name:name||'Comandante',crew,sol:1,pop:4,o2:22,agua:24,comida:32,mat:45,bat:10,salud:90,moral:70,
+    storm:0,cold:0,dirty:0,mission:0,tiles,log:[],facts:[],won:false,lastShip:1,stats:{built:2,quiz:0,events:0}};
+}
+
+/* ================= SIMULACIÓN ================= */
+function solarFactor(s){
+  let f=1;
+  if(s.storm>0)f*=has(s,'ing')?0.35:0.3;
+  if(s.dirty>0)f*=0.5;
+  if(count(s,'repair')&&poweredHas(s,'repair'))f=Math.min(1,f*1.6);
+  return f;
+}
+function poweredHas(s,type){ // aproximación (sin recursión): existe uno encendido y sano
+  return s.tiles.some(t=>t.b===type&&t.on&&!t.broken);
+}
+function flows(s){
+  const f={eProd:0,eDem:0,heat:0,powered:new Set(),unpowered:new Set(),d:{o2:0,agua:0,comida:0,mat:0},cap:0,batMax:20,heatOk:true};
+  const sf=solarFactor(s);
+  const cons=[];
+  s.tiles.forEach((t,i)=>{
+    if(!t.b)return;const b=B[t.b];
+    if(b.cap&&!t.broken)f.cap+=b.cap*(t.b==='habitat'&&t.t==='tube'?2:1);
+    if(b.store&&!t.broken)f.batMax+=b.store;
+    if(t.broken||!t.on)return;
+    if(b.e>0){f.eProd+=t.b==='solar'?b.e*sf*(has(s,'ing')?1.25:1):b.e;f.powered.add(i)}
+    else if(b.e===0)f.powered.add(i);
+    else cons.push({i,e:-b.e,pr:b.pr||9});
+  });
+  f.eProd=Math.round(f.eProd*10)/10;
+  f.heat=Math.ceil(s.pop*0.25*(s.cold>0?2:1));
+  let avail=f.eProd+s.bat-f.heat;
+  if(avail<0){f.heatOk=false;avail=0}
+  cons.sort((a,b)=>a.pr-b.pr);
+  f.eDem=f.heat;
+  for(const c of cons){f.eDem+=c.e;if(avail>=c.e){avail-=c.e;f.powered.add(c.i)}else f.unpowered.add(c.i)}
+  f.batNext=Math.min(f.batMax,Math.round(avail));
+  const mf=s.moral<30?0.75:1;
+  f.powered.forEach(i=>{
+    const t=s.tiles[i],b=B[t.b];if(!b.p)return;
+    for(const k in b.p){
+      let v=b.p[k];
+      if(v>0){
+        v*=mf;
+        if(k==='comida'&&t.b==='farm'&&has(s,'bot'))v*=1.25;
+        if(k==='mat'){if(t.t==='rock')v*=2;if(has(s,'geo'))v*=1.25}
+      }
+      f.d[k]+=v;
+    }
+  });
+  for(const k in f.d)f.d[k]=Math.round(f.d[k]);
+  f.d.o2-=s.pop;f.d.agua-=s.pop;f.d.comida-=s.pop;
+  return f;
+}
+
+function nextSol(){
+  const s=S,f=flows(s),msgs=[];
+  const before={o2:s.o2,agua:s.agua,comida:s.comida,mat:s.mat};
+  let short=0;
+  for(const k of ['o2','agua','comida','mat'])s[k]+=f.d[k];
+  const names={o2:'el oxígeno',agua:'el agua',comida:'la comida'};
+  for(const k of ['o2','agua','comida']){if(s[k]<0){short++;msgs.push(`¡Se acabó ${names[k]}! La tripulación pierde salud.`);s[k]=0}}
+  s.mat=Math.max(0,s.mat);
+  s.bat=f.batNext;
+  const dmg=has(s,'med')?9:12;
+  if(short)s.salud-=dmg*short;
+  if(!f.heatOk){s.salud-=has(s,'med')?6:9;msgs.push('No hay energía para la calefacción. ¡Hace muchísimo frío!')}
+  if(!short&&f.heatOk)s.salud+=2+(has(s,'med')?2:0);
+  const gym=s.tiles.some((t,i)=>t.b==='gym'&&f.powered.has(i));
+  const shield=s.tiles.some((t,i)=>t.b==='shield'&&f.powered.has(i));
+  if(gym){s.salud+=3;s.moral+=3}
+  if(shield)s.moral+=2;
+  if(has(s,'psi'))s.moral+=2;
+  if(s.pop>f.cap){s.moral-=6;msgs.push('Hay más colonos que camas. El equipo está incómodo.')}
+  if(s.salud<40)s.moral-=3;
+  s.moral+=(60-s.moral)*0.06;
+  s.salud=clamp(Math.round(s.salud),0,100);s.moral=clamp(Math.round(s.moral),0,100);
+  if(f.unpowered.size)msgs.push(`${f.unpowered.size} edificio(s) se quedaron sin energía.`);
+  // tiempo
+  if(s.storm>0){s.storm--;if(!s.storm)msgs.push('La tormenta de polvo ha terminado. ¡Vuelve el Sol!')}
+  if(s.cold>0)s.cold--;
+  if(s.dirty>0)s.dirty--;
+  if(count(s,'repair')&&poweredHas(s,'repair')){
+    const br=s.tiles.find(t=>t.broken);if(br){br.broken=false;msgs.push('El robot de mantenimiento ha arreglado una avería.')}
+  }
+  s.sol++;
+  addLog(`Sol ${s.sol}: `+(msgs.length?msgs.join(' '):'Todo funciona con normalidad.'));
+  flashSol();
+  floatDeltas(before);
+  if(short||!f.heatOk)beep(180,.25,'sawtooth');else beep(520,.08);
+  // misiones
+  checkMissions();
+  // derrota
+  if(s.salud<=0){save();return endGame(false)}
+  // eventos
+  const q=[];
+  if(count(s,'antenna')&&poweredHas(s,'antenna')&&s.sol-s.lastShip>=6){s.lastShip=s.sol;q.push(evShip())}
+  else if(s.sol>=3&&Math.random()<0.4){const e=randomEvent();if(e)q.push(e)}
+  if(msgs.length&&!q.length&&(short||!f.heatOk))toast(msgs[0]);
+  save();render();
+  runQueue(q);
+}
+
+function checkMissions(){
+  const s=S;
+  while(s.mission<MISSIONS.length&&MISSIONS[s.mission].ok(s)){
+    const m=MISSIONS[s.mission];s.mission++;s.mat+=m.r;
+    addLog(`<b>Misión cumplida:</b> ${m.t}${m.r?` (+${m.r} materiales)`:''}`);
+    toast(`✅ ¡Misión cumplida! ${m.r?`+${m.r} 🧱`:''}`);beep(660,.1);setTimeout(()=>beep(880,.15),110);
+    if(s.mission===MISSIONS.length&&!s.won){s.won=true;save();setTimeout(()=>endGame(true),900);return}
+  }
+}
+
+/* ================= EVENTOS ================= */
+function evShip(){
+  const n=2+rnd(3),space=flows(S).cap-S.pop;
+  return {i:'🚀',t:'¡Llega una nave de la Tierra!',x:`Una nave trae a ${n} nuevos colonos con provisiones. Tienes sitio para ${Math.max(0,space)} personas más.`,
+    fact:'En 2050 las naves de carga pueden aterrizar con más de 150 toneladas gracias a la retropropulsión.',
+    o:[
+      {l:`Recibir a los ${n} colonos`,s:space>=n?'Traen comida y materiales.':'Ojo: no hay camas para todos.',fx:s=>{s.pop+=n;s.comida+=n*5;s.mat+=n*4;return `¡Bienvenidos! Ya sois ${s.pop} en Marte. Traen ${n*5} de comida y ${n*4} materiales.`}},
+      {l:'Pedirles que esperen al próximo viaje',s:'Así preparas más hábitats.',fx:s=>{s.lastShip=s.sol-3;return 'La nave volverá en unos soles. Aprovecha para construir.'}}
+    ]};
+}
+const EVENTS=[
+  {w:3,c:s=>!s.storm&&s.sol>4,mk:()=>({i:'🌪️',t:'¡Tormenta de polvo!',x:'Una enorme nube de polvo cubre el cielo. Los paneles solares producirán muy poca energía durante varios soles.',
+    fact:'Las tormentas de polvo en Marte pueden cubrir todo el planeta y durar semanas o meses.',
+    o:[{l:'Apagar lo que no sea imprescindible',s:'Toca los edificios para encender o apagar.',fx:s=>{s.storm=3+rnd(3);return `La tormenta durará unos ${s.storm} soles. Consejo: las baterías y el reactor nuclear ayudan mucho.`}}]})},
+  {w:2,c:s=>s.sol>5,mk:()=>{
+    const safe=count(S,'shelter')>0, shield=S.tiles.some(t=>t.b==='shield'&&t.on&&!t.broken);
+    if(shield)return {i:'☀️',t:'Tormenta solar',x:'El Sol ha lanzado una ola de partículas, pero el escudo magnético la desvía. ¡Nadie corre peligro!',fact:'Un escudo magnético crea un “paraguas” que desvía las partículas cargadas del viento solar.',o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
+    return {i:'☢️',t:'¡Alerta de tormenta solar!',x:'El Sol ha lanzado una ola de radiación peligrosa que llegará pronto.',
+      fact:'Marte no tiene un campo magnético global, así que la radiación del Sol llega hasta el suelo.',
+      o:safe?[
+        {l:'Todos al refugio de regolito',s:'Seguros, pero hoy no se trabaja.',fx:s=>{s.mat=Math.max(0,s.mat-5);return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}},
+        {l:'Seguir trabajando fuera',s:'Arriesgado...',fx:s=>{s.salud-=has(s,'med')?14:20;return 'La radiación ha afectado a la tripulación. La salud baja.'}}
+      ]:[
+        {l:'Esconderse dentro del módulo',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=has(s,'med')?10:15;return 'Las paredes del módulo protegen poco. Necesitas un refugio de regolito.'}}
+      ]}}},
+  {w:2,c:()=>true,mk:()=>({i:'💨',t:'¡Fuga de aire!',x:'Una junta de una esclusa pierde aire. Un mensaje a la Tierra tardaría unos 20 minutos en llegar y otros 20 en volver.',
+    fact:'Por el retraso en las comunicaciones, los astronautas deben saber resolver problemas sin ayuda de la Tierra.',
+    o:[
+      {l:'Esperar instrucciones de la Tierra',s:'Llegarán en unos 40 minutos.',fx:s=>{s.o2=Math.max(0,s.o2-10);return 'Mientras esperabais se ha escapado mucho oxígeno (-10).'}},
+      {l:'Repararla nosotros mismos',s:'Cuesta 6 materiales.',fx:s=>{s.mat=Math.max(0,s.mat-6);s.moral+=6;return '¡Reparada en minutos! El equipo se siente orgulloso (+ánimo).'}}
+    ]})},
+  {w:2,c:s=>s.moral<85,mk:()=>({i:'😔',t:'Un astronauta echa de menos su casa',x:'Llevar tanto tiempo lejos de la familia y en un espacio pequeño es duro.',
+    fact:'El aislamiento y el confinamiento son de los mayores riesgos de los viajes espaciales según la NASA.',
+    o:[
+      {l:'Organizar una videollamada con su familia',s:'Gasta 8 de energía de la batería.',fx:s=>{s.bat=Math.max(0,s.bat-8);s.moral+=12;return 'Ver a su familia le ha alegrado mucho (+ánimo).'}},
+      {l:'Hacer una noche de juegos en equipo',s:'Gasta 3 de comida extra.',fx:s=>{s.comida=Math.max(0,s.comida-3);s.moral+=8;return '¡Qué risas! El equipo está más unido.'}},
+      {l:'Seguir trabajando como siempre',fx:s=>{s.moral-=12;return 'El equipo está más triste. Cuidar las emociones también es importante.'}}
+    ]})},
+  {w:2,c:s=>s.tiles.some(t=>t.b==='solar'),mk:()=>({i:'🟫',t:'Polvo sobre los paneles',x:'El polvo fino se ha pegado a los paneles solares y producen la mitad.',
+    fact:'El polvo marciano se acumula sobre los equipos y afecta su funcionamiento.',
+    o:[
+      {l:'Salir a limpiarlos con un paseo espacial',s:'Un poco de cansancio y radiación.',fx:s=>{s.salud-=4;return 'Paneles limpios. ¡Buen trabajo!'}},
+      {l:'Esperar a que el viento los limpie',s:'Producirán menos 3 soles.',fx:s=>{s.dirty=3;return 'Los paneles darán la mitad de energía durante 3 soles.'}}
+    ]})},
+  {w:2,c:s=>!s.cold,mk:()=>({i:'🥶',t:'Ola de frío extremo',x:'Esta noche la temperatura bajará muchísimo. La calefacción gastará el doble de energía durante 2 soles.',
+    fact:'En Marte la temperatura puede bajar hasta unos -153 °C. Sin calefacción no se puede sobrevivir.',
+    o:[{l:'Entendido, revisaré la energía',fx:s=>{s.cold=2;return 'Comprueba que produces suficiente energía para la calefacción.'}}]})},
+  {w:2,c:s=>s.tiles.filter(t=>t.b&&t.b!=='lander').length>2,mk:()=>{
+    const list=S.tiles.map((t,i)=>i).filter(i=>S.tiles[i].b&&S.tiles[i].b!=='lander'&&!S.tiles[i].broken);const i=pick(list);const nm=B[S.tiles[i].b].n;
+    return {i:'☄️',t:'¡Micrometeorito!',x:`Una pequeña roca del espacio ha golpeado tu ${nm}. Está averiado.`,
+      fact:'La atmósfera de Marte es tan fina que muchas rocas pequeñas del espacio llegan al suelo.',
+      o:[{l:'Vaya... habrá que repararlo',s:'Tócalo en el mapa para arreglarlo.',fx:s=>{s.tiles[i].broken=true;sel=-1;return `El ${nm} no funciona hasta que lo repares (o lo haga un robot de mantenimiento).`}}]}}},
+  {w:1,c:s=>s.tiles.some(t=>t.t==='soil'&&!t.b),mk:()=>({i:'🔭',t:'¡El rover encontró hielo!',x:'Un dron ha detectado un nuevo depósito de hielo enterrado.',
+    fact:'Los glaciares de Marte están cubiertos de polvo y roca, que impiden que el hielo desaparezca.',
+    o:[{l:'¡Marcarlo en el mapa!',fx:s=>{const l=s.tiles.map((t,i)=>i).filter(i=>s.tiles[i].t==='soil'&&!s.tiles[i].b);const i=pick(l);s.tiles[i].t='ice';return 'Una nueva casilla de hielo aparece en tu cráter.'}}]})},
+  {w:1,c:()=>true,mk:()=>({i:'💎',t:'Rocas valiosas',x:'Un robot ha encontrado un trozo de roca llena de metales.',
+    fact:'El regolito tiene hierro, aluminio, magnesio, titanio y azufre.',
+    o:[{l:'Recoger los minerales',fx:s=>{s.mat+=15;return '+15 materiales para construir.'}}]})},
+  {w:4,c:()=>true,mk:()=>{const q=pick(QUIZ);return {quiz:q,i:'🛰️',t:'Pregunta del control de misión',x:q.q}}}
+];
+function randomEvent(){
+  const pool=EVENTS.filter(e=>e.c(S));let tot=pool.reduce((a,e)=>a+e.w,0),r=Math.random()*tot;
+  for(const e of pool){r-=e.w;if(r<=0)return e.mk()}
+  return null;
+}
+function runQueue(q){if(!q.length)return;const e=q.shift();S.stats.events++;showEvent(e,()=>runQueue(q))}
+
+/* ================= RENDER ================= */
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
+function render(){
+  const s=S,f=flows(s);
+  $('#solLbl').innerHTML=`SOL ${s.sol}<small>${s.name.toUpperCase()} · ${s.pop} EN MARTE</small>`;
+  const pills=[];
+  if(s.storm)pills.push(`<span class="pill storm">🌪️ Tormenta ${s.storm}</span>`);
+  if(s.cold)pills.push(`<span class="pill cold">🥶 Frío ${s.cold}</span>`);
+  if(s.dirty)pills.push(`<span class="pill storm">🟫 Polvo</span>`);
+  if(!pills.length)pills.push(`<span class="pill">☀️ Despejado</span>`);
+  $('#statusPills').innerHTML=pills.join('');
+  const days=k=>f.d[k]<0?Math.floor(s[k]/-f.d[k]):99;
+  const chip=(k,lab,ic,val,dv,low)=>`<div class="chip${low?' low':''}"><span class="k">${ic} ${lab}</span><span class="v">${val}</span><span class="d ${dv>0?'up':dv<0?'down':'flat'}">${dv>0?'+':''}${dv}/sol</span></div>`;
+  const eNet=Math.round((f.eProd-f.eDem)*10)/10;
+  $('#res').innerHTML=
+    chip('o2','Oxígeno','🫁',s.o2,f.d.o2,days('o2')<3)+
+    chip('agua','Agua','💧',s.agua,f.d.agua,days('agua')<3)+
+    chip('comida','Comida','🍞',s.comida,f.d.comida,days('comida')<3)+
+    chip('mat','Material','🧱',s.mat,f.d.mat,false)+
+    `<div class="chip${eNet<0&&s.bat<5?' low':''}"><span class="k">⚡ Energía</span><span class="v">${f.eProd}/${f.eDem}</span><span class="d ${eNet>=0?'up':'down'}">${eNet>=0?'sobra':'falta'} ${Math.abs(eNet)}</span></div>`+
+    `<div class="chip"><span class="k">🔋 Batería</span><span class="v">${s.bat}</span><span class="d flat">máx ${f.batMax}</span></div>`+
+    `<div class="chip${s.pop>f.cap?' low':''}"><span class="k">👥 Colonos</span><span class="v">${s.pop}/${f.cap}</span><span class="d flat">camas</span></div>`+
+    `<div class="chip"><span class="k">🔥 Calor</span><span class="v">${f.heat}</span><span class="d ${s.cold?'down':'flat'}">${s.cold?'¡doble!':'energía'}</span></div>`;
+  const col=v=>v>60?'var(--good)':v>30?'var(--warn)':'var(--bad)';
+  $('#meters').innerHTML=`<div class="meter">❤️ Salud<span class="track"><i style="width:${s.salud}%;background:${col(s.salud)}"></i></span>${s.salud}</div>
+    <div class="meter">😊 Ánimo<span class="track"><i style="width:${s.moral}%;background:${col(s.moral)}"></i></span>${s.moral}</div>`;
+  const m=MISSIONS[Math.min(s.mission,MISSIONS.length-1)];
+  $('#missionBtn').innerHTML=s.mission>=MISSIONS.length?`<span class="num">★</span><span class="txt"><small>Colonia completada</small>¡Sigue haciendo crecer tu ciudad!</span>`:
+    `<span class="num">${s.mission+1}/${MISSIONS.length}</span><span class="txt"><small>Misión</small>${m.t}</span><span>›</span>`;
+  const map=$('#map');
+  map.innerHTML=s.tiles.map((t,i)=>{
+    let cls='tile '+t.t+(t.b?' b':'')+(i===sel?' sel':'');
+    let inner='',flag='';
+    if(t.b){
+      const off=t.broken||!t.on||f.unpowered.has(i);
+      if(off)cls+=' off';
+      inner=`<span class="ic">${B[t.b].i}</span>`;
+      if(t.broken)flag='🔧';else if(!t.on)flag='⏸️';else if(f.unpowered.has(i))flag='⚡';
+    }else inner=`<span class="terr">${TERR[t.t].g}</span>`;
+    return `<button class="${cls}" data-i="${i}" aria-label="${t.b?B[t.b].n:TERR[t.t].n}">${inner}${flag?`<span class="flag">${flag}</span>`:''}</button>`;
+  }).join('');
+  sizeMap();
+}
+function sizeMap(){
+  const w=$('#mapwrap');if(!w||w.offsetParent===null&&$('#game').hidden)return;
+  const cs=getComputedStyle(w);
+  const W=w.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-16;
+  const H=w.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-16;
+  const ts=Math.max(30,Math.floor(Math.min((W-4*(COLS-1))/COLS,(H-4*(ROWS-1))/ROWS,76)));
+  $('#map').style.setProperty('--ts',ts+'px');
+}
+function floatDeltas(before){
+  const host=$('#res');const r=host.getBoundingClientRect();
+  ['o2','agua','comida','mat'].forEach((k,j)=>{
+    const d=S[k]-before[k];if(!d)return;
+    const el=document.createElement('div');el.className='float';el.textContent=(d>0?'+':'')+d;
+    el.style.color=d>0?'var(--good)':'var(--bad)';
+    el.style.left=(r.left+r.width*(j+.6)/4)+'px';el.style.top=(r.top+10)+'px';el.style.position='fixed';
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1300);
+  });
+}
+function flashSol(){const el=document.createElement('div');el.className='solflash';el.textContent='SOL '+S.sol;document.body.appendChild(el);setTimeout(()=>el.remove(),1000)}
+let toastT;
+function toast(t){document.querySelectorAll('.toast').forEach(x=>x.remove());const el=document.createElement('div');el.className='toast';el.innerHTML=t;document.body.appendChild(el);clearTimeout(toastT);toastT=setTimeout(()=>el.remove(),2600)}
+function addLog(t){S.log.unshift(t);if(S.log.length>60)S.log.pop()}
+function learn(f){if(f&&!S.facts.includes(f))S.facts.push(f)}
+
+/* ---------- hojas ---------- */
+function sheet(html,onClose){
+  closeSheet();
+  const v=document.createElement('div');v.className='veil';v.id='veil';
+  v.innerHTML=`<div class="sheet gutter" role="dialog" aria-modal="true">${html}</div>`;
+  v.addEventListener('click',e=>{if(e.target===v&&!v.dataset.lock){closeSheet();onClose&&onClose()}});
+  document.body.appendChild(v);
+  v.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{closeSheet();onClose&&onClose()});
+  return v;
+}
+function closeSheet(){const v=$('#veil');if(v)v.remove()}
+const costTxt=b=>{const p=[];if(b.e>0)p.push(`<span class="up">+${b.e}⚡</span>`);if(b.e<0)p.push(`<span class="down">${b.e}⚡</span>`);
+  if(b.p)for(const k in b.p){const ic={o2:'🫁',agua:'💧',comida:'🍞',mat:'🧱'}[k];p.push(`<span class="${b.p[k]>0?'up':'down'}">${b.p[k]>0?'+':''}${b.p[k]}${ic}</span>`)}
+  if(b.cap)p.push(`<span class="up">+${b.cap}👥</span>`);if(b.store)p.push(`<span class="up">+${b.store}🔋</span>`);return p.join('')};
+
+function openTile(i){
+  const t=S.tiles[i];sel=i;render();
+  if(t.b)return openBuilding(i);
+  const T=TERR[t.t];
+  if(t.t==='crater'){sheet(`<div class="sheetHead"><span class="big">🕳️</span><div><h2>${T.n}</h2><p>${T.t}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>`,()=>{sel=-1;render()});return}
+  const cards=BUILD_ORDER.map(k=>{
+    const b=B[k];let why='';
+    if(S.mission<b.un)why=`🔒 Se desbloquea en la misión ${b.un+1}`;
+    else if(b.need&&t.t!==b.need)why='Necesita una casilla de hielo ❄️';
+    else if(b.req&&!count(S,b.req))why=`Necesita un ${B[b.req].n}`;
+    else if(S.mat<b.cost)why=`Faltan ${b.cost-S.mat} 🧱`;
+    const locked=S.mission<b.un;
+    return `<button class="card${why?' no':''}" data-b="${k}" ${why?'data-why="'+why+'"':''}>
+      <span class="top"><span class="e">${locked?'❔':b.i}</span><b>${locked?'???':b.n}</b></span>
+      <span class="stats"><span>🧱 ${b.cost}</span>${locked?'':costTxt(b)}</span>
+      ${why?`<span class="why">${why}</span>`:`<span class="desc">${b.desc}</span>`}</button>`}).join('');
+  const v=sheet(`<div class="sheetHead"><span class="big">${T.g||'🟤'}</span><div><h2>${T.n}</h2><p>${T.t}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <div class="sec">¿Qué quieres construir? · tienes ${S.mat} 🧱</div><div class="buildGrid">${cards}</div>`,()=>{sel=-1;render()});
+  v.querySelectorAll('.card').forEach(c=>c.onclick=()=>{
+    if(c.dataset.why){toast(c.dataset.why);beep(160,.1);return}
+    build(i,c.dataset.b);
+  });
+}
+function build(i,k){
+  const b=B[k];S.mat-=b.cost;Object.assign(S.tiles[i],{b:k,on:true,broken:false});S.stats.built++;
+  learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);closeSheet();sel=-1;beep(440,.08);setTimeout(()=>beep(660,.1),90);
+  checkMissions();render();
+  const el=document.querySelector(`.tile[data-i="${i}"]`);if(el)el.classList.add('new');
+  toast(`${b.i} ${b.n}<br><small style="font-weight:600">${b.fact}</small>`);
+  save();
+}
+function openBuilding(i){
+  const t=S.tiles[i],b=B[t.b],f=flows(S);
+  let st='✅ Funcionando';
+  if(t.broken)st='🔧 Averiado';else if(!t.on)st='⏸️ Apagado';else if(f.unpowered.has(i))st='⚡ Sin energía suficiente';
+  const btns=[];
+  if(t.broken)btns.push(`<button class="btn" id="bRep">Reparar (${Math.ceil(b.cost/2)} 🧱)</button>`);
+  else if(b.e<0&&t.b!=='lander')btns.push(`<button class="btn ${t.on?'ghost':''}" id="bTog">${t.on?'Apagar':'Encender'}</button>`);
+  if(t.b!=='lander')btns.push(`<button class="btn ghost" id="bDel">Desmontar (+${Math.floor(b.cost/2)} 🧱)</button>`);
+  let cap='';if(b.cap)cap=`<span>👥 Camas: ${b.cap*(t.b==='habitat'&&t.t==='tube'?2:1)}</span>`;
+  const v=sheet(`<div class="sheetHead"><span class="big">${b.i}</span><div><h2>${b.n}</h2><p>${st} · sobre ${TERR[t.t].n.toLowerCase()}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <p class="info">${b.desc}</p><div class="statline">${costTxt(b).replace(/<span class="(up|down)">/g,'<span class="$1">')}${cap}</div>
+    <div class="fact"><b>¿Sabías que…?</b>${b.fact}</div>
+    ${b.e<0?'<p class="hint">Si falta energía, primero se apagan los edificios menos importantes. Apagar algo deja más energía para el oxígeno y el agua.</p>':''}
+    <div class="row">${btns.join('')}</div>`,()=>{sel=-1;render()});
+  const tog=v.querySelector('#bTog');if(tog)tog.onclick=()=>{t.on=!t.on;beep(t.on?600:300,.06);save();openBuilding(i);render();sel=i};
+  const rep=v.querySelector('#bRep');if(rep)rep.onclick=()=>{const c=Math.ceil(b.cost/2);if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;t.broken=false;beep(700,.1);save();closeSheet();sel=-1;render();toast('🔧 ¡Reparado!')};
+  const del=v.querySelector('#bDel');if(del)del.onclick=()=>{
+    if(!del.dataset.sure){del.dataset.sure=1;del.textContent='¿Seguro? Toca otra vez';return}
+    S.mat+=Math.floor(b.cost/2);Object.assign(t,{b:null,on:true,broken:false});save();closeSheet();sel=-1;render();};
+}
+function showEvent(e,done){
+  learn(e.fact);
+  if(e.quiz){
+    const q=e.quiz,order=q.a.map((a,i)=>i).sort(()=>Math.random()-.5);
+    const v=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2><p>Responde bien y ganarás materiales</p></div></div>
+      <p class="info" style="font-size:1.1rem;font-weight:800">${q.q}</p>
+      <div class="stack" style="width:100%">${order.map(i=>`<button class="opt" data-i="${i}">${q.a[i]}</button>`).join('')}</div><div id="qres"></div>`);
+    v.dataset.lock=1;
+    v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(v.dataset.ans)return;v.dataset.ans=1;const ok=+b.dataset.i===q.c;
+      v.querySelectorAll('.opt').forEach(x=>{if(+x.dataset.i===q.c)x.classList.add('right');else if(x===b)x.classList.add('wrong')});
+      if(ok){S.mat+=15;S.moral+=4;S.stats.quiz++;beep(880,.12)}else beep(200,.15);
+      learn(q.e);
+      $('#qres').innerHTML=`<div class="fact" style="max-width:none"><b>${ok?'¡Correcto! +15 🧱':'¡Casi!'}</b>${q.e}</div>
+        <div class="stack" style="width:100%;margin-top:12px"><button class="btn" id="qok">Continuar</button></div>`;
+      $('#qok').onclick=()=>{closeSheet();save();render();done()};
+    });
+    return;
+  }
+  const v=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2></div></div>
+    <p class="info">${e.x}</p><div class="fact" style="max-width:none"><b>Dato real</b>${e.fact}</div>
+    <div class="sec">¿Qué decides, ${S.name}?</div>
+    <div class="stack" style="width:100%">${e.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div>`);
+  v.dataset.lock=1;beep(330,.15,'triangle');
+  v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const r=e.o[+b.dataset.i].fx(S);S.salud=clamp(S.salud,0,100);S.moral=clamp(S.moral,0,100);
+    addLog(`Sol ${S.sol}: <b>${e.t}</b> ${r}`);save();render();
+    const v2=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2></div></div><p class="info">${r}</p>
+      <div class="stack" style="width:100%"><button class="btn" id="eok">Continuar</button></div>`);v2.dataset.lock=1;
+    $('#eok').onclick=()=>{closeSheet();if(S.salud<=0)return endGame(false);done()};
+  });
+}
+function openLog(){
+  const ml=MISSIONS.map((m,i)=>`<div class="${i<S.mission?'done':i===S.mission?'cur':''}"><span>${i<S.mission?'✅':i===S.mission?'🎯':'⬜'}</span><span><b>${m.t}</b>${i===S.mission?`<br><span class="hint">${m.h}</span>`:''}</span></div>`).join('');
+  const crew=S.crew.map(id=>CREW.find(c=>c.id===id)).map(c=>`${c.face} ${c.name}`).join(' · ');
+  sheet(`<div class="sheetHead"><span class="big">📜</span><div><h2>Diario de a bordo</h2><p>${S.name} · ${crew}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <div class="sec">Misiones</div><div class="mlist">${ml}</div>
+    <div class="sec">Datos aprendidos (${S.facts.length})</div><div class="log">${S.facts.map(f=>`<div>🔬 ${f}</div>`).join('')||'<div>Construye y vive aventuras para descubrir datos sobre Marte.</div>'}</div>
+    <div class="sec">Registro</div><div class="log">${S.log.slice(0,25).map(l=>`<div>${l}</div>`).join('')}</div>`);
+}
+function openMenu(){
+  const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Menú</h2></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <div class="sec">Cómo jugar</div>
+    <div class="log" style="color:var(--ink)">
+      <div>1. Toca una casilla vacía para <b>construir</b>. Toca un edificio para verlo, apagarlo o repararlo.</div>
+      <div>2. Cada colono gasta cada sol <b>1 de oxígeno, 1 de agua y 1 de comida</b>. ¡Que no se acaben!</div>
+      <div>3. Casi todos los edificios gastan <b>energía ⚡</b>. Si no hay suficiente, algunos se apagan.</div>
+      <div>4. La <b>batería 🔋</b> guarda la energía que sobra para las tormentas.</div>
+      <div>5. Pulsa <b>Siguiente sol</b> para que pase un día marciano.</div>
+      <div>6. Cumple las misiones y llega a <b>30 colonos</b> para ganar.</div>
+    </div>
+    <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
+    <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
+  v.querySelector('#mSnd').onclick=()=>{sound=!sound;openMenu()};
+  const r=v.querySelector('#mRes');r.onclick=()=>{if(!r.dataset.sure){r.dataset.sure=1;r.textContent='¿Seguro? Toca otra vez';return}
+    try{localStorage.removeItem(SAVE)}catch(e){}S=null;closeSheet();toTitle();};
+  v.querySelector('#mTitle').onclick=()=>{closeSheet();toTitle()};
+}
+function endGame(win){
+  closeSheet();show('end');
+  $('#endIcon').textContent=win?'🏙️':'🪦';
+  $('#endTitle').textContent=win?'¡Colonia autosuficiente!':'Misión fallida';
+  $('#endText').textContent=win?`¡Enhorabuena, ${S.name}! Gracias a tus decisiones, ${S.pop} personas viven en Marte con oxígeno, agua, comida y energía propios. La humanidad tiene un nuevo hogar.`
+    :`La tripulación no ha podido seguir. En Marte hay que vigilar el oxígeno, el agua, la comida y la energía a la vez. ¡Seguro que la próxima vez lo consigues!`;
+  $('#endStats').innerHTML=`<div><b>${S.sol}</b><span>soles en Marte</span></div><div><b>${S.pop}</b><span>colonos</span></div>
+    <div><b>${S.stats.built}</b><span>edificios construidos</span></div><div><b>${S.facts.length}</b><span>datos aprendidos</span></div>`;
+  $('#bEndKeep').hidden=!win;
+  if(!win){try{localStorage.removeItem(SAVE)}catch(e){}}
+  beep(win?660:150,.3,win?'triangle':'sawtooth');
+}
+
+/* ================= FLUJO DE PANTALLAS ================= */
+function toTitle(){show('title');let has=false;try{has=!!localStorage.getItem(SAVE)}catch(e){}$('#bCont').hidden=!(has||S)}
+let storyI=0;
+function startStory(){storyI=0;show('story');drawStory()}
+function drawStory(){
+  const s=STORY[storyI];$('#storyText').textContent=s.t;storyArt=s.art;
+  $('#storyDots').innerHTML=STORY.map((_,i)=>`<i class="${i===storyI?'on':''}"></i>`).join('');
+  $('#bStory').textContent=storyI===STORY.length-1?'Elegir tripulación':'Siguiente';
+}
+function startCrew(){
+  show('crew');pickedCrew=[];
+  const g=$('#crewGrid');
+  g.innerHTML=CREW.map(c=>`<button class="crewCard" data-id="${c.id}"><span class="face">${c.face}</span><b>${c.name}</b><span>${c.role}: ${c.txt}</span></button>`).join('');
+  g.querySelectorAll('.crewCard').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id,k=pickedCrew.indexOf(id);
+    if(k>=0)pickedCrew.splice(k,1);else{if(pickedCrew.length>=3)pickedCrew.shift();pickedCrew.push(id)}
+    g.querySelectorAll('.crewCard').forEach(x=>x.classList.toggle('sel',pickedCrew.includes(x.dataset.id)));
+    $('#crewHint').textContent=pickedCrew.length<3?`Elige ${3-pickedCrew.length} especialista(s) más.`:'¡Tripulación lista! Tú eres el cuarto miembro.';
+    $('#bLaunch').disabled=pickedCrew.length<3;beep(500,.04);
+  });
+}
+let travelT0=0;
+function startTravel(){
+  const name=$('#cmdName').value.trim()||'Comandante';
+  S=newGame(name,pickedCrew.slice());
+  addLog(`Sol 1: ¡Aterrizaje completado! La tripulación de ${S.name} llega al cráter.`);
+  learn(B.lander.fact);
+  show('travel');travelT0=performance.now();$('#bLand').disabled=true;let fi=0;
+  $('#travelFact').innerHTML=`<b>Dato del viaje</b>${TRAVEL_FACTS[0]}`;
+  const iv=setInterval(()=>{if(skyMode!=='travel')return clearInterval(iv);fi=(fi+1)%TRAVEL_FACTS.length;$('#travelFact').innerHTML=`<b>Dato del viaje</b>${TRAVEL_FACTS[fi]}`},2600);
+  beep(120,.6,'sawtooth');
+}
+function startGame(){
+  show('game');sel=-1;render();requestAnimationFrame(()=>{sizeMap();render()});
+  if(S.sol===1&&S.log.length<=1)setTimeout(()=>sheet(`<div class="sheetHead"><span class="big">👩‍🚀</span><div><h2>¡Bienvenido a Marte, ${S.name}!</h2><p>Sol 1 · Cráter preparado por los robots</p></div></div>
+    <p class="info">Este cráter tiene <b>hielo azul ❄️</b>, <b>rocas con minerales 🪨</b> y hasta <b>tubos de lava 🕳️</b>. Vuestro módulo 🛖 y un panel solar 🔆 ya funcionan.</p>
+    <p class="info">El oxígeno que trajisteis solo dura unos pocos soles. ¡Mira arriba tus recursos y sigue las misiones!</p>
+    <div class="fact" style="max-width:none"><b>Consejo</b>Toca una casilla vacía para construir. Cuando estés listo, pulsa “Siguiente sol”.</div>
+    <div class="stack" style="width:100%"><button class="btn" data-close>¡A trabajar!</button></div>`),400);
+}
+function save(){try{if(S)localStorage.setItem(SAVE,JSON.stringify(S))}catch(e){}}
+function load(){try{const r=localStorage.getItem(SAVE);if(r){const s=JSON.parse(r);if(s&&s.v===1)return s}}catch(e){}return null}
+
+$('#bNew').onclick=()=>{initAudio();startStory()};
+$('#bCont').onclick=()=>{initAudio();if(!S)S=load();if(S)startGame()};
+$('#bStory').onclick=()=>{beep(500,.04);if(storyI<STORY.length-1){storyI++;drawStory()}else startCrew()};
+$('#bLaunch').onclick=()=>startTravel();
+$('#bLand').onclick=()=>startGame();
+$('#bNext').onclick=()=>{if(!$('#veil'))nextSol()};
+$('#bLog').onclick=openLog;
+$('#bMenu').onclick=openMenu;
+$('#missionBtn').onclick=openLog;
+$('#map').addEventListener('click',e=>{const b=e.target.closest('.tile');if(b)openTile(+b.dataset.i)});
+$('#bEndMain').onclick=()=>{S=null;try{localStorage.removeItem(SAVE)}catch(e){}toTitle()};
+$('#bEndKeep').onclick=()=>startGame();
+window.addEventListener('resize',()=>{if(!$('#game').hidden)sizeMap()});
+
+/* ================= SONIDO ================= */
+let AC=null;
+function initAudio(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
+function beep(fr,d,type){
+  if(!sound||!AC)return;try{const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.value=fr;
+  g.gain.setValueAtTime(.06,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d+.02)}catch(e){}
+}
+
+/* ================= CIELO Y DIBUJOS ================= */
+const sky=$('#sky'),cx=sky.getContext('2d');
+let skyMode='title',storyArt='earth',stars=[],dust=[];
+function resizeSky(){const r=devicePixelRatio||1;sky.width=innerWidth*r;sky.height=innerHeight*r;cx.setTransform(r,0,0,r,0,0);
+  stars=Array.from({length:120},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.2,p:Math.random()*6}))}
+resizeSky();addEventListener('resize',resizeSky);
+for(let i=0;i<90;i++)dust.push({x:Math.random(),y:Math.random(),v:.2+Math.random()*.8,r:1+Math.random()*2.5});
+function planet(c,x,y,r,kind,t){
+  const g=c.createRadialGradient(x-r*.35,y-r*.35,r*.1,x,y,r);
+  if(kind==='earth'){g.addColorStop(0,'#8fb7a8');g.addColorStop(.6,'#4a7380');g.addColorStop(1,'#26363c')}
+  else{g.addColorStop(0,'#f2a36b');g.addColorStop(.55,'#c4562a');g.addColorStop(1,'#4a1a10')}
+  c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill();
+  c.save();c.beginPath();c.arc(x,y,r,0,7);c.clip();
+  if(kind==='earth'){
+    c.fillStyle='#8a7a4c';for(let i=0;i<5;i++){c.beginPath();c.ellipse(x+Math.cos(i*1.9+t*.1)*r*.5,y+Math.sin(i*2.3)*r*.5,r*.28,r*.16,i,0,7);c.fill()}
+    c.fillStyle='rgba(150,120,90,.45)';c.fillRect(x-r,y-r,r*2,r*2); // contaminación
+    c.fillStyle='rgba(200,170,120,.25)';for(let i=0;i<4;i++){c.beginPath();c.ellipse(x+Math.sin(t*.3+i)*r*.6,y-r*.6+i*r*.4,r*.7,r*.1,0,0,7);c.fill()}
+  }else{
+    c.fillStyle='rgba(80,25,12,.45)';[[-.3,-.2,.18],[.25,.1,.12],[-.05,.4,.09],[.4,-.35,.07]].forEach(([a,b,s])=>{c.beginPath();c.arc(x+a*r,y+b*r,s*r,0,7);c.fill()});
+    c.fillStyle='rgba(255,255,255,.75)';c.beginPath();c.ellipse(x,y-r*.95,r*.22,r*.07,0,0,7);c.fill();
+  }
+  c.restore();
+}
+function rocket(c,x,y,s,ang,t){
+  c.save();c.translate(x,y);c.rotate(ang);c.scale(s,s);
+  c.fillStyle=`rgba(255,${150+Math.sin(t*20)*60|0},60,.9)`;c.beginPath();c.moveTo(-6,18);c.lineTo(0,34+Math.sin(t*25)*5);c.lineTo(6,18);c.fill();
+  c.fillStyle='#e9ddd3';c.beginPath();c.moveTo(0,-26);c.quadraticCurveTo(10,-10,9,18);c.lineTo(-9,18);c.quadraticCurveTo(-10,-10,0,-26);c.fill();
+  c.fillStyle='#d0582c';c.beginPath();c.moveTo(-9,8);c.lineTo(-16,22);c.lineTo(-8,18);c.fill();c.beginPath();c.moveTo(9,8);c.lineTo(16,22);c.lineTo(8,18);c.fill();
+  c.fillStyle='#62d3e3';c.beginPath();c.arc(0,-6,4,0,7);c.fill();
+  c.restore();
+}
+function drawStoryArt(t){
+  const cv=$('#storyArt'),c=cv.getContext('2d'),W=cv.width;c.clearRect(0,0,W,W);
+  const m=W/2;
+  if(storyArt==='earth'){planet(c,m,m,W*.36,'earth',t);c.fillStyle='rgba(255,120,60,.18)';c.beginPath();c.arc(m,m,W*.42,0,7);c.fill()}
+  else if(storyArt==='mars'){c.fillStyle='rgba(208,88,44,.18)';c.beginPath();c.arc(m,m,W*.45,0,7);c.fill();planet(c,m,m,W*.36,'mars',t)}
+  else if(storyArt==='robots'){
+    c.fillStyle='#c4562a';c.beginPath();c.ellipse(m,W*.7,W*.48,W*.18,0,0,7);c.fill();
+    c.fillStyle='#7c3a24';c.beginPath();c.ellipse(m,W*.72,W*.32,W*.09,0,0,7);c.fill();
+    c.fillStyle='#9fd8e6';c.beginPath();c.ellipse(m+W*.1,W*.73,W*.08,W*.03,0,0,7);c.fill();
+    // cúpula
+    c.strokeStyle='rgba(240,178,122,.8)';c.lineWidth=4;c.fillStyle='rgba(98,211,227,.15)';c.beginPath();c.arc(m-W*.08,W*.7,W*.13,Math.PI,0);c.fill();c.stroke();
+    // robots
+    for(let i=0;i<3;i++){const x=m-W*.35+((t*30+i*120)%(W*.7)),y=W*.62+Math.sin(t*3+i)*3;c.fillStyle='#e9ddd3';c.fillRect(x-14,y-12,28,16);c.fillStyle='#2a1716';c.beginPath();c.arc(x-8,y+6,6,0,7);c.arc(x+8,y+6,6,0,7);c.fill();c.fillStyle='#62d3e3';c.fillRect(x-4,y-20,8,8)}
+    c.font=`${W*.1}px serif`;c.textAlign='center';c.fillText('🦠',m+W*.28,W*.4+Math.sin(t*2)*8);
+  }else{
+    planet(c,W*.2,W*.8,W*.16,'earth',t);planet(c,W*.82,W*.2,W*.12,'mars',t);
+    const p=(t*.15)%1;rocket(c,W*.2+p*W*.6,W*.8-p*W*.6,2.2,Math.PI/4,t);
+  }
+}
+function drawTravel(t){
+  const cv=$('#travelArt'),c=cv.getContext('2d'),W=cv.width,H=cv.height;c.clearRect(0,0,W,H);
+  const p=Math.min(1,(performance.now()-travelT0)/7000);
+  c.strokeStyle='rgba(240,178,122,.35)';c.setLineDash([6,10]);c.lineWidth=3;c.beginPath();c.moveTo(70,H*.7);c.quadraticCurveTo(W/2,-20,W-70,H*.6);c.stroke();c.setLineDash([]);
+  planet(c,70,H*.7,46,'earth',t);planet(c,W-70,H*.6,36,'mars',t);
+  const q=1-p,x=q*q*70+2*q*p*W/2+p*p*(W-70),y=q*q*H*.7+2*q*p*(-20)+p*p*H*.6;
+  const dx=2*q*(W/2-70)+2*p*(W-70-W/2),dy=2*q*(-20-H*.7)+2*p*(H*.6+20);
+  rocket(c,x,y,1.6,Math.atan2(dy,dx)+Math.PI/2,t);
+  $('#travelBar').style.width=(p*100)+'%';$('#travelDay').textContent=`Día ${Math.round(p*90)} de 90`;
+  if(p>=1&&$('#bLand').disabled){$('#bLand').disabled=false;$('#travelTitle').textContent='¡Llegando a Marte!';beep(700,.2,'triangle')}
+}
+function loop(now){
+  const t=now/1000,W=innerWidth,H=innerHeight;
+  const storm=skyMode==='game'&&S&&S.storm>0;
+  const g=cx.createLinearGradient(0,0,0,H);
+  if(skyMode==='game'){g.addColorStop(0,storm?'#3a2214':'#1d0f12');g.addColorStop(1,storm?'#6b3a1c':'#3a1a14')}
+  else{g.addColorStop(0,'#0c0709');g.addColorStop(1,'#241112')}
+  cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  for(const s of stars){cx.globalAlpha=(storm?.15:.5)+Math.sin(t*1.5+s.p)*.3;cx.fillStyle='#fbeee4';cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill()}
+  cx.globalAlpha=1;
+  if(storm){cx.fillStyle='rgba(240,178,122,.35)';for(const d of dust){d.x+=d.v*.004;if(d.x>1.05)d.x=-.05;cx.beginPath();cx.arc(d.x*W,d.y*H+Math.sin(t+d.y*9)*8,d.r,0,7);cx.fill()}}
+  if(skyMode==='title'){planet(cx,W*.5,H+Math.min(W,H)*.25,Math.min(W,H)*.6,'mars',t)}
+  if(skyMode==='story')drawStoryArt(t);
+  if(skyMode==='travel')drawTravel(t);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ================= ARRANQUE ================= */
+function start(data){
+  if(data&&data.S){S=data.S;startGame();return}
+  toTitle();
+}
+window.claude?.hot?.snapshot?.(()=>({S:skyMode==='game'?S:null}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+<!--ARTIFACT-END-->
+</body>
+</html>
