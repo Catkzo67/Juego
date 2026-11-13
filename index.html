@@ -265,6 +265,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
   <p class="tag" id="endText"></p>
   <div class="endStats" id="endStats"></div>
   <div class="stack">
+    <button class="btn ghost" id="bEndFacts">📚 Datos aprendidos</button>
     <button class="btn" id="bEndMain">Jugar otra vez</button>
     <button class="btn ghost" id="bEndKeep" hidden>Seguir construyendo</button>
   </div>
@@ -384,8 +385,43 @@ const QUIZ=[
   {q:'¿Por qué hay que quitar el polvo de los trajes al entrar en la base?',a:['Es fino, abrasivo y tóxico','Es pegajoso como la miel','Es radiactivo como el uranio','Huele muy mal al calentarse'],c:0,e:'El polvo marciano es muy fino, raya los equipos y contiene percloratos.'},
   {q:'¿Qué tamaño tiene Marte comparado con la Tierra?',a:['Casi la mitad de ancho','El doble de ancho','Exactamente igual','Una décima parte'],c:0,e:'Su diámetro es un 53% del de la Tierra y su gravedad, un 38%.'},
   {q:'Si de día sobran 10 de energía y de noche faltan 12, ¿qué pasará?',a:['Faltarán 2 de noche','Sobrarán 2 de día','No pasará nada','Faltarán 22 de noche'],c:0,e:'La batería guarda los 10 del día, pero de noche hacen falta 12: faltan 2.'}
+,
+  {q:'¿Por qué en Marte llegan al suelo más meteoritos que en la Tierra?',a:['Su aire es tan fino que no los quema','Su gravedad es el doble que la terrestre','Su suelo rojo los atrae como un imán','Sus dos lunas los empujan hacia abajo'],c:0,e:'En la Tierra la mayoría se queman al atravesar la atmósfera. La de Marte es unas 100 veces más fina.'},
+  {q:'¿Cómo se llama una roca del espacio que llega a tocar el suelo?',a:['Meteorito','Cometa','Asteroide','Estrella fugaz'],c:0,e:'En el espacio es un meteoroide; al cruzar el aire brilla como meteoro; si llega al suelo es un meteorito.'},
+  {q:'¿Qué cultivo del plan Ares crece muy rápido y da mucha proteína?',a:['La espirulina, un alga','El arroz de secano','El cacao tropical','La uva de mesa'],c:0,e:'La espirulina es un alga (cianobacteria) que crece rápido en agua y tiene muchísima proteína.'},
+  {q:'¿Por qué en Marte las plantas deben crecer en invernaderos cerrados?',a:['El aire es fino, frío y sin oxígeno','Porque allí no llega la luz del Sol','Porque la lluvia marciana es ácida','Porque los robots podrían pisarlas'],c:0,e:'Fuera, el agua se congelaría o herviría y las plantas no podrían respirar ni mantenerse calientes.'},
+  {q:'Según la NASA, ¿qué es uno de los mayores riesgos de una misión larga?',a:['El aislamiento y el encierro','Comer demasiado cada día','Los dolores de muelas','El calor excesivo del Sol'],c:0,e:'La NASA estudia cinco grandes peligros: radiación, aislamiento, distancia, gravedad y entornos cerrados.'},
+  {q:'¿Por qué de noche la base gasta más en calefacción?',a:['Sin Sol, el frío baja de −80 °C','La gente duerme con la ventana abierta','Las baterías se enfrían y se paran','Los paneles absorben el calor de la base'],c:0,e:'El aire fino de Marte casi no guarda calor: cuando se pone el Sol, la temperatura cae en picado.'},
+  {q:'¿Por qué los rovers de Marte no se manejan en directo con un mando?',a:['Las órdenes tardan minutos en llegar','Los mandos no funcionan en el espacio','El polvo bloquea todas las ondas','Es más barato no moverlos nunca'],c:0,e:'Con hasta 24 minutos de retraso, los rovers reciben una lista de tareas y deciden solos muchos detalles.'},
+  {q:'¿Qué daño hace sobre todo el polvo marciano a los paneles solares?',a:['Tapa la luz y raya la superficie','Los calienta hasta derretirlos','Los vuelve radiactivos para siempre','Los hace girar sin control'],c:0,e:'El polvo es muy fino y abrasivo: tapa la luz y, con el viento, va rayando el cristal.'}
 ];
 
+// Tema de cada pregunta (mismo orden que QUIZ): permite preguntar sobre lo que acaba de pasar
+const QTOPIC=['co2','co2','gravity','night','co2','comms','co2','soil','bio','bio','co2','travel','radiation','water','dust','cold','gravity','home','radiation','co2','travel','cold','energy','co2','water','dust','travel','night',
+  'meteor','meteor','food','food','health','night','comms','dust'];
+QUIZ.forEach((q,i)=>q.tp=QTOPIC[i]||'travel');
+const BUILD_TOPIC={moxie:'co2',ice:'water',solar:'energy',battery:'night',farm:'food',vfarm:'food',bio:'bio',shelter:'radiation',antenna:'comms',habitat:'home',gym:'gravity',reactor:'energy',shield:'radiation',miner:'soil',mess:'health'};
+// "¿Por qué?" de cada edificio, en dos frases
+const WHY={
+  base:'La base es el centro de mando: de ella salen los pasillos y en ella duerme la primera tripulación. Gasta poca energía porque es compacta y está muy bien aislada.',
+  corridor:'Los pasillos presurizados permiten ir de un edificio a otro sin traje. Sin ellos, cada viaje sería un paseo espacial lento y peligroso; por eso los edificios sin conexión rinden menos.',
+  solar:'Los paneles convierten la luz del Sol en electricidad, así que de noche no producen nada. A Marte llega menos luz que a la Tierra y el polvo la tapa todavía más.',
+  moxie:'El aire de Marte es casi todo CO₂. MOXIE lo calienta a unos 800 °C para separar sus átomos de oxígeno, y por eso gasta bastante energía.',
+  ice:'El agua de Marte está congelada bajo el suelo. Hay que perforar, derretir el hielo con calor y filtrarlo, y todo eso necesita energía.',
+  miner:'Traer material desde la Tierra cuesta muchísimo, así que se usa el suelo de Marte. Las rocas grises tienen más metales: por eso sobre roca saca el doble.',
+  battery:'Guarda la energía que sobra de día para usarla de noche. Sin baterías, al ponerse el Sol la colonia se quedaría a oscuras y sin calefacción.',
+  bio:'Sus bacterias se comen los percloratos tóxicos del suelo y cultivan espirulina para comer. También es el lugar donde se investigan mejoras con el método científico.',
+  farm:'Las plantas necesitan aire con presión, calor y agua, y fuera no hay nada de eso. El invernadero se lo da, pero a cambio gasta agua y energía.',
+  shelter:'Varios metros de regolito frenan la radiación como una manta muy gruesa. Por eso protege en las tormentas solares aunque no gaste energía.',
+  antenna:'Las señales tardan entre 4 y 24 minutos en llegar a la Tierra. La antena recibe las previsiones del clima espacial y guía a las naves para aterrizar.',
+  habitat:'Las personas necesitan aire, calor y un sitio seguro para dormir. Sobre un tubo de lava cabe el doble porque la cueva natural da espacio y protección extra.',
+  mess:'Comer juntos ayuda a sentirse un equipo en un lugar tan aislado. Por eso sube el ánimo de toda la colonia, aunque no produzca nada.',
+  gym:'Con solo el 38% de la gravedad terrestre, huesos y músculos se debilitan si no se usan. Entrenar cada día mantiene sana a la tripulación.',
+  repair:'Sus robots revisan, limpian y ajustan los edificios antes de que fallen. Así todo se desgasta más despacio.',
+  vfarm:'Apila muchas plantas en torres con luz LED, así que da mucha comida en poco espacio. A cambio, las luces gastan bastante energía.',
+  reactor:'La fisión nuclear produce calor y electricidad sin depender del Sol. Por eso funciona igual de día, de noche y en mitad de una tormenta de polvo.',
+  shield:'Crea un campo magnético parecido al de la Tierra, que desvía las partículas del Sol y frena lo que cae del cielo. Mantenerlo encendido necesita muchísima energía.'
+};
 const STORY=[
   {art:'earth',t:'Año 2050. La Tierra está en apuros: hace demasiado calor, el aire está sucio y cada vez hay menos recursos.'},
   {art:'mars',t:'La humanidad necesita un nuevo hogar. Las miradas apuntan al planeta rojo: Marte.'},
@@ -511,15 +547,15 @@ const NOUP=new Set(['corridor','shelter','shield']);           // sin nada que m
 const LV=b=>Math.pow(1.5,(b.lv||1)-1), CM=b=>Math.pow(1.2,(b.lv||1)-1);
 const upCost=b=>Math.ceil((B[b.t].cost||35)*((b.lv||1)===1?1:1.6));
 const RESEARCH=[
-  {id:'perov',n:'Celdas de perovskita',i:'🔆',c:35,d:3,t:'Los paneles solares producen un 20% más.',f:'Las celdas de perovskita-silicio son ligeras, flexibles y muy eficientes.'},
-  {id:'dust',n:'Paneles antipolvo',i:'🌪️',c:30,d:3,t:'Las tormentas quitan menos energía a los paneles y los desgastan la mitad.',f:'Las superficies electrostáticas repelen el polvo fino de Marte.'},
-  {id:'drip',n:'Riego por goteo',i:'💧',c:25,d:3,t:'Invernaderos y granjas gastan la mitad de agua.',f:'Dar el agua gota a gota en la raíz evita casi toda la evaporación.'},
-  {id:'bore',n:'Perforación térmica',i:'🧊',c:30,d:3,t:'Los extractores de hielo sacan un 30% más de agua.',f:'Las sondas térmicas derriten el hielo bajo tierra sin tener que excavarlo todo.'},
-  {id:'ruth',n:'Catalizadores de rutenio',i:'🫧',c:30,d:3,t:'Las plantas MOXIE fabrican un 30% más de oxígeno.',f:'Los catalizadores aceleran las reacciones químicas sin gastarse.'},
-  {id:'freeze',n:'Liofilizado de comida',i:'🍞',c:20,d:2,t:'La comida guardada se estropea la mitad.',f:'Liofilizar es congelar y quitar el agua: así la comida dura años.'},
-  {id:'aero',n:'Aislamiento de aerogel',i:'🔥',c:35,d:3,t:'La calefacción gasta un 30% menos.',f:'El aerogel de sílice es casi todo aire atrapado y aísla muchísimo.'},
-  {id:'tial',n:'Aleaciones de titanio',i:'🔩',c:40,d:4,t:'Todos los edificios se desgastan un 25% menos.',f:'Las aleaciones de titanio-aluminio son ligeras y resisten muy bien el frío.'},
-  {id:'rad',n:'Medicina antirradiación',i:'💊',c:25,d:3,t:'Las tormentas solares hacen la mitad de daño.',f:'Algunos medicamentos ayudan al cuerpo a reparar el daño de la radiación.'}
+  {id:'perov',n:'Celdas de perovskita',i:'🔆',c:35,d:3,t:'Los paneles solares producen un 20% más.',f:'Las celdas de perovskita-silicio son ligeras, flexibles y muy eficientes.',hq:'Las celdas de perovskita son más finas que las de silicio. Con el mismo Sol, ¿qué crees que pasará?',ha:['Producirán más energía','Producirán menos energía'],hc:0,hr:'Producen un 20% más: la perovskita aprovecha partes de la luz que el silicio casi no capta.'},
+  {id:'dust',n:'Paneles antipolvo',i:'🌪️',c:30,d:3,t:'Las tormentas quitan menos energía a los paneles y los desgastan la mitad.',f:'Las superficies electrostáticas repelen el polvo fino de Marte.',hq:'¿Qué crees que protegerá mejor los paneles del polvo?',ha:['Una carga eléctrica que lo repela','Una capa pegajosa que lo atrape'],hc:0,hr:'La carga electrostática empuja el polvo fuera. Una capa pegajosa se llenaría enseguida y taparía la luz.'},
+  {id:'drip',n:'Riego por goteo',i:'💧',c:25,d:3,t:'Invernaderos y granjas gastan la mitad de agua.',f:'Dar el agua gota a gota en la raíz evita casi toda la evaporación.',hq:'Si damos el agua gota a gota en la raíz, ¿qué crees que pasará con las plantas?',ha:['Crecerán igual con la mitad de agua','Crecerán la mitad de rápido'],hc:0,hr:'Crecen igual: casi toda el agua de riego normal se evapora o se escapa sin llegar a la raíz.'},
+  {id:'bore',n:'Perforación térmica',i:'🧊',c:30,d:3,t:'Los extractores de hielo sacan un 30% más de agua.',f:'Las sondas térmicas derriten el hielo bajo tierra sin tener que excavarlo todo.',hq:'Para sacar el hielo enterrado, ¿qué método crees que dará más agua?',ha:['Derretirlo bajo tierra con calor','Excavarlo y subirlo en bloques'],hc:0,hr:'Derretirlo bajo tierra da un 30% más: no se pierde hielo al romperlo y se mueve mucha menos roca.'},
+  {id:'ruth',n:'Catalizadores de rutenio',i:'🫧',c:30,d:3,t:'Las plantas MOXIE fabrican un 30% más de oxígeno.',f:'Los catalizadores aceleran las reacciones químicas sin gastarse.',hq:'Un catalizador acelera una reacción química. ¿Qué crees que le pasará al rutenio?',ha:['Se podrá usar una y otra vez','Se gastará cada sol'],hc:0,hr:'Un catalizador ayuda a la reacción sin gastarse, así que MOXIE fabrica un 30% más sin reponerlo.'},
+  {id:'freeze',n:'Liofilizado de comida',i:'🍞',c:20,d:2,t:'La comida guardada se estropea la mitad.',f:'Liofilizar es congelar y quitar el agua: así la comida dura años.',hq:'Si quitamos casi toda el agua de la comida congelada, ¿cuánto crees que durará?',ha:['Mucho más tiempo','Mucho menos tiempo'],hc:0,hr:'Dura muchísimo más: sin agua, los microbios que la estropean no pueden crecer.'},
+  {id:'aero',n:'Aislamiento de aerogel',i:'🔥',c:35,d:3,t:'La calefacción gasta un 30% menos.',f:'El aerogel de sílice es casi todo aire atrapado y aísla muchísimo.',hq:'El aerogel es casi todo aire. Comparado con una pared maciza, ¿cómo crees que aislará del frío?',ha:['Mejor que la pared','Peor que la pared'],hc:0,hr:'Aísla mejor: el aire atrapado en poros diminutos casi no deja pasar el calor.'},
+  {id:'tial',n:'Aleaciones de titanio',i:'🔩',c:40,d:4,t:'Todos los edificios se desgastan un 25% menos.',f:'Las aleaciones de titanio-aluminio son ligeras y resisten muy bien el frío.',hq:'Con un frío de −100 °C, ¿qué crees que aguantará más sin romperse?',ha:['Una aleación de titanio','El acero normal de la Tierra'],hc:0,hr:'El titanio aguanta mejor: el acero normal se vuelve quebradizo con frío extremo.'},
+  {id:'rad',n:'Medicina antirradiación',i:'💊',c:25,d:3,t:'Las tormentas solares hacen la mitad de daño.',f:'Algunos medicamentos ayudan al cuerpo a reparar el daño de la radiación.',hq:'¿Crees que un medicamento puede reducir el daño de la radiación?',ha:['Sí, ayuda a reparar el cuerpo','No, solo sirve un escudo'],hc:0,hr:'Sí: algunos medicamentos ayudan a las células a reparar el daño. El escudo y el refugio siguen siendo lo mejor.'}
 ];
 const hasR=(s,id)=>!!(s.rs&&s.rs.done.includes(id));
 // Las mecánicas difíciles llegan poco a poco, con las misiones y los soles
@@ -671,7 +707,7 @@ function nextSol(){
   if(s.rs&&s.rs.cur&&mech(s,'research')){
     if(f.act.has('bio')){s.rs.prog+=Math.pow(1.5,f.lvAct.bio-1)*(has(s,'mic')?1.25:1);
       const R0=RESEARCH.find(r=>r.id===s.rs.cur);
-      if(s.rs.prog>=R0.d){s.rs.done.push(R0.id);s.rs.cur=null;s.rs.prog=0;learn(R0.f);msgs.push(`Investigación terminada: ${R0.n}.`);s.rsDone=R0}}
+      if(s.rs.prog>=R0.d){s.rs.done.push(R0.id);s.rs.cur=null;s.rs.prog=0;learn(R0.f);msgs.push(`Experimento terminado: ${R0.n}.`);s.rsDone={id:R0.id,pred:s.rs.pred}}}
     else msgs.push('La investigación está parada: el bio-laboratorio no tiene energía todo el sol.');
   }
   if(s.storm>0){s.storm--;if(!s.storm)msgs.push('La tormenta de polvo ha terminado. ¡Vuelve el Sol!')}
@@ -687,7 +723,7 @@ function nextSol(){
   s.wx=s.wx||[];
   const due=s.wx.filter(w=>w.at<=s.sol);s.wx=s.wx.filter(w=>w.at>s.sol);
   due.forEach(w=>{const e=EVENTS[w.k].mk();if(e){e.forecast=w.seen;q.push(e)}});
-  if(s.rsDone){const R0=s.rsDone;s.rsDone=null;toast(`🧫 ¡Investigación terminada! ${R0.i} ${R0.n}`)}
+  if(s.rsDone){q.push(evResult(s.rsDone));s.rsDone=null}
   const shipEvery=has(s,'com')?5:6;
   q.unshift(...updateMechs(s));                                        // nuevas mecánicas primero
   if(mech(s,'meteor')&&Math.random()<(has(s,'met')?.07:.10)){const e=evStrike();if(e)q.push(e)}
@@ -725,9 +761,16 @@ function addDeposit(s,type){ // nuevo depósito de hielo o roca cerca de la base
   const b=baseOf(s);let i,j,t=0;do{i=b.i+3+rnd(25)-12;j=b.j+3+rnd(25)-12;t++}while(t<150&&!(inMap(i,j)&&s.map[idx(i,j)]==='soil'&&OCC[idx(i,j)]<0));
   [[0,0],[1,0],[0,1],[-1,0],[0,-1],[1,1]].forEach(([a,c])=>{if(inMap(i+a,j+c)&&s.map[idx(i+a,j+c)]==='soil')s.map[idx(i+a,j+c)]=type});terrainDirty=true;focusTile(i,j);
 }
+function evResult(d){ // paso final del método científico: comparar el resultado con la hipótesis
+  const r=RESEARCH.find(x=>x.id===d.id),ok=d.pred===r.hc;
+  return {i:'🧫',t:`Resultado: ${r.n}`,x:`<b>Pregunta:</b> ${r.hq}<br><b>Tu hipótesis:</b> ${r.ha[d.pred]}<br><b>Resultado del experimento:</b> ${r.hr}`,
+    fact:`${r.f} Mejora conseguida: ${r.t}`,
+    o:[{l:ok?'¡Mi hipótesis era correcta!':'Mi hipótesis no se cumplió',s:ok?'Premio por acertar: +10 🧱':'En ciencia, equivocarse también enseña.',fx:s=>{if(ok)s.mat+=10;
+      (s.qlog=s.qlog||[]).push({exp:1,q:r.hq,a:r.ha[r.hc],ok,e:r.hr});return ok?'Has comprobado tu hipótesis con un experimento. ¡Así trabaja la ciencia! (+10 🧱)':'El experimento no salió como esperabas. Ahora sabes algo nuevo, y eso también es ciencia.'}}]};
+}
 function evShip(){
   const n=2+rnd(3)+(has(S,'com')?1:0)+((flows(S).lvAct.antenna||1)>=3?1:0),space=flows(S).cap-S.pop,P=S.pop,heatUp=Math.ceil((P+n)*.3*(1+(P+n)/40))-Math.ceil(P*.3*(1+P/40));
-  return {i:'🚀',t:'¡Llega una nave de la Tierra!',x:`Una nave trae a ${n} nuevos colonos y cajas de carga. Tienes sitio para ${Math.max(0,space)} personas más. Con ellos, la calefacción gastará unos ${heatUp} de energía más cada sol.`,
+  return {tp:'travel',i:'🚀',t:'¡Llega una nave de la Tierra!',x:`Una nave trae a ${n} nuevos colonos y cajas de carga. Tienes sitio para ${Math.max(0,space)} personas más. Con ellos, la calefacción gastará unos ${heatUp} de energía más cada sol.`,
     fact:'En 2050 las naves de carga pueden aterrizar con más de 150 toneladas gracias a la retropropulsión.',
     o:[
       {l:`Recibir a los ${n} colonos`,s:space>=n?'Traen comida y cajas de carga. Recuerda: más colonos, más consumo.':'Ojo: no hay camas para todos.',fx:s=>{s.pop+=n;s.comida+=n*5;dropCrates(2);return `¡Bienvenidos! Ya sois ${s.pop} en Marte. Traen ${n*5} de comida y han dejado 2 cajas de carga en el mapa.`}},
@@ -746,7 +789,7 @@ function evStrike(){
     fact:'Marte recibe muchos más impactos que la Tierra porque su atmósfera es tan fina que casi no frena las rocas.',o:[{l:'¡Bien por el escudo!',fx:s=>{s.moral+=4;return 'La colonia sigue intacta.'}}]};
   const targets=S.blds.filter(b=>!NOWEAR.has(b.t));if(!targets.length)return null;
   const tb=pick(targets),[w,h]=dim(tb.t),ci=tb.i+rnd(w),cj=tb.j+rnd(h),i0=ci-1,j0=cj-1,nm=B[tb.t].n;   // zona de 4×4 baldosas
-  return {i:'☄️',t:'¡Impacto de meteorito!',x:`${has(S,'met')?'La meteoróloga lo ha detectado a tiempo, pero no':'No'} se puede esquivar: un meteorito va a caer junto a ${nm.toLowerCase()}. Todo lo que haya en una zona de 4×4 baldosas quedará muy averiado.`,
+  return {tp:'meteor',i:'☄️',t:'¡Impacto de meteorito!',x:`${has(S,'met')?'La meteoróloga lo ha detectado a tiempo, pero no':'No'} se puede esquivar: un meteorito va a caer junto a ${nm.toLowerCase()}. Todo lo que haya en una zona de 4×4 baldosas quedará muy averiado.`,
     fact:'Marte recibe muchos más impactos que la Tierra porque su atmósfera es tan fina que casi no frena las rocas.',
     o:[{l:'¡Todos a cubierto!',s:'Solo un escudo magnético activo puede evitarlo.',fx:s=>{
       const hit=[];
@@ -760,13 +803,13 @@ function evStrike(){
 }
 const EVENTS=[
   {bad:1,wx:'Tormenta de polvo',w:3,c:s=>!s.storm&&s.sol>4,mk:()=>{const long=S.sol>30&&Math.random()<.45,n=long?8+rnd(3):3+rnd(3);
-    return {i:'🌪️',t:long?'¡Tormenta de polvo gigante!':'¡Tormenta de polvo!',x:`Una ${long?'enorme ':''}nube de polvo cubre el cielo durante unos ${n} soles. Los paneles producirán muy poco y el polvo desgastará paneles y excavadoras.`,
+    return {tp:'dust',i:'🌪️',t:long?'¡Tormenta de polvo gigante!':'¡Tormenta de polvo!',x:`Una ${long?'enorme ':''}nube de polvo cubre el cielo durante unos ${n} soles. Los paneles producirán muy poco y el polvo desgastará paneles y excavadoras.`,
     fact:'Las tormentas de polvo en Marte pueden cubrir todo el planeta y durar semanas o meses.',
     o:[{l:'Prepararse para la tormenta',s:'Apaga lo que no sea imprescindible y vigila las baterías.',fx:s=>{s.storm=n;return `La tormenta durará unos ${n} soles. El reactor nuclear y las baterías son tu mejor ayuda.`}}]}}},
   {bad:1,wx:'Tormenta solar',w:2,c:s=>s.sol>5,mk:()=>{
     const safe=count(S,'shelter')>0;
     if(isActive('shield'))return {i:'☀️',t:'Tormenta solar',x:'El Sol ha lanzado una ola de partículas, pero el escudo magnético la desvía. ¡Nadie corre peligro!',fact:'Un escudo magnético crea un “paraguas” que desvía las partículas cargadas del viento solar.',o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
-    return {i:'☢️',t:'¡Alerta de tormenta solar!',x:'El Sol ha lanzado una ola de radiación peligrosa que llegará pronto.',
+    return {tp:'radiation',i:'☢️',t:'¡Alerta de tormenta solar!',x:'El Sol ha lanzado una ola de radiación peligrosa que llegará pronto.',
       fact:'Marte no tiene un campo magnético global, así que la radiación del Sol llega hasta el suelo.',
       o:safe?[
         {l:'Todos al refugio de regolito',s:'Seguros, pero hoy no se trabaja.',fx:s=>{s.mat=Math.max(0,s.mat-8);return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}},
@@ -774,31 +817,31 @@ const EVENTS=[
       ]:[
         {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=(has(s,'med')?12:18)*(hasR(s,'rad')?.5:1);return 'Las paredes de la base protegen poco. Necesitas un refugio de regolito.'}}
       ]}}},
-  {bad:1,w:2,c:()=>true,mk:()=>({i:'💨',t:'¡Fuga de aire!',x:'Una junta de una esclusa pierde aire. Un mensaje a la Tierra tardaría unos 20 minutos en llegar y otros 20 en volver.',
+  {bad:1,w:2,c:()=>true,mk:()=>({tp:'comms',i:'💨',t:'¡Fuga de aire!',x:'Una junta de una esclusa pierde aire. Un mensaje a la Tierra tardaría unos 20 minutos en llegar y otros 20 en volver.',
     fact:'Por el retraso en las comunicaciones, los astronautas deben saber resolver problemas sin ayuda de la Tierra.',
     o:[
       {l:'Esperar instrucciones de la Tierra',s:has(S,'com')?'Haddad agiliza la comunicación.':'Llegarán en unos 40 minutos.',fx:s=>{const l=has(s,'com')?6:12;s.o2=Math.max(0,s.o2-l);return `Mientras esperabais se ha escapado oxígeno (-${l}).`}},
       {l:'Repararla nosotros mismos',s:'Cuesta 8 materiales.',fx:s=>{s.mat=Math.max(0,s.mat-8);s.moral+=6;return '¡Reparada en minutos! El equipo se siente orgulloso (+ánimo).'}}
     ]})},
-  {bad:1,w:2,c:s=>s.moral<85,mk:()=>({i:'😔',t:'Un astronauta echa de menos su casa',x:'Llevar tanto tiempo lejos de la familia y en un espacio pequeño es duro.',
+  {bad:1,w:2,c:s=>s.moral<85,mk:()=>({tp:'health',i:'😔',t:'Un astronauta echa de menos su casa',x:'Llevar tanto tiempo lejos de la familia y en un espacio pequeño es duro.',
     fact:'El aislamiento y el confinamiento son de los mayores riesgos de los viajes espaciales según la NASA.',
     o:[
       {l:'Organizar una videollamada con su familia',s:'Gasta 10 de energía de la batería.',fx:s=>{s.bat=Math.max(0,s.bat-10);s.moral+=12;return 'Ver a su familia le ha alegrado mucho (+ánimo).'}},
       {l:'Hacer una noche de juegos en equipo',s:'Gasta 5 de comida extra.',fx:s=>{s.comida=Math.max(0,s.comida-5);s.moral+=8;return '¡Qué risas! El equipo está más unido.'}},
       {l:'Seguir trabajando como siempre',fx:s=>{const l=has(s,'psi')?6:12;s.moral-=l;return 'El equipo está más triste. Cuidar las emociones también es importante.'}}
     ]})},
-  {bad:1,w:2,c:s=>s.blds.some(t=>t.t==='solar'),mk:()=>({i:'🟫',t:'Polvo sobre los paneles',x:'El polvo fino se ha pegado a los paneles solares y producen la mitad.',
+  {bad:1,w:2,c:s=>s.blds.some(t=>t.t==='solar'),mk:()=>({tp:'dust',i:'🟫',t:'Polvo sobre los paneles',x:'El polvo fino se ha pegado a los paneles solares y producen la mitad.',
     fact:'El polvo marciano se acumula sobre los equipos y afecta su funcionamiento.',
     o:[
       {l:'Salir a limpiarlos con un paseo espacial',s:'Cansancio y algo de radiación.',fx:s=>{s.salud-=5;return 'Paneles limpios. ¡Buen trabajo!'}},
       {l:'Esperar a que el viento los limpie',s:'Producirán la mitad durante 3 soles.',fx:s=>{s.dirty=3;return 'Los paneles darán la mitad de energía durante 3 soles.'}}
     ]})},
-  {bad:1,wx:'Ola de frío',w:2,c:s=>!s.cold,mk:()=>({i:'🥶',t:'Ola de frío extremo',x:'Las próximas noches serán todavía más frías. La calefacción gastará el doble durante 2 soles.',
+  {bad:1,wx:'Ola de frío',w:2,c:s=>!s.cold,mk:()=>({tp:'cold',i:'🥶',t:'Ola de frío extremo',x:'Las próximas noches serán todavía más frías. La calefacción gastará el doble durante 2 soles.',
     fact:'En Marte la temperatura puede bajar hasta unos -153 °C. Sin calefacción no se puede sobrevivir.',
     o:[{l:'Entendido, revisaré las baterías',fx:s=>{s.cold=2;return 'Comprueba que las baterías aguantan la noche.'}}]})},
   {bad:1,w:2,c:s=>s.blds.filter(t=>!NOWEAR.has(t.t)).length>2&&(!isActive('shield')||Math.random()<.3),mk:()=>{
     const list=S.blds.filter(b=>!NOWEAR.has(b.t)&&!b.broken);if(!list.length)return null;const tb=pick(list),id=tb.id,nm=B[tb.t].n;
-    return {i:'☄️',t:'¡Micrometeorito!',x:`Una pequeña roca del espacio ha golpeado tu ${nm}. Está averiado.`,
+    return {tp:'meteor',i:'☄️',t:'¡Micrometeorito!',x:`Una pequeña roca del espacio ha golpeado tu ${nm}. Está averiado.`,
       fact:'La atmósfera de Marte es tan fina que muchas rocas pequeñas del espacio llegan al suelo.',
       o:[{l:'Vaya... habrá que repararlo',s:'Tócalo en el mapa para arreglarlo.',fx:s=>{const b=s.blds.find(b=>b.id===id);if(b){b.broken=true;focusTile(b.i,b.j)}return `El ${nm} no funciona hasta que lo repares.`}}]}}},
   {w:1,c:()=>true,mk:()=>({i:'🔭',t:'¡Un dron encontró hielo!',x:'Un dron ha detectado un nuevo depósito de hielo enterrado cerca de la base.',
@@ -807,17 +850,22 @@ const EVENTS=[
   {w:1,c:()=>true,mk:()=>({i:'💎',t:'Rocas valiosas',x:'Un rover ha encontrado un trozo de roca llena de metales.',
     fact:'El regolito tiene hierro, aluminio, magnesio, titanio y azufre.',
     o:[{l:'Recoger los minerales',fx:s=>{s.mat+=12;return '+12 materiales para construir.'}}]})},
-  {w:4,c:()=>true,mk:()=>{
-    let pool=QUIZ.map((q,i)=>i).filter(i=>!S.quizUsed.includes(i));if(!pool.length){S.quizUsed=[];pool=QUIZ.map((q,i)=>i)}
-    const qi=pick(pool);S.quizUsed.push(qi);const q=QUIZ[qi];return {quiz:q,i:'🛰️',t:'Pregunta del control de misión',x:q.q}}}
+  {w:4,c:()=>true,mk:()=>quizEvent()}
 ];
+function quizEvent(tp){ // pregunta del tema que toca (o cualquiera que no se haya hecho)
+  let pool=QUIZ.map((q,i)=>i).filter(i=>!S.quizUsed.includes(i));if(!pool.length){S.quizUsed=[];pool=QUIZ.map((q,i)=>i)}
+  const on=tp?pool.filter(i=>QUIZ[i].tp===tp):[];const qi=pick(on.length?on:pool);S.quizUsed.push(qi);
+  return {quiz:QUIZ[qi],i:'🛰️',t:'Pregunta del control de misión',x:QUIZ[qi].q,ctx:!!(tp&&on.length)};
+}
 function pickEvent(bad){
   const pool=EVENTS.map((e,k)=>k).filter(k=>!!EVENTS[k].bad===bad&&EVENTS[k].c(S));let tot=pool.reduce((a,k)=>a+EVENTS[k].w,0),r=Math.random()*tot;
   for(const k of pool){r-=EVENTS[k].w;if(r<=0)return k}
   return -1;
 }
 const canForecast=s=>has(s,'met')||(s.act||[]).includes('antenna');
-function runQueue(q){if(!q.length)return;const e=q.shift();S.stats.events++;showEvent(e,()=>runQueue(q))}
+function runQueue(q){if(!q.length)return;const e=q.shift();S.stats.events++;showEvent(e,()=>{
+    if(e.tp&&!e.quiz&&S.lastQuizSol!==S.sol&&Math.random()<.75){S.lastQuizSol=S.sol;q.unshift(quizEvent(e.tp))}   // una pregunta sobre lo que acaba de pasar
+    runQueue(q)})}
 
 /* ================= MAPA ISOMÉTRICO ================= */
 const mc=$('#mapCanvas'),mx=mc.getContext('2d');
@@ -1223,7 +1271,9 @@ function build(k,i,j){
   learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
   toast(`${b.i} ${b.n}<br><small style="font-weight:600">${b.fact}</small>`);
-  const nm=updateMechs(S);if(nm.length)setTimeout(()=>runQueue(nm),900);
+  const nm=updateMechs(S);
+  S.qBuilt=S.qBuilt||[];if(BUILD_TOPIC[k]&&!S.qBuilt.includes(k)){S.qBuilt.push(k);nm.push(quizEvent(BUILD_TOPIC[k]))}
+  if(nm.length)setTimeout(()=>{if(!$('#veil'))runQueue(nm)},900);
   save();
 }
 function openCrate(ci){
@@ -1254,18 +1304,25 @@ function openBuilding(k){
   let resHtml='';
   if(t.t==='bio'&&!mech(S,'research'))resHtml='<div class="sec">Investigación</div><p class="hint">🔒 La investigación se desbloquea en el sol 6.</p>';
   else if(t.t==='bio'){const rs=S.rs,cur=rs.cur&&RESEARCH.find(r=>r.id===rs.cur);
-    resHtml=`<div class="sec">Investigación</div>${cur?`<div class="meter">${cur.i} ${cur.n}<span class="track"><i style="width:${Math.min(100,rs.prog/cur.d*100)}%;background:var(--glass)"></i></span>${Math.floor(rs.prog)}/${cur.d} soles</div>`:'<p class="hint">Elige un proyecto. Avanza cada sol si el bio-laboratorio tiene energía todo el sol (más rápido con más nivel).</p>'}
+    resHtml=`<div class="sec">Investigación</div><p class="hint">Método científico: 1) haces una predicción, 2) el experimento dura unos soles, 3) comparas el resultado con lo que predijiste.</p>${cur?`<div class="meter">${cur.i} ${cur.n}<span class="track"><i style="width:${Math.min(100,rs.prog/cur.d*100)}%;background:var(--glass)"></i></span>${Math.floor(rs.prog)}/${cur.d} soles</div><p class="hint">Tu hipótesis: «${cur.ha[rs.pred??0]}»</p>`:'<p class="hint">Elige un proyecto. Avanza cada sol si el bio-laboratorio tiene energía todo el sol (más rápido con más nivel).</p>'}
       <div class="mlist">${RESEARCH.map(r=>{const done=rs.done.includes(r.id);return `<div class="${done?'done':''}"><span>${done?'✅':r.i}</span><span style="flex:1"><b>${r.n}</b><br><span class="hint">${r.t}</span></span>${done||cur?'':`<button class="btn ghost" data-rs="${r.id}" style="padding:6px 10px;font-size:.8rem;flex:none">${r.c} 🧱 · ${r.d} soles</button>`}</div>`}).join('')}</div>`}
   const v=sheet(`<div class="sheetHead"><div><h2>${b.n}${NOUP.has(t.t)?'':` · Nv ${t.lv||1}`}</h2><p>${st}${b.inside?' · vista interior':''}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <img class="bimg" src="${pic}" alt="${b.n}">
-    <p class="info">${b.desc}</p><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
+    <p class="info">${b.desc}</p><button class="btn ghost" id="bWhy" style="font-size:.85rem;padding:8px 12px;align-self:flex-start">¿Por qué?</button>
+    <div class="fact" id="whyTxt" hidden style="max-width:none"><b>¿Por qué?</b>${WHY[t.t]||''}</div><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
     ${lvTxt}${conn}
     ${isB&&mech(S,'wear')?`<div class="meter">🔩 Desgaste<span class="track wear"><i style="width:${w}%;background:${wc}"></i></span>${w}%</div><p class="hint">Cada sol se desgasta un poco. Con más desgaste es más fácil que se averíe: hazle mantenimiento a tiempo.</p>`:''}
     <div class="fact" style="max-width:none"><b>¿Sabías que…?</b>${b.fact}</div>
     ${b.e<0?'<p class="hint">Si falta energía, primero se apagan los edificios menos importantes. De noche solo hay baterías y reactor.</p>':''}
     <div class="row">${btns.join('')}</div>${resHtml}`,()=>{selB=-1});
+  v.querySelector('#bWhy').onclick=()=>{const w=v.querySelector('#whyTxt');w.hidden=!w.hidden;beep(500,.04)};
   const up=v.querySelector('#bUp');if(up)up.onclick=()=>{const c=upCost(t);if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;t.lv=(t.lv||1)+1;beep(660,.1);setTimeout(()=>beep(990,.12),90);save();render();toast(`⬆️ ${b.n} ahora es de nivel ${t.lv}`);openBuilding(k)};
-  v.querySelectorAll('[data-rs]').forEach(x=>x.onclick=()=>{const r=RESEARCH.find(r=>r.id===x.dataset.rs);if(S.mat<r.c){toast(`Faltan ${r.c-S.mat} 🧱`);return}S.mat-=r.c;S.rs.cur=r.id;S.rs.prog=0;beep(600,.08);save();render();toast(`🧫 Investigando: ${r.n}`);openBuilding(k)});
+  v.querySelectorAll('[data-rs]').forEach(x=>x.onclick=()=>{const r=RESEARCH.find(r=>r.id===x.dataset.rs);if(S.mat<r.c){toast(`Faltan ${r.c-S.mat} 🧱`);return}
+    const ord=Math.random()<.5?[0,1]:[1,0];
+    const h=sheet(`<div class="sheetHead"><span class="big">🧫</span><div><h2>${r.n}</h2><p>Método científico · paso 1 de 3: hipótesis</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+      <p class="info"><b>Pregunta:</b> ${r.hq}</p><p class="hint">Elige tu predicción. Después, el experimento durará ${r.d} soles y compararemos el resultado con lo que has dicho.</p>
+      <div class="stack" style="width:100%">${ord.map(i=>`<button class="opt" data-h="${i}">${r.ha[i]}</button>`).join('')}</div>`,()=>openBuilding(k));
+    h.querySelectorAll('[data-h]').forEach(o=>o.onclick=()=>{S.mat-=r.c;S.rs.cur=r.id;S.rs.prog=0;S.rs.pred=+o.dataset.h;beep(600,.08);save();render();toast(`🧪 Experimento en marcha: ${r.n}`);openBuilding(k)})});
   const tog=v.querySelector('#bTog');if(tog)tog.onclick=()=>{t.on=!t.on;beep(t.on?600:300,.06);save();render();openBuilding(k)};
   const pay=(c,fn)=>{if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;fn();beep(700,.1);save();closeSheet();selB=-1;render()};
   const rep=v.querySelector('#bRep');if(rep)rep.onclick=()=>pay(rcost(t.t),()=>{t.broken=false;t.w=0;toast('🔧 ¡Reparado!')});
@@ -1278,7 +1335,7 @@ function showEvent(e,done){
   learn(e.fact);
   if(e.quiz){
     const q=e.quiz,order=q.a.map((a,i)=>i).sort(()=>Math.random()-.5);
-    const v=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2><p>Racha actual: ${S.streak||0} · 3 seguidas dan premio extra</p></div></div>
+    const v=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2><p>${e.ctx?'Sobre lo que acaba de pasar · ':''}Racha: ${S.streak||0} · 3 seguidas dan premio</p></div></div>
       <p class="info" style="font-size:1.1rem;font-weight:800">${q.q}</p>
       <div class="stack" style="width:100%">${order.map(i=>`<button class="opt" data-i="${i}">${q.a[i]}</button>`).join('')}</div><div id="qres"></div>`);
     v.dataset.lock=1;
@@ -1291,7 +1348,7 @@ function showEvent(e,done){
         else if(S.streak%3===0){S.mat+=20;S.moral+=4;bonus=`🔥 ¡Racha de ${S.streak}! Premio extra: +20 🧱.`}
         else bonus=`Racha: ${S.streak} seguidas. A las 3 seguidas hay premio extra.`}
       else{bonus=S.streak>=2?`Se ha cortado tu racha de ${S.streak}.`:'';S.streak=0;beep(200,.15)}
-      learn(q.e);
+      learn(q.e);(S.qlog=S.qlog||[]).push({q:q.q,a:q.a[q.c],ok,e:q.e});
       $('#qres').innerHTML=`<div class="fact" style="max-width:none"><b>${ok?'¡Correcto! +12 🧱':'No es esa'}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
         <div class="stack" style="width:100%;margin-top:12px"><button class="btn" id="qok">Continuar</button></div>`;
       $('#qok').onclick=()=>{closeSheet();save();render();done()};
@@ -1419,6 +1476,12 @@ $('#bMenu').onclick=openMenu;
 $('#missionBtn').onclick=openLog;
 $('#bEndMain').onclick=()=>{S=null;try{localStorage.removeItem(SAVE)}catch(e){}toTitle()};
 $('#bEndKeep').onclick=()=>startGame();
+$('#bEndFacts').onclick=()=>{const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filter(x=>x.exp),ok=qs.filter(x=>x.ok).length;
+  const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;
+  sheet(`<div class="sheetHead"><span class="big">📚</span><div><h2>Datos aprendidos</h2><p>${qs.length} preguntas · ${ok} acertadas · ${ex.length} experimentos</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <div class="sec">Preguntas que respondiste</div><div class="mlist">${qs.map(item).join('')||'<div><span>•</span><span>Esta vez no respondiste ninguna pregunta.</span></div>'}</div>
+    ${ex.length?`<div class="sec">Experimentos (método científico)</div><div class="mlist">${ex.map(item).join('')}</div>`:''}
+    <div class="sec">Otros datos que descubriste</div><div class="log">${((S&&S.facts)||[]).map(f=>`<div>🔬 ${f}</div>`).join('')}</div>`)};
 window.addEventListener('resize',()=>{if(!$('#game').hidden){resizeMap();clampCam()}});
 
 /* ================= SONIDO ================= */

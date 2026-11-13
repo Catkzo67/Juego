@@ -19,7 +19,10 @@ Videojuego educativo para móviles (niños de 7 a 12 años) sobre cómo fundar l
 - Mejora los edificios hasta nivel 3 (cada nivel ×1,5 de producción o capacidad); el nivel se ve en el mapa.
 - Avisos antes de que pase algo (desgaste alto, energía de la noche, recursos que se acaban, previsión del clima) y confirmación al pasar el sol si hay avisos nuevos.
 - La antena (o la meteoróloga) anuncia tormentas y olas de frío 1 o 2 soles antes.
-- El bio-laboratorio investiga 9 mejoras: paneles antipolvo, riego por goteo, perforación térmica, aerogel, etc.
+- El bio-laboratorio investiga 9 mejoras con el método científico: primero predices qué pasará, el experimento dura unos soles y al final se compara el resultado con tu hipótesis.
+- Cada edificio tiene un botón "¿Por qué?" que explica en dos frases por qué funciona así.
+- Las preguntas tratan de lo que acaba de pasar (tras una tormenta, una sobre tormentas; al construir la MOXIE, una sobre el CO₂).
+- En la pantalla final, "Datos aprendidos" muestra todas las preguntas respondidas, los experimentos y los datos descubiertos.
 
 - Tamaños: base 6×6 (se conecta con pasillos por el extremo de sus 4 brazos); MOXIE 1×3; hábitat, invernadero, granja vertical, extractor, refugio, reactor y escudo 3×3; el resto 2×2; pasillos 1×1. Hay que dejar una baldosa libre entre edificios distintos; los iguales y los pasillos pueden ir pegados.
 - Cada colono consume oxígeno, agua y comida en cada sol; casi todo gasta energía.
