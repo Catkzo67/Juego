@@ -11,7 +11,10 @@ Videojuego educativo para móviles (niños de 7 a 12 años) sobre cómo fundar l
 - Elige tu nombre y 3 especialistas (ingeniera, botánico, doctora, geólogo, psicóloga).
 - Edificios: base central, pasillos, paneles solares, planta MOXIE (oxígeno del CO₂), extractor de hielo, excavadora minera, batería, bio-laboratorio contra percloratos, invernadero, granja vertical, refugio de regolito (toca un cráter para construirlo ahí), antena, hábitat (doble sobre tubos de lava), comedor, gimnasio, taller de robots, microrreactor nuclear y escudo magnético.
 - Recoge las cajas de carga que llegan desde la Tierra.
-- Los pasillos solo se unen entre sí y con las puertas de los edificios (al colocar un pasillo, las puertas libres se marcan en dorado).
+- Los pasillos solo se unen entre sí y con las puertas de los edificios. Un edificio sin conexión con la base produce un 40% menos y gasta un 50% más de energía.
+- Cada sol tiene día y noche: los paneles solo funcionan de día y de noche hacen falta baterías o reactor.
+- Los edificios se desgastan y se averían si no se les hace mantenimiento; con el tiempo llegan tormentas largas y meteoritos que pueden destruir instalaciones (el escudo magnético los evita).
+- Tripulación de 6: tú y 5 especialistas elegidos entre 10, cada uno con una habilidad propia.
 
 - Tamaños: base 6×6 (se conecta con pasillos por el extremo de sus 4 brazos); MOXIE 1×3; hábitat, invernadero, granja vertical, extractor, refugio, reactor y escudo 3×3; el resto 2×2; pasillos 1×1. Hay que dejar una baldosa libre entre edificios distintos; los iguales y los pasillos pueden ir pegados.
 - Cada colono consume oxígeno, agua y comida en cada sol; casi todo gasta energía.
