@@ -178,7 +178,18 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
   color:var(--cream);text-shadow:0 4px 0 var(--navy),0 0 30px var(--rust);animation:flash 1s forwards}
 @keyframes flash{0%{opacity:0;transform:scale(.8)}25%{opacity:1;transform:scale(1)}100%{opacity:0}}
 #end h1{font-size:2.3rem}
-.endStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(340px,100%)}
+.endStats{display:grid;grid-template-columns:1fr;gap:8px;width:min(380px,100%)}
+.scoreBox{background:var(--navy);border:2px solid var(--cream);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;text-align:left;box-shadow:var(--bevel)}
+.endStats .scRow,.endStats .scRow *{background:none;border:0;border-radius:0;padding:0;box-shadow:none}
+.endStats .scRow{padding:3px 0}
+.endStats .scoreBox .sec{background:none;border:0;padding:0;box-shadow:none}
+.endStats .scRow.tot{border-top:2px solid var(--navy-3);padding-top:8px}
+.scRow{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:800;font-size:.9rem}
+.scRow small{display:block;font-weight:600;color:var(--muted);font-size:.72rem}
+.scRow b{font-family:var(--display);font-size:1.1rem;font-variant-numeric:tabular-nums}
+.scRow.tot{border-top:2px solid var(--navy-3);padding-top:6px;font-size:1.05rem}
+.scRow.tot b{font-size:1.6rem;color:var(--gold)}
+#end{overflow-y:auto;justify-content:flex-start}
 .endStats div{background:var(--navy);border:2px solid var(--navy-3);border-radius:6px;padding:10px}
 .endStats b{display:block;font-family:var(--display);font-size:1.6rem}
 .endStats span{font-size:.75rem;color:var(--muted)}
@@ -196,6 +207,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
   <div class="stack">
     <button class="btn" id="bNew">Nueva misión</button>
     <button class="btn ghost" id="bCont" hidden>Continuar partida</button>
+    <button class="btn ghost" id="bAch">🏆 Logros</button>
   </div>
 </section>
 
@@ -265,7 +277,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
   <p class="tag" id="endText"></p>
   <div class="endStats" id="endStats"></div>
   <div class="stack">
-    <button class="btn ghost" id="bEndFacts">📚 Datos aprendidos</button>
+    <div class="row"><button class="btn ghost" id="bEndFacts">📚 Datos aprendidos</button><button class="btn ghost" id="bEndAch">🏆 Logros</button></div>
     <button class="btn" id="bEndMain">Jugar otra vez</button>
     <button class="btn ghost" id="bEndKeep" hidden>Seguir construyendo</button>
   </div>
@@ -351,7 +363,7 @@ const MISSIONS=[
   {t:'Construye un refugio contra la radiación',h:'Las tormentas solares son peligrosas. Toca un cráter para construirlo ahí.',ok:s=>count(s,'shelter')>=1,r:15},
   {t:'Instala una antena para llamar a más colonos',h:'Si tiene energía, cada 6 soles llegará una nave.',ok:s=>count(s,'antenna')>=1,r:15},
   {t:'Llega a 12 colonos',h:'Construye hábitats para que tengan dónde vivir.',ok:s=>s.pop>=12,r:25},
-  {t:'Activa un microrreactor nuclear',h:'Energía constante, de día, de noche y con tormenta.',ok:s=>count(s,'reactor')>=1,r:30},
+  {t:'Consigue energía estable: un microrreactor o 4 baterías',h:'El reactor da energía constante; con 4 baterías también aguantas noches y tormentas.',ok:s=>count(s,'reactor')>=1||count(s,'battery')>=4,r:30},
   {t:'Protege la colonia con un escudo magnético',h:'Anula tormentas solares y desvía meteoritos si tiene energía.',ok:s=>count(s,'shield')>=1,r:30},
   {t:'Llega a 30 colonos: ¡ciudad autosuficiente!',h:'Más hábitats, más comida, más oxígeno, más agua y más energía.',ok:s=>s.pop>=30,r:0}
 ];
@@ -503,11 +515,11 @@ function newGame(name,crew){
   map[idx(25,13)]='tube';
   const blds=[{id:1,t:'base',i:B0[0],j:B0[1],on:true,broken:false},{id:2,t:'solar',i:24,j:18,on:true,broken:false},{id:3,t:'corridor',i:23,j:19,on:true,broken:false}];
   [[24,18],[25,18],[24,19],[25,19],[23,19]].forEach(([i,j])=>{map[idx(i,j)]='soil'});
-  const crates=[[15,25],[27,14],[13,19],[26,25],[20,13]].map(([i,j])=>({i,j}));
+  const crates=[[15,25],[27,14],[13,19],[26,25],[20,13]].map(([i,j])=>({i,j,init:1}));
   crates.forEach(c=>{map[idx(c.i,c.j)]='soil'});
   return {v:5,name:name||'Comandante',crew,sol:1,pop:CREW_SIZE+1,o2:30,agua:30,comida:60,mat:60,bat:15,salud:90,moral:70,
     storm:0,cold:0,dirty:0,mission:0,map,craters,blds,nextId:4,crates,log:[],facts:[],won:false,lastShip:1,act:[],streak:0,quizUsed:[],
-    rs:{done:[],cur:null,prog:0},wx:[],ack:[],stats:{built:3,quiz:0,events:0,lost:0}};
+    rs:{done:[],cur:null,prog:0},wx:[],ack:[],ach:newAch(),stats:{built:3,quiz:0,events:0,lost:0}};
 }
 
 /* ---------- ocupación del mapa ---------- */
@@ -699,10 +711,18 @@ function nextSol(){
     if(!f.conn.has(k)&&mech(s,'conn'))r*=1.3;
     b.w=Math.min(100,(b.w||0)+r*wr);
     const p=b.w>35?Math.pow((b.w-35)/65,1.5)*.3:0;
-    if(Math.random()<p||(s.storm>0&&exposed&&Math.random()<(has(s,'met')?.05:.1))){b.broken=true;broke.push(B[b.t].n)}
+    const byWear=Math.random()<p;
+    if(byWear||(s.storm>0&&exposed&&Math.random()<(has(s,'met')?.05:.1))){b.broken=true;broke.push(B[b.t].n);if(byWear)s.ach.wearBreaks++}
   });
   if(broke.length)msgs.push(`Averías: ${broke.join(', ')}.`);
   const worn=s.blds.filter(b=>!NOWEAR.has(b.t)&&!b.broken&&(b.w||0)>=60).length;
+  // rachas y marcas para los logros
+  const A=s.ach;
+  A.noBreak=broke.length?0:A.noBreak+1;
+  if(mech(s,'night')){A.nightRun=f.nightShort===0&&f.heatOk?A.nightRun+1:0;A.battRun=f.batAfterDay>=f.batMax-.5?A.battRun+1:0}
+  A.moodRun=s.moral>80?A.moodRun+1:0;A.minSalud=Math.min(A.minSalud,s.salud);
+  if(s.storm>0&&A.giantOn&&f.unpowered.size)A.giantFail=true;
+  if(s.storm===1&&A.giantOn){if(!A.giantFail)A.giant=1;A.giantOn=false}
   s.act=[...f.act];
   if(s.rs&&s.rs.cur&&mech(s,'research')){
     if(f.act.has('bio')){s.rs.prog+=Math.pow(1.5,f.lvAct.bio-1)*(has(s,'mic')?1.25:1);
@@ -737,7 +757,7 @@ function nextSol(){
     else if(r<pBad+.25){const k=pickEvent(false);if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
   }
   if(!q.length){if(broke.length)toast(`🔧 Avería: ${broke.join(', ')}`);else if(short||!f.heatOk)toast(msgs[0]);else if(worn)toast(`⚠️ ${worn} edificio(s) muy desgastados: hazles mantenimiento.`);else if(full)toast('📦 Almacenes llenos');}
-  save();render();runQueue(q);
+  save();render();checkAch();runQueue(q);
 }
 
 function checkMissions(){
@@ -786,7 +806,7 @@ function evGeo(){
 // Impacto de meteorito: deja muy averiado todo lo que haya en una zona de 4×4 (salvo que el escudo esté activo).
 function evStrike(){
   if(isActive('shield'))return {i:'🌠',t:'¡Lluvia de meteoritos!',x:'Varios meteoritos caían hacia la colonia, pero el escudo los ha desviado. ¡Ni un rasguño!',
-    fact:'Marte recibe muchos más impactos que la Tierra porque su atmósfera es tan fina que casi no frena las rocas.',o:[{l:'¡Bien por el escudo!',fx:s=>{s.moral+=4;return 'La colonia sigue intacta.'}}]};
+    fact:'Marte recibe muchos más impactos que la Tierra porque su atmósfera es tan fina que casi no frena las rocas.',o:[{l:'¡Bien por el escudo!',fx:s=>{s.moral+=4;s.ach.shield++;return 'La colonia sigue intacta.'}}]};
   const targets=S.blds.filter(b=>!NOWEAR.has(b.t));if(!targets.length)return null;
   const tb=pick(targets),[w,h]=dim(tb.t),ci=tb.i+rnd(w),cj=tb.j+rnd(h),i0=ci-1,j0=cj-1,nm=B[tb.t].n;   // zona de 4×4 baldosas
   return {tp:'meteor',i:'☄️',t:'¡Impacto de meteorito!',x:`${has(S,'met')?'La meteoróloga lo ha detectado a tiempo, pero no':'No'} se puede esquivar: un meteorito va a caer junto a ${nm.toLowerCase()}. Todo lo que haya en una zona de 4×4 baldosas quedará muy averiado.`,
@@ -794,7 +814,7 @@ function evStrike(){
     o:[{l:'¡Todos a cubierto!',s:'Solo un escudo magnético activo puede evitarlo.',fx:s=>{
       const hit=[];
       s.blds.forEach(b=>{if(NOWEAR.has(b.t))return;const [bw,bh]=dim(b.t);
-        if(b.i<i0+4&&b.i+bw>i0&&b.j<j0+4&&b.j+bh>j0){b.broken=true;b.w=Math.max(b.w||0,85+rnd(15));hit.push(B[b.t].n)}});
+        if(b.i<i0+4&&b.i+bw>i0&&b.j<j0+4&&b.j+bh>j0){b.broken=true;s.ach.noBreak=0;b.w=Math.max(b.w||0,85+rnd(15));hit.push(B[b.t].n)}});
       // si el centro está libre, deja un cráter pequeño
       if([[ci,cj],[ci+1,cj],[ci,cj+1],[ci+1,cj+1]].every(([i,j])=>inMap(i,j)&&OCC[idx(i,j)]<0)){s.craters.push({x:ci+1,y:cj+1,r:.8});
         [[ci,cj],[ci+1,cj],[ci,cj+1],[ci+1,cj+1]].forEach(([i,j])=>s.map[idx(i,j)]='crater');terrainDirty=true}
@@ -805,14 +825,14 @@ const EVENTS=[
   {bad:1,wx:'Tormenta de polvo',w:3,c:s=>!s.storm&&s.sol>4,mk:()=>{const long=S.sol>30&&Math.random()<.45,n=long?8+rnd(3):3+rnd(3);
     return {tp:'dust',i:'🌪️',t:long?'¡Tormenta de polvo gigante!':'¡Tormenta de polvo!',x:`Una ${long?'enorme ':''}nube de polvo cubre el cielo durante unos ${n} soles. Los paneles producirán muy poco y el polvo desgastará paneles y excavadoras.`,
     fact:'Las tormentas de polvo en Marte pueden cubrir todo el planeta y durar semanas o meses.',
-    o:[{l:'Prepararse para la tormenta',s:'Apaga lo que no sea imprescindible y vigila las baterías.',fx:s=>{s.storm=n;return `La tormenta durará unos ${n} soles. El reactor nuclear y las baterías son tu mejor ayuda.`}}]}}},
+    o:[{l:'Prepararse para la tormenta',s:'Apaga lo que no sea imprescindible y vigila las baterías.',fx:s=>{s.storm=n;if(n>=8){s.ach.giantOn=true;s.ach.giantFail=false}return `La tormenta durará unos ${n} soles. El reactor nuclear y las baterías son tu mejor ayuda.`}}]}}},
   {bad:1,wx:'Tormenta solar',w:2,c:s=>s.sol>5,mk:()=>{
     const safe=count(S,'shelter')>0;
     if(isActive('shield'))return {i:'☀️',t:'Tormenta solar',x:'El Sol ha lanzado una ola de partículas, pero el escudo magnético la desvía. ¡Nadie corre peligro!',fact:'Un escudo magnético crea un “paraguas” que desvía las partículas cargadas del viento solar.',o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
     return {tp:'radiation',i:'☢️',t:'¡Alerta de tormenta solar!',x:'El Sol ha lanzado una ola de radiación peligrosa que llegará pronto.',
       fact:'Marte no tiene un campo magnético global, así que la radiación del Sol llega hasta el suelo.',
       o:safe?[
-        {l:'Todos al refugio de regolito',s:'Seguros, pero hoy no se trabaja.',fx:s=>{s.mat=Math.max(0,s.mat-8);return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}},
+        {l:'Todos al refugio de regolito',s:'Seguros, pero hoy no se trabaja.',fx:s=>{s.mat=Math.max(0,s.mat-8);s.ach.shelter=1;return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}},
         {l:'Seguir trabajando fuera',s:'Arriesgado...',fx:s=>{s.salud-=(has(s,'med')?14:20)*(hasR(s,'rad')?.5:1);return 'La radiación ha afectado a la tripulación. La salud baja.'}}
       ]:[
         {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=(has(s,'med')?12:18)*(hasR(s,'rad')?.5:1);return 'Las paredes de la base protegen poco. Necesitas un refugio de regolito.'}}
@@ -843,7 +863,7 @@ const EVENTS=[
     const list=S.blds.filter(b=>!NOWEAR.has(b.t)&&!b.broken);if(!list.length)return null;const tb=pick(list),id=tb.id,nm=B[tb.t].n;
     return {tp:'meteor',i:'☄️',t:'¡Micrometeorito!',x:`Una pequeña roca del espacio ha golpeado tu ${nm}. Está averiado.`,
       fact:'La atmósfera de Marte es tan fina que muchas rocas pequeñas del espacio llegan al suelo.',
-      o:[{l:'Vaya... habrá que repararlo',s:'Tócalo en el mapa para arreglarlo.',fx:s=>{const b=s.blds.find(b=>b.id===id);if(b){b.broken=true;focusTile(b.i,b.j)}return `El ${nm} no funciona hasta que lo repares.`}}]}}},
+      o:[{l:'Vaya... habrá que repararlo',s:'Tócalo en el mapa para arreglarlo.',fx:s=>{const b=s.blds.find(b=>b.id===id);if(b){b.broken=true;s.ach.noBreak=0;focusTile(b.i,b.j)}return `El ${nm} no funciona hasta que lo repares.`}}]}}},
   {w:1,c:()=>true,mk:()=>({i:'🔭',t:'¡Un dron encontró hielo!',x:'Un dron ha detectado un nuevo depósito de hielo enterrado cerca de la base.',
     fact:'Los glaciares de Marte están cubiertos de polvo y roca, que impiden que el hielo desaparezca.',
     o:[{l:'¡Marcarlo en el mapa!',fx:s=>{addDeposit(s,'ice');return 'Ha aparecido un nuevo depósito de hielo azul en tu cráter.'}}]})},
@@ -1114,6 +1134,80 @@ function tapMap(sx,sy){
   if(inMap(ti,tj))openTile(ti,tj);
 }
 
+/* ================= LOGROS Y PUNTUACIÓN ================= */
+const ACH_KEY='ares2050-logros';
+function newAch(){return {nightRun:0,battRun:0,moodRun:0,noBreak:0,wearBreaks:0,minSalud:100,shield:0,crInit:0,nuke:0,shelter:0,giant:0,giantOn:false,giantFail:false,win:0}}
+// Guardado propio de los logros: no se borra al perder ni al empezar de nuevo
+let P={d:{},best:{},qOk:[],facts:[],hi:0};
+try{const r=JSON.parse(localStorage.getItem(ACH_KEY)||'null');if(r)P=Object.assign(P,r)}catch(e){}
+function saveP(){try{localStorage.setItem(ACH_KEY,JSON.stringify(P))}catch(e){}}
+const UNIV=[...new Set([...Object.values(B).map(b=>b.fact),...QUIZ.map(q=>q.e),...RESEARCH.map(r=>r.f)])];   // todos los datos del cuaderno
+const nB=s=>s.blds.filter(b=>!NOWEAR.has(b.t)).length;
+const W=s=>s.ach&&s.ach.win;   // logros que se comprueban al ganar
+const ACH=[
+ {g:'🚀 Primeros pasos',items:[
+  {id:'moxie',i:'🫁',n:'Primer aliento',d:'Construye la primera planta MOXIE.',max:1,v:s=>count(s,'moxie')?1:0},
+  {id:'conn',i:'🔗',n:'Bien conectados',d:'Ten al menos 4 edificios y todos unidos a la base (ninguno con 🔌).',max:1,v:(s,f)=>nB(s)>=4&&s.blds.every((b,k)=>NOWEAR.has(b.t)||f.conn.has(k))?1:0},
+  {id:'crates',i:'📦',n:'Abrir el regalo',d:'Recoge las 5 cajas de carga del principio.',max:5,v:s=>s.ach.crInit},
+  {id:'night',i:'🌙',n:'Sobrevivir a la noche',d:'Pasa 5 soles seguidos sin que falte energía de noche.',max:5,v:s=>s.ach.nightRun}]},
+ {g:'🔬 Ciencia y aprendizaje',items:[
+  {id:'facts',i:'📖',n:'Mente curiosa',d:'Ten 15 datos en el cuaderno en una partida.',max:15,v:s=>s.facts.length},
+  {id:'encyc',i:'🎓',n:'Enciclopedia marciana',d:'Descubre todos los datos del juego (entre todas tus partidas).',max:UNIV.length,v:()=>P.facts.length},
+  {id:'streak',i:'🔥',n:'Racha perfecta',d:'Acierta 5 preguntas seguidas.',max:5,v:s=>s.streak||0},
+  {id:'allq',i:'🧠',n:'Sabelotodo',d:'Acierta cada pregunta del juego al menos una vez (entre todas tus partidas).',max:QUIZ.length,v:()=>P.qOk.length},
+  {id:'sci',i:'🧫',n:'Científico jefe',d:'Termina las 9 investigaciones.',max:9,v:s=>s.rs?s.rs.done.length:0}]},
+ {g:'🔧 Gestión e ingeniería',items:[
+  {id:'mech',i:'🔩',n:'Mecánico de guardia',d:'Pasa 20 soles seguidos sin ninguna avería.',max:20,v:s=>s.ach.noBreak},
+  {id:'nowear',i:'♻️',n:'Nada se pierde',d:'Llega al sol 30 sin que ningún edificio se averíe por desgaste.',max:30,v:s=>s.ach.wearBreaks?0:Math.min(s.sol,30)},
+  {id:'lv3',i:'⬆️',n:'Al máximo',d:'Ten 5 edificios en nivel 3.',max:5,v:s=>s.blds.filter(b=>b.lv===3).length},
+  {id:'batt',i:'⚡',n:'Energía de sobra',d:'Empieza la noche con la batería llena 10 soles seguidos.',max:10,v:s=>s.ach.battRun},
+  {id:'pantry',i:'🍞',n:'Despensa llena',d:'Ten a la vez oxígeno, agua y comida al máximo del almacén.',max:3,v:(s,f)=>mech(s,'storage')?['o2','agua','comida'].filter(k=>s[k]>=f.stor).length:0}]},
+ {g:'🌪️ Supervivencia',items:[
+  {id:'giant',i:'🌪️',n:'Aguantar la tormenta',d:'Supera una tormenta de polvo gigante (8 soles o más) sin que se quede nada sin energía.',max:1,v:s=>s.ach.giant},
+  {id:'shelter',i:'⛰️',n:'Bajo tierra',d:'Protege a todos en el refugio durante una tormenta solar.',max:1,v:s=>s.ach.shelter},
+  {id:'shield',i:'🧲',n:'Paraguas magnético',d:'Que el escudo desvíe 3 meteoritos.',max:3,v:s=>s.ach.shield},
+  {id:'scratch',i:'❤️',n:'Sin un rasguño',d:'Gana sin que la salud baje nunca de 50.',max:1,v:s=>W(s)&&s.ach.minSalud>=50?1:0}]},
+ {g:'👥 Colonia',items:[
+  {id:'family',i:'🏠',n:'Familia grande',d:'Llega a 30 colonos.',max:30,v:s=>Math.min(30,s.pop)},
+  {id:'happy',i:'😊',n:'Todos contentos',d:'Mantén el ánimo por encima de 80 durante 15 soles seguidos.',max:15,v:s=>s.ach.moodRun},
+  {id:'lava',i:'🕳️',n:'Hogar volcánico',d:'Aloja a 12 colonos en un hábitat sobre un tubo de lava.',max:12,v:s=>s.blds.some(b=>b.t==='habitat'&&!b.broken&&footprint(b).includes('tube'))?Math.min(12,s.pop):0}]},
+ {g:'🏆 Retos difíciles',items:[
+  {id:'speed',i:'⏱️',n:'Velocista',d:'Gana antes del sol 45.',max:1,v:s=>W(s)&&s.sol<45?1:0},
+  {id:'nonuke',i:'☀️',n:'Sin nuclear',d:'Gana sin construir ningún reactor.',max:1,v:s=>W(s)&&!s.ach.nuke?1:0},
+  {id:'nopilot',i:'🧑‍🚀',n:'Equipo inusual',d:'Gana sin el Piloto Haddad en la tripulación.',max:1,v:s=>W(s)&&!has(s,'com')?1:0},
+  {id:'minimal',i:'📐',n:'Ingeniero minimalista',d:'Gana con menos de 25 edificios (sin contar pasillos).',max:1,v:s=>W(s)&&nB(s)<25?1:0}]}
+];
+const ACH_ALL=ACH.flatMap(g=>g.items);
+function checkAch(){
+  if(!S||!S.ach)return;const f=flows(S),got=[];
+  for(const a of ACH_ALL){const v=Math.min(a.max,a.v(S,f)||0);if(v>(P.best[a.id]||0))P.best[a.id]=v;
+    if(v>=a.max&&!P.d[a.id]){P.d[a.id]=Date.now();got.push(a)}}
+  saveP();
+  got.forEach((a,k)=>setTimeout(()=>{toast(`🏆 ¡Logro conseguido!<br>${a.i} ${a.n}`);beep(784,.1);setTimeout(()=>beep(1046,.18),110);addLog(`<b>Logro:</b> ${a.i} ${a.n}`)},k*2700));
+}
+function openAch(){
+  const f=S&&S.ach?flows(S):null,done=ACH_ALL.filter(a=>P.d[a.id]).length;
+  const row=a=>{const ok=!!P.d[a.id],live=f?Math.min(a.max,a.v(S,f)||0):0,best=Math.max(live,P.best[a.id]||0);
+    return `<div class="${ok?'':''}" style="${ok?'':'opacity:.92'}"><span style="font-size:1.4rem;filter:${ok?'none':'grayscale(1)'}">${a.i}</span><span style="flex:1;min-width:0"><b>${a.n}</b> ${ok?'✅':''}<br><span class="hint">${a.d}</span>
+      ${ok?`<br><span class="hint" style="color:var(--good)">Conseguido el ${new Date(P.d[a.id]).toLocaleDateString('es')}</span>`:`<div class="meter" style="margin-top:4px">${a.max>1?`${best}/${a.max}`:'Pendiente'}<span class="track"><i style="width:${best/a.max*100}%;background:var(--gold)"></i></span></div>`}</span></div>`};
+  sheet(`<div class="sheetHead"><span class="big">🏆</span><div><h2>Logros</h2><p>${done}/${ACH_ALL.length} conseguidos · mejor puntuación: ${P.hi||0}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+    <p class="hint">Los logros se guardan aparte: no se pierden al empezar de nuevo ni al perder.</p>
+    ${ACH.map(g=>`<div class="sec">${g.g}</div><div class="mlist">${g.items.map(row).join('')}</div>`).join('')}`);
+}
+// Puntuación final: colonos, edificios, recursos guardados, tiempo y misiones
+function score(win){
+  const s=S,bl=s.blds.filter(b=>!NOWEAR.has(b.t)),lv=bl.reduce((a,b)=>a+((b.lv||1)-1),0);
+  const res=Math.round(s.o2+s.agua+s.comida+s.mat*.5+s.bat*.5);
+  const rows=[
+    ['👥 Colonos',`${s.pop} × 100`,s.pop*100],
+    ['🏗️ Edificios en pie',`${bl.length} × 40 + ${lv} niveles × 25`,bl.length*40+lv*25],
+    ['📦 Recursos guardados',`oxígeno + agua + comida + ½ material + ½ batería`,res],
+    win?['⏱️ Rapidez',`(100 − ${s.sol} soles) × 40`,Math.max(0,100-s.sol)*40]:['⏱️ Supervivencia',`${s.sol} soles × 15`,s.sol*15],
+    ['🎯 Misiones',`${s.mission} × 100`,s.mission*100]];
+  if(win)rows.push(['🏆 Victoria','colonia autosuficiente',2000]);
+  return {rows,total:rows.reduce((a,r)=>a+r[2],0)};
+}
+
 /* ================= RENDER HUD ================= */
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
 // Avisos: lo que va a pasar si no haces nada
@@ -1192,7 +1286,7 @@ function flashSol(){const el=document.createElement('div');el.className='solflas
 let toastT;
 function toast(t){document.querySelectorAll('.toast').forEach(x=>x.remove());const el=document.createElement('div');el.className='toast';el.innerHTML=t;document.body.appendChild(el);clearTimeout(toastT);toastT=setTimeout(()=>el.remove(),2600)}
 function addLog(t){S.log.unshift(t);if(S.log.length>60)S.log.pop()}
-function learn(f){if(f&&!S.facts.includes(f))S.facts.push(f)}
+function learn(f){if(f&&!S.facts.includes(f))S.facts.push(f);if(f&&UNIV.includes(f)&&!P.facts.includes(f)){P.facts.push(f);saveP()}}
 
 /* ---------- hojas ---------- */
 function sheet(html,onClose){
@@ -1267,12 +1361,13 @@ $('#pbCancel').onclick=stopPlacing;
 $('#pbOk').onclick=()=>{if(!placing)return;const {t,i,j}=placing;if(!validSpot(t,i,j).ok)return;stopPlacing();build(t,i,j)};
 function build(k,i,j){
   const b=B[k];if(S.mat<b.cost){toast(`Faltan ${b.cost-S.mat} 🧱`);return}
-  S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false});S.stats.built++;rebuildOcc();if(k==='shelter')terrainDirty=true;
+  S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false});S.stats.built++;if(k==='reactor')S.ach.nuke=1;rebuildOcc();if(k==='shelter')terrainDirty=true;
   learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
   toast(`${b.i} ${b.n}<br><small style="font-weight:600">${b.fact}</small>`);
   const nm=updateMechs(S);
   S.qBuilt=S.qBuilt||[];if(BUILD_TOPIC[k]&&!S.qBuilt.includes(k)){S.qBuilt.push(k);nm.push(quizEvent(BUILD_TOPIC[k]))}
+  checkAch();
   if(nm.length)setTimeout(()=>{if(!$('#veil'))runQueue(nm)},900);
   save();
 }
@@ -1282,7 +1377,7 @@ function openCrate(ci){
     <div class="fact" style="max-width:none"><b>Contenido</b>${item}</div>
     <p class="info">Solo se envían desde la Tierra los materiales que todavía no se pueden fabricar en Marte.</p>
     <div class="stack" style="width:100%"><button class="btn" id="cOk">Abrir caja (+10 🧱)</button></div>`);
-  v.querySelector('#cOk').onclick=()=>{S.crates.splice(ci,1);S.mat+=10;learn('Carga desde la Tierra: '+item);beep(700,.08);setTimeout(()=>beep(900,.1),80);closeSheet();render();save();toast('📦 +10 🧱')};
+  v.querySelector('#cOk').onclick=()=>{if(S.crates[ci].init)S.ach.crInit++;S.crates.splice(ci,1);S.mat+=10;learn('Carga desde la Tierra: '+item);beep(700,.08);setTimeout(()=>beep(900,.1),80);closeSheet();render();save();toast('📦 +10 🧱');checkAch()};
 }
 function openBuilding(k){
   const t=S.blds[k],b=B[t.t],f=flows(S),fr=f.frac.get(k)??0,isB=!NOWEAR.has(t.t),linked=f.conn.has(k)||!isB||!mech(S,'conn'),w=Math.round(t.w||0);
@@ -1343,7 +1438,7 @@ function showEvent(e,done){
       if(v.dataset.ans)return;v.dataset.ans=1;const ok=+b.dataset.i===q.c;
       v.querySelectorAll('.opt').forEach(x=>{if(+x.dataset.i===q.c)x.classList.add('right');else if(x===b)x.classList.add('wrong')});
       let bonus='';
-      if(ok){S.streak=(S.streak||0)+1;S.mat+=12;S.moral+=3;S.stats.quiz++;beep(880,.12);
+      if(ok){const qi=QUIZ.indexOf(q);if(qi>=0&&!P.qOk.includes(qi)){P.qOk.push(qi);saveP()}S.streak=(S.streak||0)+1;S.mat+=12;S.moral+=3;S.stats.quiz++;beep(880,.12);
         if(S.streak%5===0){S.mat+=40;S.moral+=8;bonus=`🏅 ¡Racha de ${S.streak}! Premio extra: +40 🧱 y +8 de ánimo.`}
         else if(S.streak%3===0){S.mat+=20;S.moral+=4;bonus=`🔥 ¡Racha de ${S.streak}! Premio extra: +20 🧱.`}
         else bonus=`Racha: ${S.streak} seguidas. A las 3 seguidas hay premio extra.`}
@@ -1351,7 +1446,7 @@ function showEvent(e,done){
       learn(q.e);(S.qlog=S.qlog||[]).push({q:q.q,a:q.a[q.c],ok,e:q.e});
       $('#qres').innerHTML=`<div class="fact" style="max-width:none"><b>${ok?'¡Correcto! +12 🧱':'No es esa'}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
         <div class="stack" style="width:100%;margin-top:12px"><button class="btn" id="qok">Continuar</button></div>`;
-      $('#qok').onclick=()=>{closeSheet();save();render();done()};
+      $('#qok').onclick=()=>{closeSheet();save();render();checkAch();done()};
     });
     return;
   }
@@ -1396,12 +1491,13 @@ function openMenu(){
       <div>10. Mira los <b>⚠️ avisos</b>: te dicen lo que va a pasar si no haces nada. Cumple las misiones y llega a <b>30 colonos</b> para ganar.</div>
     </div>
     <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
-    <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
+    <div class="row"><button class="btn ghost" id="mAch">🏆 Logros</button><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
   v.querySelector('#mMant').onclick=()=>{if(S.mat<cost){toast(`Faltan ${cost-S.mat} 🧱`);return}S.mat-=cost;worn.forEach(b=>b.w=0);beep(700,.1);save();render();closeSheet();toast(`🔩 Mantenimiento hecho en ${worn.length} edificio(s)`)};
   v.querySelector('#mSnd').onclick=()=>{sound=!sound;openMenu()};
   const r=v.querySelector('#mRes');r.onclick=()=>{if(!r.dataset.sure){r.dataset.sure=1;r.textContent='¿Seguro? Toca otra vez';return}
     try{localStorage.removeItem(SAVE)}catch(e){}S=null;closeSheet();toTitle();};
   v.querySelector('#mTitle').onclick=()=>{closeSheet();toTitle()};
+  v.querySelector('#mAch').onclick=()=>{closeSheet();openAch()};
 }
 function endGame(win){
   closeSheet();stopPlacing();show('end');
@@ -1409,8 +1505,12 @@ function endGame(win){
   $('#endTitle').textContent=win?'¡Colonia autosuficiente!':'Misión fallida';
   $('#endText').textContent=win?`¡Enhorabuena, ${S.name}! Gracias a tus decisiones, ${S.pop} personas viven en Marte con oxígeno, agua, comida y energía propios. La humanidad tiene un nuevo hogar.`
     :`La tripulación no ha podido seguir. Lo último que pasó: ${(S.log[0]||'').replace(/<[^>]+>/g,'').replace(/^Sol \d+: /,'')} En Marte hay que vigilar oxígeno, agua, comida, energía de noche y el desgaste a la vez. ¡Seguro que la próxima vez lo consigues!`;
-  $('#endStats').innerHTML=`<div><b>${S.sol}</b><span>soles en Marte</span></div><div><b>${S.pop}</b><span>colonos</span></div>
-    <div><b>${S.stats.built}</b><span>edificios construidos</span></div><div><b>${S.facts.length}</b><span>datos aprendidos</span></div>`;
+  if(win){S.ach.win=1}checkAch();
+  const sc=score(win),rec=sc.total>(P.hi||0);if(rec){P.hi=sc.total;saveP()}
+  $('#endStats').innerHTML=`<div class="scoreBox"><div class="sec">Puntuación final</div>
+    ${sc.rows.map(r=>`<div class="scRow"><span>${r[0]}<small>${r[1]}</small></span><b>${r[2]}</b></div>`).join('')}
+    <div class="scRow tot"><span>Total${rec?' · ¡nuevo récord!':''}</span><b>${sc.total}</b></div>
+    <p class="hint" style="margin:0">Mejor puntuación: ${P.hi}</p></div>`;
   $('#bEndKeep').hidden=!win;
   if(!win){try{localStorage.removeItem(SAVE)}catch(e){}}
   beep(win?660:150,.3,win?'triangle':'sawtooth');
@@ -1449,7 +1549,7 @@ function startTravel(){
   beep(120,.6,'sawtooth');
 }
 function startGame(){
-  S.rs=S.rs||{done:[],cur:null,prog:0};S.wx=S.wx||[];S.ack=S.ack||[];if(!S.unl)updateMechs(S,true);
+  S.rs=S.rs||{done:[],cur:null,prog:0};S.wx=S.wx||[];S.ack=S.ack||[];S.ach=Object.assign(newAch(),S.ach||{});if(!S.unl)updateMechs(S,true);
   show('game');selB=-1;stopPlacing();rebuildOcc();terrainDirty=true;setHud(hudOpen);render();
   resizeMap();focusBase();clampCam();
   if(S.sol===1&&S.log.length<=1)setTimeout(()=>sheet(`<div class="sheetHead"><span class="big">👩‍🚀</span><div><h2>¡Bienvenido a Marte, ${S.name}!</h2><p>Sol 1 · Cráter preparado por los robots</p></div></div>
@@ -1476,6 +1576,7 @@ $('#bMenu').onclick=openMenu;
 $('#missionBtn').onclick=openLog;
 $('#bEndMain').onclick=()=>{S=null;try{localStorage.removeItem(SAVE)}catch(e){}toTitle()};
 $('#bEndKeep').onclick=()=>startGame();
+$('#bEndAch').onclick=openAch;$('#bAch').onclick=openAch;
 $('#bEndFacts').onclick=()=>{const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filter(x=>x.exp),ok=qs.filter(x=>x.ok).length;
   const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;
   sheet(`<div class="sheetHead"><span class="big">📚</span><div><h2>Datos aprendidos</h2><p>${qs.length} preguntas · ${ok} acertadas · ${ex.length} experimentos</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>

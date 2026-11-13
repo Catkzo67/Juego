@@ -23,6 +23,8 @@ Videojuego educativo para móviles (niños de 7 a 12 años) sobre cómo fundar l
 - Cada edificio tiene un botón "¿Por qué?" que explica en dos frases por qué funciona así.
 - Las preguntas tratan de lo que acaba de pasar (tras una tormenta, una sobre tormentas; al construir la MOXIE, una sobre el CO₂).
 - En la pantalla final, "Datos aprendidos" muestra todas las preguntas respondidas, los experimentos y los datos descubiertos.
+- Puntuación final según colonos, edificios en pie (y sus niveles), recursos guardados, rapidez o soles sobrevividos y misiones; con récord guardado.
+- 25 logros en 6 grupos con barra de progreso (por ejemplo "Racha perfecta: 3/5"). Se guardan aparte de la partida y no se pierden al empezar de nuevo o al perder.
 
 - Tamaños: base 6×6 (se conecta con pasillos por el extremo de sus 4 brazos); MOXIE 1×3; hábitat, invernadero, granja vertical, extractor, refugio, reactor y escudo 3×3; el resto 2×2; pasillos 1×1. Hay que dejar una baldosa libre entre edificios distintos; los iguales y los pasillos pueden ir pegados.
 - Cada colono consume oxígeno, agua y comida en cada sol; casi todo gasta energía.
