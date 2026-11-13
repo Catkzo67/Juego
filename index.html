@@ -513,18 +513,21 @@ function newGame(name,crew){
   for(let k=0;k<8;k++)blob(rnd(N),rnd(N),1.3+Math.random()*1.5,'rock');
   for(let k=0;k<6;k++){const i=rnd(N-2)+1,j=rnd(N-2)+1;if(map[idx(i,j)]==='soil'&&!near(i,j,3))map[idx(i,j)]='tube'}
   map[idx(25,13)]='tube';
-  const blds=[{id:1,t:'base',i:B0[0],j:B0[1],on:true,broken:false},{id:2,t:'solar',i:24,j:18,on:true,broken:false},{id:3,t:'corridor',i:23,j:19,on:true,broken:false}];
-  [[24,18],[25,18],[24,19],[25,19],[23,19]].forEach(([i,j])=>{map[idx(i,j)]='soil'});
+  const blds=[{id:1,t:'base',i:B0[0],j:B0[1],on:true,broken:false},{id:2,t:'solar',i:25,j:18,on:true,broken:false},{id:3,t:'corridor',i:23,j:19,on:true,broken:false},{id:4,t:'corridor',i:24,j:19,on:true,broken:false}];
+  [[25,18],[26,18],[25,19],[26,19],[23,19],[24,19]].forEach(([i,j])=>{map[idx(i,j)]='soil'});
   const crates=[[15,25],[27,14],[13,19],[26,25],[20,13]].map(([i,j])=>({i,j,init:1}));
   crates.forEach(c=>{map[idx(c.i,c.j)]='soil'});
   return {v:5,name:name||'Comandante',crew,sol:1,pop:CREW_SIZE+1,o2:30,agua:30,comida:60,mat:60,bat:15,salud:90,moral:70,
-    storm:0,cold:0,dirty:0,mission:0,map,craters,blds,nextId:4,crates,log:[],facts:[],won:false,lastShip:1,act:[],streak:0,quizUsed:[],
+    storm:0,cold:0,dirty:0,mission:0,map,craters,blds,nextId:5,crates,log:[],facts:[],won:false,lastShip:1,act:[],streak:0,quizUsed:[],
     rs:{done:[],cur:null,prog:0},wx:[],ack:[],ach:newAch(),stats:{built:3,quiz:0,events:0,lost:0}};
 }
 
 /* ---------- ocupación del mapa ---------- */
 const OCC=new Int32Array(N*N);
-function rebuildOcc(){OCC.fill(-1);S.blds.forEach((b,k)=>{const [w,h]=dim(b.t);for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j))OCC[idx(i,j)]=k})}
+const BASE_SHAPE=new Set();for(let j=1;j<5;j++)for(let i=1;i<5;i++)BASE_SHAPE.add(i+','+j);
+[[0,2],[0,3],[5,2],[5,3],[2,0],[3,0],[2,5],[3,5]].forEach(([i,j])=>BASE_SHAPE.add(i+','+j));
+const occupies=(b,i,j)=>b.t!=='base'||BASE_SHAPE.has((i-b.i)+','+(j-b.j));   // la base solo ocupa su forma visible
+function rebuildOcc(){OCC.fill(-1);S.blds.forEach((b,k)=>{const [w,h]=dim(b.t);for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j)&&occupies(b,i,j))OCC[idx(i,j)]=k})}
 function footprint(b){const [w,h]=dim(b.t),a=[];for(let j=b.j;j<b.j+h;j++)for(let i=b.i;i<b.i+w;i++)if(inMap(i,j))a.push(S.map[idx(i,j)]);return a}
 function validSpot(t,i0,j0){
   const b=B[t],[w,h]=dim(t);let ice=false;
@@ -541,10 +544,15 @@ function validSpot(t,i0,j0){
     for(const [a,c] of [[1,0],[-1,0],[0,1],[0,-1]]){const o=inMap(i0+a,j0+c)?OCC[idx(i0+a,j0+c)]:-1;if(o<0)continue;const nb=S.blds[o],P=B[nb.t].ports||[];
       if(B[nb.t].gate&&!P.some(([pi,pj])=>nb.i+pi===i0&&nb.j+pj===j0))return {ok:false,why:'A la base solo se conectan pasillos por el extremo de sus brazos (marcados en dorado).'}}
   }
+  for(const bs of S.blds){if(bs.t!=='base')continue;
+    if(t==='corridor'){if(i0>=bs.i&&i0<bs.i+6&&j0>=bs.j&&j0<bs.j+6)return {ok:false,why:'Demasiado pegado a la base: conecta los pasillos en las bocas de sus brazos.'};continue}
+    // zona sin edificios: exactamente 2 baldosas alrededor de la forma de la base (espacio para los pasillos)
+    for(let j=j0;j<j0+h;j++)for(let i=i0;i<i0+w;i++)for(let dj=-2;dj<=2;dj++)for(let di=-2;di<=2;di++){const ii=i+di,jj=j+dj;
+      if(ii>=bs.i&&ii<bs.i+6&&jj>=bs.j&&jj<bs.j+6&&BASE_SHAPE.has((ii-bs.i)+','+(jj-bs.j)))return {ok:false,why:'Deja 2 baldosas libres alrededor de la base para los pasillos.'}}}
   if(t!=='corridor'){ // margen de una baldosa entre edificios distintos (los iguales y los pasillos sí pueden ir pegados)
     for(let j=j0-1;j<=j0+h;j++)for(let i=i0-1;i<=i0+w;i++){
       if(!inMap(i,j)||(i>=i0&&i<i0+w&&j>=j0&&j<j0+h))continue;const o=OCC[idx(i,j)];
-      if(o>=0&&S.blds[o].t!=='corridor'&&S.blds[o].t!==t)return {ok:false,why:'Deja una baldosa libre junto a edificios distintos. Los iguales pueden ir pegados y puedes unirlos con pasillos.'};
+      if(o>=0&&S.blds[o].t!=='corridor'&&S.blds[o].t!=='base'&&S.blds[o].t!==t)return {ok:false,why:'Deja una baldosa libre junto a edificios distintos. Los iguales pueden ir pegados y puedes unirlos con pasillos.'};
     }
   }
   return {ok:true,why:''};
@@ -1480,7 +1488,7 @@ function openMenu(){
     <div class="sec">Cómo jugar</div>
     <div class="log" style="color:var(--ink)">
       <div>1. <b>Arrastra</b> el mapa para moverte y <b>pellizca</b> (o usa + y −) para hacer zoom.</div>
-      <div>2. Pulsa <b>Construir</b> o toca el suelo y coloca edificios. Deja <b>una baldosa libre</b> entre edificios distintos.</div>
+      <div>2. Pulsa <b>Construir</b> o toca el suelo y coloca edificios. Deja <b>una baldosa libre</b> entre edificios distintos y <b>dos alrededor de la base</b>, para que quepan los pasillos.</div>
       <div>3. <b>Une todo a la base con pasillos</b> hasta las puertas. Un edificio sin conexión 🔌 produce un 40% menos y gasta un 50% más de energía.</div>
       <div>4. Cada sol tiene <b>día y noche</b>. Los paneles solo funcionan de día: de noche hacen falta <b>baterías 🔋</b> o un reactor. Si falta energía de noche 🌙, los edificios rinden la mitad.</div>
       <div>5. Los edificios se <b>desgastan</b> cada sol. Con mucho desgaste ⚠️ se averían 🔧: hazles <b>mantenimiento</b>, que es barato.</div>
@@ -1508,6 +1516,7 @@ function endGame(win){
   if(win){S.ach.win=1}checkAch();
   const sc=score(win),rec=sc.total>(P.hi||0);if(rec){P.hi=sc.total;saveP()}
   $('#endStats').innerHTML=`<div class="scoreBox"><div class="sec">Puntuación final</div>
+    ${sc.rows.map(r=>`<div class="scRow"><span>${r[0]}</span><b>${r[2]}</b></div>`).join('')}
     <div class="scRow tot"><span>Total${rec?' · ¡nuevo récord!':''}</span><b>${sc.total}</b></div>
     <p class="hint" style="margin:0">Mejor puntuación: ${P.hi}</p></div>`;
   $('#bEndKeep').hidden=!win;
