@@ -1508,7 +1508,6 @@ function endGame(win){
   if(win){S.ach.win=1}checkAch();
   const sc=score(win),rec=sc.total>(P.hi||0);if(rec){P.hi=sc.total;saveP()}
   $('#endStats').innerHTML=`<div class="scoreBox"><div class="sec">Puntuación final</div>
-    ${sc.rows.map(r=>`<div class="scRow"><span>${r[0]}<small>${r[1]}</small></span><b>${r[2]}</b></div>`).join('')}
     <div class="scRow tot"><span>Total${rec?' · ¡nuevo récord!':''}</span><b>${sc.total}</b></div>
     <p class="hint" style="margin:0">Mejor puntuación: ${P.hi}</p></div>`;
   $('#bEndKeep').hidden=!win;
