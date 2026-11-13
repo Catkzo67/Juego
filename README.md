@@ -13,7 +13,8 @@ Videojuego educativo para móviles (niños de 7 a 12 años) sobre cómo fundar l
 - Recoge las cajas de carga que llegan desde la Tierra.
 - Los pasillos solo se unen entre sí y con las puertas de los edificios. Un edificio sin conexión con la base produce un 40% menos y gasta un 50% más de energía.
 - Cada sol tiene día y noche: los paneles solo funcionan de día y de noche hacen falta baterías o reactor.
-- Los edificios se desgastan y se averían si no se les hace mantenimiento; con el tiempo llegan tormentas largas y meteoritos que pueden destruir instalaciones (el escudo magnético los evita).
+- Los edificios se desgastan y se averían si no se les hace mantenimiento; con el tiempo llegan tormentas largas y meteoritos que dejan muy averiado todo lo que haya en una zona de 4×4 (el escudo magnético los evita).
+- Las mecánicas se desbloquean poco a poco: noche (misión 1), conexiones (misión 2), desgaste (sol 4), mejoras (misión 4), comida que se estropea (misión 5), investigación (sol 6), almacenes con límite (misión 7) y meteoritos (misión 9 y sol 12).
 - Tripulación de 6: tú y 5 especialistas elegidos entre 10, cada uno con una habilidad propia.
 - Mejora los edificios hasta nivel 3 (cada nivel ×1,5 de producción o capacidad); el nivel se ve en el mapa.
 - Avisos antes de que pase algo (desgaste alto, energía de la noche, recursos que se acaban, previsión del clima) y confirmación al pasar el sol si hay avisos nuevos.
