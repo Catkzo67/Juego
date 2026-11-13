@@ -15,6 +15,10 @@ Videojuego educativo para móviles (niños de 7 a 12 años) sobre cómo fundar l
 - Cada sol tiene día y noche: los paneles solo funcionan de día y de noche hacen falta baterías o reactor.
 - Los edificios se desgastan y se averían si no se les hace mantenimiento; con el tiempo llegan tormentas largas y meteoritos que pueden destruir instalaciones (el escudo magnético los evita).
 - Tripulación de 6: tú y 5 especialistas elegidos entre 10, cada uno con una habilidad propia.
+- Mejora los edificios hasta nivel 3 (cada nivel ×1,5 de producción o capacidad); el nivel se ve en el mapa.
+- Avisos antes de que pase algo (desgaste alto, energía de la noche, recursos que se acaban, previsión del clima) y confirmación al pasar el sol si hay avisos nuevos.
+- La antena (o la meteoróloga) anuncia tormentas y olas de frío 1 o 2 soles antes.
+- El bio-laboratorio investiga 9 mejoras: paneles antipolvo, riego por goteo, perforación térmica, aerogel, etc.
 
 - Tamaños: base 6×6 (se conecta con pasillos por el extremo de sus 4 brazos); MOXIE 1×3; hábitat, invernadero, granja vertical, extractor, refugio, reactor y escudo 3×3; el resto 2×2; pasillos 1×1. Hay que dejar una baldosa libre entre edificios distintos; los iguales y los pasillos pueden ir pegados.
 - Cada colono consume oxígeno, agua y comida en cada sol; casi todo gasta energía.

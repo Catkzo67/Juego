@@ -308,7 +308,7 @@ const B={
   bio:{n:'Bio-laboratorio',i:'🧫',ports:[[3,1]],img:'laboratorio',inside:'laboratorio_interior',fp:3,s:1,dy:.03,cost:20,e:-3,p:{comida:2},pr:4,un:5,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
   farm:{n:'Invernadero',i:'🌱',ports:[[1,3]],img:'invernadero',fp:3,s:1,dy:.03,cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:6,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
   shelter:{n:'Refugio de regolito',i:'⛰️',ports:[[1,3],[3,1]],img:'refugio',fp:3,s:1.05,dy:.1,cost:25,e:0,pr:0,un:7,crater:true,desc:'Búnker medio enterrado. Protege de la radiación. ¡Se puede construir dentro de un cráter!',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
-  antenna:{n:'Antena',i:'📡',ports:[[1,2],[2,1]],img:'antena',fp:2,s:.8,dy:.03,cost:20,e:-1,pr:5,un:8,desc:'Habla con la Tierra y guía a las naves con nuevos colonos.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
+  antenna:{n:'Antena',i:'📡',ports:[[1,2],[2,1]],img:'antena',fp:2,s:.8,dy:.03,cost:20,e:-1,pr:5,un:8,desc:'Guía a las naves con nuevos colonos y anuncia el clima (tormentas y frío) 1 o 2 soles antes.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
   habitat:{n:'Hábitat',i:'🏠',ports:[[1,3],[3,1]],img:'habitat',inside:'habitat_interior',fp:3,s:1,dy:.03,cost:30,e:-2,cap:6,pr:2,un:9,desc:'Casa para 6 colonos. Sobre un tubo de lava caben 12.',fact:'Los tubos de lava son cuevas que dejaron los volcanes. Protegen de la radiación y de los micrometeoritos.'},
   mess:{n:'Comedor',i:'🍽️',ports:[[1,-1]],img:'comedor',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:9,desc:'Cocina y sala común. Comer juntos sube mucho el ánimo.',fact:'La convivencia en espacios pequeños es difícil. Compartir comidas ayuda a trabajar en equipo.'},
   gym:{n:'Gimnasio',i:'🏋️',ports:[[2,0],[1,-1]],img:'gimnasio',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:9,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
@@ -470,7 +470,7 @@ function newGame(name,crew){
   crates.forEach(c=>{map[idx(c.i,c.j)]='soil'});
   return {v:5,name:name||'Comandante',crew,sol:1,pop:CREW_SIZE+1,o2:30,agua:30,comida:60,mat:60,bat:15,salud:90,moral:70,
     storm:0,cold:0,dirty:0,mission:0,map,craters,blds,nextId:4,crates,log:[],facts:[],won:false,lastShip:1,act:[],streak:0,quizUsed:[],
-    stats:{built:3,quiz:0,events:0,lost:0}};
+    rs:{done:[],cur:null,prog:0},wx:[],ack:[],stats:{built:3,quiz:0,events:0,lost:0}};
 }
 
 /* ---------- ocupación del mapa ---------- */
@@ -506,6 +506,21 @@ const NOWEAR=new Set(['base','corridor']);
 const mcost=t=>Math.max(2,Math.ceil(B[t].cost*.12*(has(S,'mec')?.5:1)));   // mantenimiento
 const rcost=t=>Math.max(3,Math.ceil(B[t].cost*.5*(has(S,'mec')?.5:1)));    // reparación
 const DIRS4=[[1,0],[-1,0],[0,1],[0,-1]];
+const NOUP=new Set(['corridor','shelter','shield']);           // sin nada que mejorar
+const LV=b=>Math.pow(1.5,(b.lv||1)-1), CM=b=>Math.pow(1.2,(b.lv||1)-1);
+const upCost=b=>Math.ceil((B[b.t].cost||35)*((b.lv||1)===1?1:1.6));
+const RESEARCH=[
+  {id:'perov',n:'Celdas de perovskita',i:'🔆',c:35,d:3,t:'Los paneles solares producen un 20% más.',f:'Las celdas de perovskita-silicio son ligeras, flexibles y muy eficientes.'},
+  {id:'dust',n:'Paneles antipolvo',i:'🌪️',c:30,d:3,t:'Las tormentas quitan menos energía a los paneles y los desgastan la mitad.',f:'Las superficies electrostáticas repelen el polvo fino de Marte.'},
+  {id:'drip',n:'Riego por goteo',i:'💧',c:25,d:3,t:'Invernaderos y granjas gastan la mitad de agua.',f:'Dar el agua gota a gota en la raíz evita casi toda la evaporación.'},
+  {id:'bore',n:'Perforación térmica',i:'🧊',c:30,d:3,t:'Los extractores de hielo sacan un 30% más de agua.',f:'Las sondas térmicas derriten el hielo bajo tierra sin tener que excavarlo todo.'},
+  {id:'ruth',n:'Catalizadores de rutenio',i:'🫧',c:30,d:3,t:'Las plantas MOXIE fabrican un 30% más de oxígeno.',f:'Los catalizadores aceleran las reacciones químicas sin gastarse.'},
+  {id:'freeze',n:'Liofilizado de comida',i:'🍞',c:20,d:2,t:'La comida guardada se estropea la mitad.',f:'Liofilizar es congelar y quitar el agua: así la comida dura años.'},
+  {id:'aero',n:'Aislamiento de aerogel',i:'🔥',c:35,d:3,t:'La calefacción gasta un 30% menos.',f:'El aerogel de sílice es casi todo aire atrapado y aísla muchísimo.'},
+  {id:'tial',n:'Aleaciones de titanio',i:'🔩',c:40,d:4,t:'Todos los edificios se desgastan un 25% menos.',f:'Las aleaciones de titanio-aluminio son ligeras y resisten muy bien el frío.'},
+  {id:'rad',n:'Medicina antirradiación',i:'💊',c:25,d:3,t:'Las tormentas solares hacen la mitad de daño.',f:'Algunos medicamentos ayudan al cuerpo a reparar el daño de la radiación.'}
+];
+const hasR=(s,id)=>!!(s.rs&&s.rs.done.includes(id));
 function ring4(b){const [w,h]=dim(b.t),o=[];for(let i=b.i;i<b.i+w;i++){o.push([i,b.j-1],[i,b.j+h])}for(let j=b.j;j<b.j+h;j++){o.push([b.i-1,j],[b.i+w,j])}return o}
 // Red conectada a la base: pasillos que salen de sus brazos y edificios unidos por su puerta.
 // Los edificios sin puerta (paneles, extractor, excavadora, escudo) se conectan con un pasillo pegado; los iguales pegados comparten conexión.
@@ -527,7 +542,7 @@ function network(s){
 }
 function solarFactor(s){
   let f=1;
-  if(s.storm>0)f*=has(s,'ing')?0.35:0.3;
+  if(s.storm>0)f*=hasR(s,'dust')?0.5:has(s,'ing')?0.35:0.3;
   if(s.dirty>0)f*=0.5;
   if((s.act||[]).includes('repair'))f=Math.min(1,f*1.6);   // los robots del taller (si tuvieron energía) limpian el polvo
   return f;
@@ -539,20 +554,20 @@ function flows(s){
   const sf=solarFactor(s),cons=[];let dayP=0,nightP=0;
   s.blds.forEach((t,k)=>{
     const b=B[t.t];
-    if(b.cap&&!t.broken)f.cap+=b.cap*(t.t==='habitat'&&footprint(t).includes('tube')?2:1);
-    if(t.t==='habitat'&&!t.broken)f.stor+=25;
-    if(b.store&&!t.broken)f.batMax+=b.store+(has(s,'ing')?10:0);
+    if(b.cap&&!t.broken)f.cap+=Math.round(b.cap*LV(t)*(t.t==='habitat'&&footprint(t).includes('tube')?2:1));
+    if(t.t==='habitat'&&!t.broken)f.stor+=Math.round(25*LV(t));
+    if(b.store&&!t.broken)f.batMax+=Math.round((b.store+(has(s,'ing')?10:0))*LV(t));
     if(t.broken||!t.on)return;
     const linked=NOWEAR.has(t.t)||f.conn.has(k),pm=linked?1:.6,em=linked?1:1.5;
     if(b.e>0){
-      if(t.t==='solar'){const v=b.e*sf*(has(s,'ing')?1.2:1)*pm;dayP+=v}
-      else{const v=b.e*pm;dayP+=v/2;nightP+=v/2}
+      if(t.t==='solar'){const v=b.e*sf*(has(s,'ing')?1.2:1)*(hasR(s,'perov')?1.2:1)*pm*LV(t);dayP+=v}
+      else{const v=b.e*pm*LV(t);dayP+=v/2;nightP+=v/2}
       f.frac.set(k,1);
     }else if(b.e===0)f.frac.set(k,1);
-    else cons.push({k,d:-b.e*em/2,pr:b.pr??9});
+    else cons.push({k,d:-b.e*em/2*CM(t),pr:b.pr??9});
   });
   const pop=s.pop;
-  f.heat=Math.ceil(pop*.3*(1+pop/40)*(s.cold>0?2:1));
+  f.heat=Math.ceil(pop*.3*(1+pop/40)*(s.cold>0?2:1)*(hasR(s,'aero')?.7:1));
   const hd=f.heat/3,hn=f.heat*2/3;   // la noche marciana es mucho más fría
   cons.sort((a,b)=>a.pr-b.pr);
   const run=(avail,heat,set)=>{avail-=heat;let ok=true;if(avail<0){ok=false;avail=0}for(const c of cons)if(avail>=c.d-1e-9){avail-=c.d;set.add(c.k)}return [avail,ok]};
@@ -565,15 +580,18 @@ function flows(s){
   f.eDem=Math.round((f.heat+cons.reduce((a,c)=>a+c.d*2,0))*10)/10;
   for(const c of cons){const fr=((pd.has(c.k)?1:0)+(pn.has(c.k)?1:0))/2;f.frac.set(c.k,fr);if(fr<1)f.unpowered.add(c.k);if(pd.has(c.k)&&!pn.has(c.k))f.night.add(c.k)}
   f.nightShort=Math.ceil(cons.filter(c=>!pn.has(c.k)).reduce((a,c)=>a+c.d,0)+(ok2?0:hn));
-  f.frac.forEach((v,k)=>{if(v>=1)f.act.add(s.blds[k].t)});
+  f.lvAct={};f.frac.forEach((v,k)=>{if(v>=1){const t=s.blds[k].t;f.act.add(t);f.lvAct[t]=Math.max(f.lvAct[t]||0,s.blds[k].lv||1)}});
   const mf=s.moral<30?0.75:1;
   f.frac.forEach((fr,k)=>{
     const t=s.blds[k],b=B[t.t];if(!b.p||fr<=0)return;
     const pm=f.conn.has(k)?1:.6;
     for(const r in b.p){
       let v=b.p[r]*fr;
+      if(v<0){v*=CM(t);if(hasR(s,'drip')&&(t.t==='farm'||t.t==='vfarm'))v*=.5}
       if(v>0){
-        v*=mf*pm;
+        v*=mf*pm*LV(t);
+        if(t.t==='ice'&&hasR(s,'bore'))v*=1.3;
+        if(t.t==='moxie'&&hasR(s,'ruth'))v*=1.3;
         if(r==='comida'&&(t.t==='farm'||t.t==='vfarm')&&has(s,'bot'))v*=1.25;
         if(t.t==='bio'&&has(s,'mic'))v*=2;
         if((t.t==='moxie'||t.t==='ice')&&has(s,'qui'))v*=1.25;
@@ -585,7 +603,7 @@ function flows(s){
   for(const r in f.d)f.d[r]=Math.round(f.d[r]);
   f.use=Math.round(pop*(1+Math.max(0,pop-10)*.015));          // con más colonos, el soporte vital gasta más por persona
   f.d.o2-=f.use;f.d.agua-=f.use;f.d.comida-=f.use;
-  f.spoil=Math.floor(s.comida*(has(s,'mic')?.02:.04));          // la comida guardada se estropea poco a poco
+  f.spoil=Math.floor(s.comida*.04*(has(s,'mic')?.5:1)*(hasR(s,'freeze')?.5:1));          // la comida guardada se estropea poco a poco
   f.d.comida-=f.spoil;
   return f;
 }
@@ -608,8 +626,8 @@ function nextSol(){
   if(short)s.salud-=dmg*short;
   if(!f.heatOk){s.salud-=has(s,'med')?6:9;msgs.push('De noche no hubo energía para la calefacción. ¡Hace muchísimo frío!')}
   if(!short&&f.heatOk)s.salud+=2+(has(s,'med')?2:0);
-  if(f.act.has('gym')){s.salud+=3;s.moral+=3}
-  if(f.act.has('mess'))s.moral+=3;
+  if(f.act.has('gym')){const m=Math.pow(1.5,f.lvAct.gym-1);s.salud+=3*m;s.moral+=3*m}
+  if(f.act.has('mess'))s.moral+=3*Math.pow(1.5,f.lvAct.mess-1);
   if(f.act.has('shield'))s.moral+=2;
   s.moral+=Math.min(3,Math.floor(s.blds.filter((b,k)=>b.t==='corridor'&&f.conn.has(k)).length/3));
   if(has(s,'psi'))s.moral+=2;
@@ -620,12 +638,12 @@ function nextSol(){
   if(f.night.size)msgs.push(`De noche ${f.night.size} edificio(s) se quedaron sin batería.`);
   const off=[...f.unpowered].filter(k=>!f.night.has(k)).length;if(off)msgs.push(`${off} edificio(s) no tuvieron energía en todo el sol.`);
   // desgaste: crece cada sol; cuanto más alto, más fácil que falle
-  const wr=(has(s,'mec')?.65:1)*(f.act.has('repair')?.5:1),broke=[];
+  const wr=(has(s,'mec')?.65:1)*(f.act.has('repair')?[0,.5,.38,.25][f.lvAct.repair]:1)*(hasR(s,'tial')?.75:1),broke=[];
   s.blds.forEach((b,k)=>{
     if(NOWEAR.has(b.t)||b.broken)return;
     let r=b.on?2.5:.8;
     const exposed=b.t==='solar'||b.t==='miner';
-    if(s.storm>0)r+=exposed?(has(s,'met')?3.5:7):.8;
+    if(s.storm>0)r+=exposed?(has(s,'met')?3.5:7)*(b.t==='solar'&&hasR(s,'dust')?.5:1):.8;
     if(!f.conn.has(k))r*=1.3;
     b.w=Math.min(100,(b.w||0)+r*wr);
     const p=b.w>35?Math.pow((b.w-35)/65,1.5)*.3:0;
@@ -634,6 +652,12 @@ function nextSol(){
   if(broke.length)msgs.push(`Averías: ${broke.join(', ')}.`);
   const worn=s.blds.filter(b=>!NOWEAR.has(b.t)&&!b.broken&&(b.w||0)>=60).length;
   s.act=[...f.act];
+  if(s.rs&&s.rs.cur){
+    if(f.act.has('bio')){s.rs.prog+=Math.pow(1.5,f.lvAct.bio-1)*(has(s,'mic')?1.25:1);
+      const R0=RESEARCH.find(r=>r.id===s.rs.cur);
+      if(s.rs.prog>=R0.d){s.rs.done.push(R0.id);s.rs.cur=null;s.rs.prog=0;learn(R0.f);msgs.push(`Investigación terminada: ${R0.n}.`);s.rsDone=R0}}
+    else msgs.push('La investigación está parada: el bio-laboratorio no tiene energía todo el sol.');
+  }
   if(s.storm>0){s.storm--;if(!s.storm)msgs.push('La tormenta de polvo ha terminado. ¡Vuelve el Sol!')}
   if(s.cold>0)s.cold--;
   if(s.dirty>0)s.dirty--;
@@ -644,14 +668,21 @@ function nextSol(){
   checkMissions();
   if(s.salud<=0){save();return endGame(false)}
   const q=[];
+  s.wx=s.wx||[];
+  const due=s.wx.filter(w=>w.at<=s.sol);s.wx=s.wx.filter(w=>w.at>s.sol);
+  due.forEach(w=>{const e=EVENTS[w.k].mk();if(e){e.forecast=w.seen;q.push(e)}});
+  if(s.rsDone){const R0=s.rsDone;s.rsDone=null;toast(`🧫 ¡Investigación terminada! ${R0.i} ${R0.n}`)}
   const shipEvery=has(s,'com')?5:6;
-  if(s.sol>=12&&Math.random()<(has(s,'met')?.07:.10)){const e=evStrike();if(e)q.push(e)}
+  if(q.length){}
+  else if(s.sol>=12&&Math.random()<(has(s,'met')?.07:.10)){const e=evStrike();if(e)q.push(e)}
   else if(f.act.has('antenna')&&s.sol-s.lastShip>=shipEvery){s.lastShip=s.sol;q.push(evShip())}
   else if(has(s,'geo')&&s.sol%6===0)q.push(evGeo());
   else if(s.sol>=3){
     const pBad=Math.min(.7,.28+s.sol*.008),r=Math.random();   // los problemas son más probables con el tiempo
-    if(r<pBad){const e=randomEvent(true);if(e)q.push(e)}
-    else if(r<pBad+.25){const e=randomEvent(false);if(e)q.push(e)}
+    if(r<pBad){const k=pickEvent(true);
+      if(k>=0&&EVENTS[k].wx){if(!s.wx.some(w=>w.k===k))s.wx.push({k,at:s.sol+1+rnd(2),seen:canForecast(s)})} // el clima llega 1 o 2 soles después
+      else if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
+    else if(r<pBad+.25){const k=pickEvent(false);if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
   }
   if(!q.length){if(broke.length)toast(`🔧 Avería: ${broke.join(', ')}`);else if(short||!f.heatOk)toast(msgs[0]);else if(worn)toast(`⚠️ ${worn} edificio(s) muy desgastados: hazles mantenimiento.`);else if(full)toast('📦 Almacenes llenos');}
   save();render();runQueue(q);
@@ -679,7 +710,7 @@ function addDeposit(s,type){ // nuevo depósito de hielo o roca cerca de la base
   [[0,0],[1,0],[0,1],[-1,0],[0,-1],[1,1]].forEach(([a,c])=>{if(inMap(i+a,j+c)&&s.map[idx(i+a,j+c)]==='soil')s.map[idx(i+a,j+c)]=type});terrainDirty=true;focusTile(i,j);
 }
 function evShip(){
-  const n=2+rnd(3)+(has(S,'com')?1:0),space=flows(S).cap-S.pop;
+  const n=2+rnd(3)+(has(S,'com')?1:0)+((flows(S).lvAct.antenna||1)>=3?1:0),space=flows(S).cap-S.pop;
   return {i:'🚀',t:'¡Llega una nave de la Tierra!',x:`Una nave trae a ${n} nuevos colonos y cajas de carga. Tienes sitio para ${Math.max(0,space)} personas más.`,
     fact:'En 2050 las naves de carga pueden aterrizar con más de 150 toneladas gracias a la retropropulsión.',
     o:[
@@ -713,20 +744,20 @@ function evStrike(){
       return gone.length?`El impacto ha destruido: ${gone.join(', ')}. Ha quedado un cráter nuevo.`:'El meteorito cayó cerca, pero no destruyó nada. Ha quedado un cráter nuevo.';}}]};
 }
 const EVENTS=[
-  {bad:1,w:3,c:s=>!s.storm&&s.sol>4,mk:()=>{const long=S.sol>30&&Math.random()<.45,n=long?8+rnd(3):3+rnd(3);
+  {bad:1,wx:'Tormenta de polvo',w:3,c:s=>!s.storm&&s.sol>4,mk:()=>{const long=S.sol>30&&Math.random()<.45,n=long?8+rnd(3):3+rnd(3);
     return {i:'🌪️',t:long?'¡Tormenta de polvo gigante!':'¡Tormenta de polvo!',x:`Una ${long?'enorme ':''}nube de polvo cubre el cielo durante unos ${n} soles. Los paneles producirán muy poco y el polvo desgastará paneles y excavadoras.`,
     fact:'Las tormentas de polvo en Marte pueden cubrir todo el planeta y durar semanas o meses.',
     o:[{l:'Prepararse para la tormenta',s:'Apaga lo que no sea imprescindible y vigila las baterías.',fx:s=>{s.storm=n;return `La tormenta durará unos ${n} soles. El reactor nuclear y las baterías son tu mejor ayuda.`}}]}}},
-  {bad:1,w:2,c:s=>s.sol>5,mk:()=>{
+  {bad:1,wx:'Tormenta solar',w:2,c:s=>s.sol>5,mk:()=>{
     const safe=count(S,'shelter')>0;
     if(isActive('shield'))return {i:'☀️',t:'Tormenta solar',x:'El Sol ha lanzado una ola de partículas, pero el escudo magnético la desvía. ¡Nadie corre peligro!',fact:'Un escudo magnético crea un “paraguas” que desvía las partículas cargadas del viento solar.',o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
     return {i:'☢️',t:'¡Alerta de tormenta solar!',x:'El Sol ha lanzado una ola de radiación peligrosa que llegará pronto.',
       fact:'Marte no tiene un campo magnético global, así que la radiación del Sol llega hasta el suelo.',
       o:safe?[
         {l:'Todos al refugio de regolito',s:'Seguros, pero hoy no se trabaja.',fx:s=>{s.mat=Math.max(0,s.mat-8);return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}},
-        {l:'Seguir trabajando fuera',s:'Arriesgado...',fx:s=>{s.salud-=has(s,'med')?14:20;return 'La radiación ha afectado a la tripulación. La salud baja.'}}
+        {l:'Seguir trabajando fuera',s:'Arriesgado...',fx:s=>{s.salud-=(has(s,'med')?14:20)*(hasR(s,'rad')?.5:1);return 'La radiación ha afectado a la tripulación. La salud baja.'}}
       ]:[
-        {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=has(s,'med')?12:18;return 'Las paredes de la base protegen poco. Necesitas un refugio de regolito.'}}
+        {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=(has(s,'med')?12:18)*(hasR(s,'rad')?.5:1);return 'Las paredes de la base protegen poco. Necesitas un refugio de regolito.'}}
       ]}}},
   {bad:1,w:2,c:()=>true,mk:()=>({i:'💨',t:'¡Fuga de aire!',x:'Una junta de una esclusa pierde aire. Un mensaje a la Tierra tardaría unos 20 minutos en llegar y otros 20 en volver.',
     fact:'Por el retraso en las comunicaciones, los astronautas deben saber resolver problemas sin ayuda de la Tierra.',
@@ -747,7 +778,7 @@ const EVENTS=[
       {l:'Salir a limpiarlos con un paseo espacial',s:'Cansancio y algo de radiación.',fx:s=>{s.salud-=5;return 'Paneles limpios. ¡Buen trabajo!'}},
       {l:'Esperar a que el viento los limpie',s:'Producirán la mitad durante 3 soles.',fx:s=>{s.dirty=3;return 'Los paneles darán la mitad de energía durante 3 soles.'}}
     ]})},
-  {bad:1,w:2,c:s=>!s.cold,mk:()=>({i:'🥶',t:'Ola de frío extremo',x:'Las próximas noches serán todavía más frías. La calefacción gastará el doble durante 2 soles.',
+  {bad:1,wx:'Ola de frío',w:2,c:s=>!s.cold,mk:()=>({i:'🥶',t:'Ola de frío extremo',x:'Las próximas noches serán todavía más frías. La calefacción gastará el doble durante 2 soles.',
     fact:'En Marte la temperatura puede bajar hasta unos -153 °C. Sin calefacción no se puede sobrevivir.',
     o:[{l:'Entendido, revisaré las baterías',fx:s=>{s.cold=2;return 'Comprueba que las baterías aguantan la noche.'}}]})},
   {bad:1,w:2,c:s=>s.blds.filter(t=>!NOWEAR.has(t.t)).length>2&&(!isActive('shield')||Math.random()<.3),mk:()=>{
@@ -765,11 +796,12 @@ const EVENTS=[
     let pool=QUIZ.map((q,i)=>i).filter(i=>!S.quizUsed.includes(i));if(!pool.length){S.quizUsed=[];pool=QUIZ.map((q,i)=>i)}
     const qi=pick(pool);S.quizUsed.push(qi);const q=QUIZ[qi];return {quiz:q,i:'🛰️',t:'Pregunta del control de misión',x:q.q}}}
 ];
-function randomEvent(bad){
-  const pool=EVENTS.filter(e=>!!e.bad===bad&&e.c(S));let tot=pool.reduce((a,e)=>a+e.w,0),r=Math.random()*tot;
-  for(const e of pool){r-=e.w;if(r<=0)return e.mk()}
-  return null;
+function pickEvent(bad){
+  const pool=EVENTS.map((e,k)=>k).filter(k=>!!EVENTS[k].bad===bad&&EVENTS[k].c(S));let tot=pool.reduce((a,k)=>a+EVENTS[k].w,0),r=Math.random()*tot;
+  for(const k of pool){r-=EVENTS[k].w;if(r<=0)return k}
+  return -1;
 }
+const canForecast=s=>has(s,'met')||(s.act||[]).includes('antenna');
 function runQueue(q){if(!q.length)return;const e=q.shift();S.stats.events++;showEvent(e,()=>runQueue(q))}
 
 /* ================= MAPA ISOMÉTRICO ================= */
@@ -961,6 +993,8 @@ function drawMap(t){
       let flag='';const isB=!NOWEAR.has(b.t);
       if(b.broken)flag='🔧';else if(!b.on)flag='⏸️';else if(B[b.t].e<0&&fr===0)flag='⚡';else if(B[b.t].e<0&&fr<1)flag='🌙';
       else if(isB&&!f.conn.has(it.k))flag='🔌';else if(isB&&(b.w||0)>=60)flag='⚠️';
+      if((b.lv||1)>1){const lx=r.x+r.w*.18,ly=r.y+r.h*.78;x.fillStyle='#d8ab4c';x.strokeStyle='#222a4c';x.lineWidth=2;x.beginPath();x.arc(lx,ly,8,0,7);x.fill();x.stroke();
+        x.fillStyle='#222a4c';x.font='700 11px "Pixelify Sans", monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(b.lv,lx,ly+1)}
       if(flag){const fx=r.x+r.w/2,fy=r.y+4;x.fillStyle='#120d16';x.strokeStyle='#e9e4d6';x.lineWidth=2;x.beginPath();x.arc(fx,fy,11,0,7);x.fill();x.stroke();
         x.font='13px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(flag,fx,fy+1)}
     }
@@ -1019,6 +1053,29 @@ function tapMap(sx,sy){
 
 /* ================= RENDER HUD ================= */
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
+// Avisos: lo que va a pasar si no haces nada
+function warnings(f){
+  const s=S,w=[];
+  const days=k=>f.d[k]<0?Math.floor(s[k]/-f.d[k]):99,nm={o2:'oxígeno',agua:'agua',comida:'comida'};
+  const art={o2:'el oxígeno',agua:'el agua',comida:'la comida'};
+  for(const k of ['o2','agua','comida']){const d=days(k);if(d<=3)w.push({k:'res-'+k,c:d<=1,t:d<=0?`¡Mañana se acaba ${art[k]}!`:`Quedan ${d} soles de ${nm[k]}.`})}
+  if(f.nightShort>0)w.push({k:'night',c:true,t:`Esta noche faltarán ${f.nightShort} de energía: algunos edificios rendirán la mitad.`});
+  if(!f.heatOk)w.push({k:'heat',c:true,t:'No hay energía para la calefacción de esta noche: la tripulación perderá salud.'});
+  s.blds.forEach((b,k)=>{if(NOWEAR.has(b.t))return;const n=B[b.t].n;
+    if(b.broken)w.push({k:'br-'+b.id,c:false,t:`${n} está averiado: no funciona hasta que lo repares.`});
+    else if((b.w||0)>=70)w.push({k:'w-'+b.id+(b.w>=85?'b':'a'),c:true,t:`${n} está al ${Math.round(b.w)}% de desgaste: puede averiarse pronto.`})});
+  const un=s.blds.filter((b,k)=>!NOWEAR.has(b.t)&&!f.conn.has(k)).length;if(un)w.push({k:'conn'+un,c:false,t:`${un} edificio(s) sin conexión con la base (🔌): rinden menos.`});
+  if(s.pop>f.cap)w.push({k:'beds',c:false,t:`Faltan ${s.pop-f.cap} camas: el ánimo bajará.`});
+  if(canForecast(s))(s.wx||[]).forEach(x=>{const d=x.at-s.sol;w.push({k:'wx-'+x.k+'-'+x.at,c:true,t:`📡 Previsión: ${EVENTS[x.k].wx.toLowerCase()} ${d<=1?'mañana':`dentro de ${d} soles`}.`})});
+  if(s.storm)w.push({k:'storm',c:false,t:`Tormenta de polvo: quedan ${s.storm} soles. Desgasta paneles y excavadoras.`});
+  return w;
+}
+function openWarnings(list,onGo){
+  const v=sheet(`<div class="sheetHead"><span class="big">⚠️</span><div><h2>Avisos</h2><p>${onGo?'Antes de pasar al siguiente sol':'Lo que puede pasar si no haces nada'}</p></div>${onGo?'':'<button class="close" data-close aria-label="Cerrar">✕</button>'}</div>
+    <div class="mlist">${list.map(x=>`<div class="${x.c?'cur':''}"><span>${x.c?'❗':'•'}</span><span>${x.t}</span></div>`).join('')||'<div><span>✅</span><span>Todo en orden.</span></div>'}</div>
+    ${onGo?'<div class="row"><button class="btn ghost" id="wFix">Revisar primero</button><button class="btn" id="wGo">Pasar el sol igualmente</button></div>':''}`);
+  if(onGo){v.dataset.lock=1;v.querySelector('#wFix').onclick=()=>closeSheet();v.querySelector('#wGo').onclick=()=>{closeSheet();onGo()}}
+}
 let hudOpen=false;try{hudOpen=localStorage.getItem('ares-hud')==='1'}catch(e){}
 function setHud(o){hudOpen=o;try{localStorage.setItem('ares-hud',o?'1':'0')}catch(e){}$('#resMore').hidden=!o;$('#hudTog').textContent=o?'▴ Ver menos':'▾ Ver más datos';$('#hudTog').setAttribute('aria-expanded',o)}
 function render(){
@@ -1029,6 +1086,8 @@ function render(){
   if(s.cold)pills.push(`<span class="pill cold">🥶 Frío ${s.cold}</span>`);
   if(s.dirty)pills.push(`<span class="pill storm">🟫 Polvo</span>`);
   pills.push(f.nightShort>0?`<span class="pill bad">🌙 Noche: faltan ${f.nightShort}⚡</span>`:`<span class="pill night">🌙 Noche cubierta</span>`);
+  const W=warnings(f);S.ack=(S.ack||[]).filter(k=>W.some(x=>x.k===k));lastWarn=W;
+  if(W.length)pills.push(`<button class="pill bad" id="warnPill">⚠️ ${W.length} aviso${W.length>1?'s':''}</button>`);
   pills.push(`<span class="pill${s.salud<40?' bad':''}">❤️ ${s.salud}</span>`);
   $('#statusPills').innerHTML=pills.join('');
   const days=k=>f.d[k]<0?Math.floor(s[k]/-f.d[k]):99;
@@ -1052,6 +1111,8 @@ function render(){
     `<span class="num">${s.mission+1}/${MISSIONS.length}</span><span class="txt"><small>Misión</small>${m.t}</span><span>›</span>`;
 }
 $('#hudTog').onclick=()=>setHud(!hudOpen);
+let lastWarn=[];
+$('#statusPills').addEventListener('click',e=>{if(e.target.closest('#warnPill'))openWarnings(lastWarn)});
 function floatDeltas(before){
   const r=$('#res').getBoundingClientRect();
   ['o2','agua','comida'].forEach((k,j)=>{
@@ -1162,20 +1223,29 @@ function openBuilding(k){
   if(t.broken)btns.push(`<button class="btn" id="bRep">Reparar (${rcost(t.t)} 🧱)</button>`);
   else if(isB&&w>0)btns.push(`<button class="btn" id="bMant">Mantenimiento (${mcost(t.t)} 🧱)</button>`);
   if(!t.broken&&b.e<0&&t.t!=='base')btns.push(`<button class="btn ghost" id="bTog">${t.on?'Apagar':'Encender'}</button>`);
+  const canUp=!NOUP.has(t.t)&&(t.lv||1)<3&&!t.broken;
+  if(canUp)btns.unshift(`<button class="btn" id="bUp">Mejorar a nivel ${(t.lv||1)+1} (${upCost(t)} 🧱)</button>`);
   if(t.t!=='base')btns.push(`<button class="btn ghost" id="bDel">Desmontar (+${Math.floor(b.cost/2)} 🧱)</button>`);
   const fpT=footprint(t);
   let cap='';if(b.cap)cap=`<span>👥 Camas: ${b.cap*(t.t==='habitat'&&fpT.includes('tube')?2:1)}</span>`;
   const pic=b.ph?SPR[t.t].url:imgSrc(b.inside||b.img);
   const wc=w>=60?'var(--bad)':w>=35?'var(--warn)':'var(--good)';
   const conn=!isB?'':linked?'<p class="hint">🔗 Conectado a la base.</p>':`<p class="hint" style="color:var(--warn)">🔌 Sin conexión con la base: produce un 40% menos, gasta un 50% más de energía y se desgasta antes. ${(b.ports||[]).length?'Lleva un pasillo hasta su puerta (se marcan en dorado al colocar pasillos).':'Pon un pasillo conectado pegado a él.'}</p>`;
-  const v=sheet(`<div class="sheetHead"><div><h2>${b.n}</h2><p>${st}${b.inside?' · vista interior':''}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+  const lvTxt=NOUP.has(t.t)?'':`<p class="hint"><b style="color:var(--gold)">Nivel ${t.lv||1}/3</b> · producción y capacidad ×${LV(t).toFixed(2).replace(/\.?0+$/,'')}${(t.lv||1)>1?` · consumo de energía ×${CM(t).toFixed(2).replace(/\.?0+$/,'')}`:''}. Cada nivel multiplica ×1,5 lo que da el edificio.</p>`;
+  let resHtml='';
+  if(t.t==='bio'){const rs=S.rs,cur=rs.cur&&RESEARCH.find(r=>r.id===rs.cur);
+    resHtml=`<div class="sec">Investigación</div>${cur?`<div class="meter">${cur.i} ${cur.n}<span class="track"><i style="width:${Math.min(100,rs.prog/cur.d*100)}%;background:var(--glass)"></i></span>${Math.floor(rs.prog)}/${cur.d} soles</div>`:'<p class="hint">Elige un proyecto. Avanza cada sol si el bio-laboratorio tiene energía todo el sol (más rápido con más nivel).</p>'}
+      <div class="mlist">${RESEARCH.map(r=>{const done=rs.done.includes(r.id);return `<div class="${done?'done':''}"><span>${done?'✅':r.i}</span><span style="flex:1"><b>${r.n}</b><br><span class="hint">${r.t}</span></span>${done||cur?'':`<button class="btn ghost" data-rs="${r.id}" style="padding:6px 10px;font-size:.8rem;flex:none">${r.c} 🧱 · ${r.d} soles</button>`}</div>`}).join('')}</div>`}
+  const v=sheet(`<div class="sheetHead"><div><h2>${b.n}${NOUP.has(t.t)?'':` · Nv ${t.lv||1}`}</h2><p>${st}${b.inside?' · vista interior':''}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <img class="bimg" src="${pic}" alt="${b.n}">
     <p class="info">${b.desc}</p><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
-    ${conn}
+    ${lvTxt}${conn}
     ${isB?`<div class="meter">🔩 Desgaste<span class="track wear"><i style="width:${w}%;background:${wc}"></i></span>${w}%</div><p class="hint">Cada sol se desgasta un poco. Con más desgaste es más fácil que se averíe: hazle mantenimiento a tiempo.</p>`:''}
     <div class="fact" style="max-width:none"><b>¿Sabías que…?</b>${b.fact}</div>
     ${b.e<0?'<p class="hint">Si falta energía, primero se apagan los edificios menos importantes. De noche solo hay baterías y reactor.</p>':''}
-    <div class="row">${btns.join('')}</div>`,()=>{selB=-1});
+    <div class="row">${btns.join('')}</div>${resHtml}`,()=>{selB=-1});
+  const up=v.querySelector('#bUp');if(up)up.onclick=()=>{const c=upCost(t);if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;t.lv=(t.lv||1)+1;beep(660,.1);setTimeout(()=>beep(990,.12),90);save();render();toast(`⬆️ ${b.n} ahora es de nivel ${t.lv}`);openBuilding(k)};
+  v.querySelectorAll('[data-rs]').forEach(x=>x.onclick=()=>{const r=RESEARCH.find(r=>r.id===x.dataset.rs);if(S.mat<r.c){toast(`Faltan ${r.c-S.mat} 🧱`);return}S.mat-=r.c;S.rs.cur=r.id;S.rs.prog=0;beep(600,.08);save();render();toast(`🧫 Investigando: ${r.n}`);openBuilding(k)});
   const tog=v.querySelector('#bTog');if(tog)tog.onclick=()=>{t.on=!t.on;beep(t.on?600:300,.06);save();render();openBuilding(k)};
   const pay=(c,fn)=>{if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;fn();beep(700,.1);save();closeSheet();selB=-1;render()};
   const rep=v.querySelector('#bRep');if(rep)rep.onclick=()=>pay(rcost(t.t),()=>{t.broken=false;t.w=0;toast('🔧 ¡Reparado!')});
@@ -1209,7 +1279,7 @@ function showEvent(e,done){
     return;
   }
   const v=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2></div></div>
-    <p class="info">${e.x}</p><div class="fact" style="max-width:none"><b>Dato real</b>${e.fact}</div>
+    <p class="info">${e.x}</p>${e.forecast?'<p class="hint" style="color:var(--glass)">📡 La previsión ya lo había anunciado.</p>':''}<div class="fact" style="max-width:none"><b>Dato real</b>${e.fact}</div>
     <div class="sec">¿Qué decides, ${S.name}?</div>
     <div class="stack" style="width:100%">${e.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div>`);
   v.dataset.lock=1;beep(330,.15,'triangle');
@@ -1244,7 +1314,9 @@ function openMenu(){
       <div>5. Los edificios se <b>desgastan</b> cada sol. Con mucho desgaste ⚠️ se averían 🔧: hazles <b>mantenimiento</b>, que es barato.</div>
       <div>6. Cuantos más colonos, más gasta cada uno y más calefacción hace falta. Los almacenes tienen límite y la comida se estropea poco a poco.</div>
       <div>7. Con los soles llegan más problemas: tormentas largas y meteoritos que pueden destruir edificios. El escudo magnético los evita.</div>
-      <div>8. Cumple las misiones y llega a <b>30 colonos</b> para ganar.</div>
+      <div>8. <b>Mejora</b> tus edificios hasta el nivel 3 (×1,5 cada nivel) en vez de llenar el mapa de copias.</div>
+      <div>9. La <b>antena</b> anuncia tormentas y frío 1 o 2 soles antes. El <b>bio-laboratorio</b> investiga mejoras.</div>
+      <div>10. Mira los <b>⚠️ avisos</b>: te dicen lo que va a pasar si no haces nada. Cumple las misiones y llega a <b>30 colonos</b> para ganar.</div>
     </div>
     <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
     <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
@@ -1300,6 +1372,7 @@ function startTravel(){
   beep(120,.6,'sawtooth');
 }
 function startGame(){
+  S.rs=S.rs||{done:[],cur:null,prog:0};S.wx=S.wx||[];S.ack=S.ack||[];
   show('game');selB=-1;stopPlacing();rebuildOcc();terrainDirty=true;setHud(hudOpen);render();
   resizeMap();focusBase();clampCam();
   if(S.sol===1&&S.log.length<=1)setTimeout(()=>sheet(`<div class="sheetHead"><span class="big">👩‍🚀</span><div><h2>¡Bienvenido a Marte, ${S.name}!</h2><p>Sol 1 · Cráter preparado por los robots</p></div></div>
@@ -1317,7 +1390,9 @@ $('#bCont').onclick=()=>{initAudio();if(!S)S=load();if(S)startGame()};
 $('#bStory').onclick=()=>{beep(500,.04);if(storyI<STORY.length-1){storyI++;drawStory()}else startCrew()};
 $('#bLaunch').onclick=()=>startTravel();
 $('#bLand').onclick=()=>startGame();
-$('#bNext').onclick=()=>{if(!$('#veil')&&!placing)nextSol()};
+$('#bNext').onclick=()=>{if($('#veil')||placing)return;
+  const fresh=lastWarn.filter(x=>x.c&&!S.ack.includes(x.k));          // solo avisos importantes que aún no has visto
+  if(fresh.length)openWarnings(lastWarn,()=>{S.ack=[...new Set([...S.ack,...lastWarn.map(x=>x.k)])];nextSol()});else nextSol()};
 $('#bBuild').onclick=openBuildMenu;
 $('#bLog').onclick=openLog;
 $('#bMenu').onclick=openMenu;
