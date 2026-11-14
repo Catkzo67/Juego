@@ -41,3 +41,11 @@ La partida se guarda automáticamente en el navegador.
 - Al tocar su retrato se abre su menú: objetivo actual, mantenimiento general, cuaderno de ciencia, logros, registro y repaso de consejos.
 - Las imágenes están en `assets/laika_*.png`; la correspondencia emoción → imagen está en `MOOD_IMG`, dentro de `index.html`.
 - Su historia la cuenta ella misma: toca la base central y pulsa «¿Quién eres?».
+
+## Dificultad
+Se elige antes de la tripulación, en cada partida nueva:
+- **Fácil:** el juego base. Meta de 30 colonos; la puntuación vale la mitad.
+- **Normal:** más desastres y meteoritos, un 30% más de desgaste, construir e investigar cuesta un 25% más. Meta de 40 colonos.
+- **Difícil:** aún más desastres, un 70% más de desgaste, costes un 50% mayores, los edificios gastan un 20% más de energía y los colonos consumen un 25% más. Se empieza con algo menos de comida, Laika casi no da consejos y la meta son 50 colonos; la puntuación vale un 50% más.
+
+El refugio de regolito no necesita conexión con la base.
