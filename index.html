@@ -532,7 +532,7 @@ const TRAVEL_FACTS=[
 
 /* ================= SPRITES ================= */
 const IMG={};
-const IMG_NAMES=['base','pasillo','pasillo_v','cruce','tierra','marte','solar','moxie','extractor','laboratorio','laboratorio_interior','invernadero','refugio','habitat','habitat_interior','comedor','taller','granja','cajas','excavadora','bateria','antena','gimnasio','reactor','escudo'];
+const IMG_NAMES=['cohete','capsula','base','pasillo','pasillo_v','cruce','tierra','marte','solar','moxie','extractor','laboratorio','laboratorio_interior','invernadero','refugio','habitat','habitat_interior','comedor','taller','granja','cajas','excavadora','bateria','antena','gimnasio','reactor','escudo'];
 const imgSrc=n=>`assets/${n}.png`;
 function mkSprite(src){
   const sp={ok:false,w:1,h:1,img:null,dim:null,mask:null};
@@ -2087,7 +2087,15 @@ function drawTravel(t){
   planet(c,70,H*.7,46,'earth',t);planet(c,W-70,H*.6,36,'mars',t);
   const q=1-p,x=q*q*70+2*q*p*W/2+p*p*(W-70),y=q*q*H*.7+2*q*p*(-20)+p*p*H*.6;
   const dx=2*q*(W/2-70)+2*p*(W-70-W/2),dy=2*q*(-20-H*.7)+2*p*(H*.6+20);
-  rocket(c,x,y,1.6,Math.atan2(dy,dx)+Math.PI/2,t);
+  const th=Math.atan2(dy,dx),rk=IMG.cohete,cp=IMG.capsula;
+  if(rk.ok&&cp.ok){
+    const sep=clamp((p-.78)/.08,0,1);   // al llegar a Marte, la cápsula se separa del cohete
+    if(sep<1){const h=86,w=h*rk.w/rk.h,back=sep*46;c.save();c.globalAlpha=1-sep;
+      c.translate(x-Math.cos(th)*back,y-Math.sin(th)*back);c.rotate(th+Math.PI/2+sep*.5);
+      if(sep===0){c.fillStyle=`rgba(255,${150+Math.sin(t*20)*60|0},60,.85)`;c.beginPath();c.moveTo(-9,h/2-4);c.lineTo(0,h/2+16+Math.sin(t*25)*5);c.lineTo(9,h/2-4);c.fill()}
+      c.drawImage(rk.img,-w/2,-h/2,w,h);c.restore()}
+    if(sep>0){const w=90,h=w*cp.h/cp.w;c.save();c.globalAlpha=Math.min(1,sep*1.6);c.translate(x,y);c.rotate(th-.42);c.scale(-1,1);c.drawImage(cp.img,-w/2,-h/2,w,h);c.restore()}
+  }else rocket(c,x,y,1.6,th+Math.PI/2,t);
   $('#travelBar').style.width=(p*100)+'%';$('#travelDay').textContent=`Día ${Math.round(p*90)} de 90`;
   if(p>=1&&$('#bLand').disabled){$('#bLand').disabled=false;$('#travelTitle').textContent='¡Llegando a Marte!';beep(700,.2,'triangle')}
 }
