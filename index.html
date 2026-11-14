@@ -1923,7 +1923,7 @@ window.addEventListener('resize',()=>{if(!$('#game').hidden){resizeMap();clampCa
 /* ================= MÚSICA ================= */
 // Menús (portada, historia, dificultad, tripulación, viaje y final): música de menú en bucle.
 // Partida: la pista de la dificultad suena de vez en cuando, empieza en cualquier momento y se apaga poco a poco al final.
-const MUSIC={menu:'assets/musica_facil.mp3',   // hueco para la música de menú (provisional: la de fácil)
+const MUSIC={menu:'assets/musica_menu.mp3',   // hueco para la música de menú (provisional)
   game:['assets/musica_facil.mp3','assets/musica_normal.mp3','assets/musica_dificil.mp3']};
 const VOL={menu:.4,game:.35},FADE_END=25;   // segundos finales en los que baja el volumen
 let musicOn=true;try{musicOn=localStorage.getItem('ares-music')!=='0'}catch(e){}

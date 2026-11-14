@@ -62,6 +62,6 @@ El refugio de regolito no necesita conexión con la base.
 - En el menú de Laika está el **Diccionario**, con todas las palabras por grupos y las ya consultadas marcadas. Consultar 40 da el logro *Diccionario andante*.
 
 ## Música
-- En los menús (portada, historia, dificultad, tripulación, viaje y pantalla final) suena en bucle la música de menú (`MUSIC.menu` en `index.html`; de momento, la de la dificultad fácil).
+- En los menús (portada, historia, dificultad, tripulación, viaje y pantalla final) suena en bucle la música de menú (`assets/musica_menu.mp3`, provisional).
 - En la partida suena la pista de la dificultad (`assets/musica_facil.mp3`, `musica_normal.mp3`, `musica_dificil.mp3`): empieza en un momento al azar, se apaga poco a poco en sus últimos 25 segundos y vuelve a sonar tras un silencio de 1 a 3 minutos.
 - Se puede silenciar con el botón 🎵 de la portada o desde Ajustes.
