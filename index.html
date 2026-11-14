@@ -2074,7 +2074,7 @@ function drawStoryArt(t){
   else if(storyArt==='mars'){c.fillStyle='rgba(208,88,44,.18)';c.beginPath();c.arc(m,m,W*.45,0,7);c.fill();planet(c,m,m,W*.36,'mars',t)}
   else if(storyArt==='robots'){
     const sc=storyScene(W);if(sc)c.drawImage(sc,0,0);
-    c.font=`${W*.09}px serif`;c.textAlign='center';c.fillText('🦠',m+W*.33,W*.2+Math.sin(t*2)*6);
+    c.font=`${W*.08}px serif`;c.textAlign='center';c.fillText('🦠',m+W*.24,W*.36);
   }else{
     planet(c,W*.2,W*.8,W*.16,'earth',t);planet(c,W*.82,W*.2,W*.12,'mars',t);
     const p=(t*.15)%1;rocket(c,W*.2+p*W*.6,W*.8-p*W*.6,2.2,Math.PI/4,t);
