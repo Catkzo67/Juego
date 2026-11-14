@@ -467,6 +467,31 @@ const QUIZ_DIFICIL=[
 const QT_FACIL=['soil','travel','travel','co2','comms','co2','water','gravity','gravity','home','energy','radiation'];
 const QT_NORMAL=['co2','co2','gravity','night','comms','travel','soil','dust','cold','travel','dust','radiation','water','night','cold'];
 const QT_DIFICIL=['co2','soil','bio','bio','co2','co2','health','travel','dust','meteor','soil','dust','gravity'];
+// Preguntas extra
+QUIZ_FACIL.push(
+  {q:'¿Qué necesitan los astronautas para salir fuera de la base?',a:['Un traje espacial con oxígeno','Ropa de abrigo normal','Solo unas gafas de sol','Nada, el aire es bueno'],c:0,e:'Fuera no se puede respirar y la presión es muy baja: sin traje no se sobrevive.'},
+  {q:'¿Hace más frío o más calor en Marte que en la Tierra?',a:['Mucho más frío','Mucho más calor','Lo mismo que aquí','Solo hace calor de noche'],c:0,e:'Está más lejos del Sol y su aire es muy fino, así que el calor se escapa enseguida.'},
+  {q:'¿Qué necesitan las plantas del invernadero para crecer?',a:['Luz, agua y calor','Solo arena roja','Oscuridad y frío','Nada, crecen solas'],c:0,e:'Por eso los invernaderos de Marte gastan agua y energía.'},
+  {q:'¿Para qué sirven las baterías de la base?',a:['Guardar energía para la noche','Fabricar oxígeno','Calentar la comida','Llamar a las naves'],c:0,e:'De día guardan la energía que sobra y de noche la usan, cuando los paneles no funcionan.'},
+  {q:'¿Qué es un meteorito?',a:['Una roca del espacio que llega al suelo','Una estrella que se apaga','Un tipo de nube marciana','Un volcán muy pequeño'],c:0,e:'En Marte llegan muchos porque su aire es tan fino que casi no los frena.'},
+  {q:'¿Qué les pasa a los paneles solares en una tormenta de polvo?',a:['Producen mucha menos energía','Producen el doble','No les pasa nada','Se convierten en baterías'],c:0,e:'El polvo tapa la luz del Sol y se queda pegado encima de los paneles.'}
+);
+QT_FACIL.push('co2','cold','food','night','meteor','dust');
+
+// ---- Normal: 3 más ----
+QUIZ_NORMAL.push(
+  {q:'¿Por qué no hay agua líquida en la superficie de Marte?',a:['Por la presión tan baja y el frío','Porque el suelo se la bebe toda','Porque el Sol está muy cerca','Porque las lunas se la llevan'],c:0,e:'Con tan poca presión, el agua hierve o se congela enseguida. Solo queda hielo.'},
+  {q:'¿Qué rover de la NASA llegó a Marte en 2021?',a:['Perseverance','Opportunity','Spirit','Sojourner'],c:0,e:'Llevaba el experimento MOXIE y un pequeño helicóptero llamado Ingenuity.'},
+  {q:'¿Qué protege mejor de una tormenta solar?',a:['Varios metros de regolito encima','Una tienda de campaña','Las ventanas de la base','La sombra de un panel solar'],c:0,e:'El suelo grueso frena las partículas, por eso los refugios van medio enterrados.'}
+);
+QT_NORMAL.push('water','travel','radiation');
+
+// ---- Difícil: 2 más ----
+QUIZ_DIFICIL.push(
+  {q:'¿Qué hace un catalizador en una reacción química?',a:['La acelera sin gastarse','Se convierte en el producto final','Detiene la reacción por completo','Solo le cambia el color'],c:0,e:'Por eso el rutenio de MOXIE se puede usar una y otra vez.'},
+  {q:'Marte está unas 1,5 veces más lejos del Sol que la Tierra. ¿Cuánta luz solar le llega?',a:['Menos de la mitad','Dos tercios','La misma cantidad','Una décima parte'],c:0,e:'La luz se reparte al alejarse: 1 ÷ (1,5 × 1,5) ≈ 0,44. Por eso los paneles rinden menos que en la Tierra.'}
+);
+QT_DIFICIL.push('co2','energy');
 const QUIZ=[];
 [[QUIZ_FACIL,QT_FACIL],[QUIZ_NORMAL,QT_NORMAL],[QUIZ_DIFICIL,QT_DIFICIL]].forEach(([L,T],lv)=>L.forEach((q,i)=>QUIZ.push(Object.assign(q,{lv,tp:T[i]||'travel'}))));
 const BUILD_TOPIC={moxie:'co2',ice:'water',solar:'energy',battery:'night',farm:'food',vfarm:'food',bio:'bio',shelter:'radiation',antenna:'comms',habitat:'home',gym:'gravity',reactor:'energy',shield:'radiation',miner:'soil',mess:'health'};
@@ -622,7 +647,7 @@ function validSpot(t,i0,j0){
 const DIFF=[
   {n:'Fácil',i:'🌱',goal:30,cost:1,wear:1,bad:0,met:1,energy:1,use:1,score:.5,txt:'Para aprender. Menos desastres y Laika te ayuda en todo. Meta: 30 colonos. La puntuación vale la mitad.'},
   {n:'Normal',i:'🚀',goal:40,cost:1.25,wear:1.3,bad:.08,met:1.3,energy:1,use:1,score:1,txt:'Más desastres, los edificios se desgastan antes y construir cuesta un 25% más. Meta: 40 colonos.'},
-  {n:'Difícil',i:'☄️',goal:50,cost:1.5,wear:1.7,bad:.16,met:1.7,energy:1.2,use:1.25,score:1.5,txt:'Todo cuesta un 50% más, gasta más energía y los colonos consumen más. Laika apenas da consejos. Meta: 50 colonos. La puntuación vale un 50% más.'}];
+  {n:'Difícil',i:'☄️',goal:50,cost:1.5,wear:1.7,bad:.16,met:1.7,energy:1.2,use:1.15,score:1.5,txt:'Todo cuesta un 50% más, gasta más energía y los colonos consumen más. Laika apenas da consejos. Meta: 50 colonos. La puntuación vale un 50% más.'}];
 const D=()=>DIFF[(S&&S.diff)||0],hard=()=>!!S&&S.diff===2;
 function applyDiff(){ // ajusta costes y meta final a la dificultad de la partida
   const d=D();
@@ -769,6 +794,7 @@ function nextSol(){
   s.bat=f.batNext;
   const dmg=has(s,'med')?9:12;
   if(short)s.salud-=dmg*short;
+  if(short)s.ach.anyShort=1;
   if(!f.heatOk){s.salud-=has(s,'med')?6:9;msgs.push('De noche no hubo energía para la calefacción. ¡Hace muchísimo frío!')}
   if(!short&&f.heatOk)s.salud+=2+(has(s,'med')?2:0);
   if(f.act.has('gym')){const m=Math.pow(1.5,f.lvAct.gym-1);s.salud+=3*m;s.moral+=3*m}
@@ -1356,7 +1382,7 @@ function openDict(){
 
 /* ================= LOGROS Y PUNTUACIÓN ================= */
 const ACH_KEY='ares2050-logros';
-function newAch(){return {nightRun:0,battRun:0,moodRun:0,noBreak:0,wearBreaks:0,minSalud:100,shield:0,crInit:0,nuke:0,shelter:0,giant:0,giantOn:false,giantFail:false,win:0}}
+function newAch(){return {anyShort:0,nightRun:0,battRun:0,moodRun:0,noBreak:0,wearBreaks:0,minSalud:100,shield:0,crInit:0,nuke:0,shelter:0,giant:0,giantOn:false,giantFail:false,win:0}}
 // Guardado propio de los logros: no se borra al perder ni al empezar de nuevo
 let P={d:{},best:{},qOk:[],facts:[],hi:0,qv:2,gl:[]};
 try{const r=JSON.parse(localStorage.getItem(ACH_KEY)||'null');if(r)P=Object.assign(P,r)}catch(e){}
@@ -1378,29 +1404,42 @@ const ACH=[
   {id:'streak',i:'🔥',n:'Racha perfecta',d:'Acierta 5 preguntas seguidas.',max:5,v:s=>s.streak||0},
   {id:'allq',i:'🧠',n:'Sabelotodo',d:'Acierta cada pregunta del juego al menos una vez, en las tres dificultades (entre todas tus partidas).',max:QUIZ.length,v:()=>P.qOk.filter(t=>QUIZ.some(q=>q.q===t)).length},
   {id:'dict',i:'📖',n:'Diccionario andante',d:'Consulta 40 palabras del diccionario de Laika (tocándolas en los textos o en su menú).',max:40,v:()=>P.gl.length},
-  {id:'sci',i:'🧫',n:'Científico jefe',d:'Termina las 9 investigaciones.',max:9,v:s=>s.rs?s.rs.done.length:0}]},
+  {id:'sci',i:'🧫',n:'Científico jefe',d:'Termina las 9 investigaciones.',max:9,v:s=>s.rs?s.rs.done.length:0},
+  {id:'streak10',i:'🌟',n:'Mente brillante',d:'Acierta 10 preguntas seguidas.',max:10,v:s=>s.streak||0},
+  {id:'hypo',i:'🔬',n:'Científico riguroso',d:'Acierta 6 hipótesis de experimentos en una misma partida.',max:6,v:s=>(s.qlog||[]).filter(x=>x.exp&&x.ok).length}]},
  {g:'🔧 Gestión e ingeniería',items:[
   {id:'mech',i:'🔩',n:'Mecánico de guardia',d:'Pasa 20 soles seguidos sin ninguna avería.',max:20,v:s=>s.ach.noBreak},
   {id:'nowear',i:'♻️',n:'Nada se pierde',d:'Llega al sol 30 sin que ningún edificio se averíe por desgaste.',max:30,v:s=>s.ach.wearBreaks?0:Math.min(s.sol,30)},
   {id:'lv3',i:'⬆️',n:'Al máximo',d:'Ten 5 edificios en nivel 3.',max:5,v:s=>s.blds.filter(b=>b.lv===3).length},
   {id:'batt',i:'⚡',n:'Energía de sobra',d:'Empieza la noche con la batería llena 10 soles seguidos.',max:10,v:s=>s.ach.battRun},
-  {id:'pantry',i:'🍞',n:'Despensa llena',d:'Ten a la vez oxígeno, agua y comida al máximo del almacén.',max:3,v:(s,f)=>mech(s,'storage')?['o2','agua','comida'].filter(k=>s[k]>=f.stor).length:0}]},
+  {id:'pantry',i:'🍞',n:'Despensa llena',d:'Ten a la vez oxígeno, agua y comida al máximo del almacén.',max:3,v:(s,f)=>mech(s,'storage')?['o2','agua','comida'].filter(k=>s[k]>=f.stor).length:0},
+  {id:'elite',i:'🏗️',n:'Ingeniería de élite',d:'Ten 12 edificios en nivel 3 a la vez.',max:12,v:s=>s.blds.filter(b=>b.lv===3).length},
+  {id:'night25',i:'🌌',n:'Noche eterna',d:'Pasa 25 soles seguidos sin que falte energía de noche.',max:25,v:s=>s.ach.nightRun}]},
  {g:'🌪️ Supervivencia',items:[
   {id:'giant',i:'🌪️',n:'Aguantar la tormenta',d:'Supera una tormenta de polvo gigante (8 soles o más) sin que se quede nada sin energía.',max:1,v:s=>s.ach.giant},
   {id:'shelter',i:'⛰️',n:'Bajo tierra',d:'Protege a todos en el refugio durante una tormenta solar.',max:1,v:s=>s.ach.shelter},
   {id:'shield',i:'🧲',n:'Paraguas magnético',d:'Que el escudo desvíe 3 meteoritos.',max:3,v:s=>s.ach.shield},
-  {id:'scratch',i:'❤️',n:'Sin un rasguño',d:'Gana sin que la salud baje nunca de 50.',max:1,v:s=>W(s)&&s.ach.minSalud>=50?1:0}]},
+  {id:'scratch',i:'❤️',n:'Sin un rasguño',d:'Gana sin que la salud baje nunca de 50.',max:1,v:s=>W(s)&&s.ach.minSalud>=50?1:0},
+  {id:'veteran',i:'⏳',n:'Veterano del cráter',d:'Sobrevive 100 soles en una misma partida.',max:100,v:s=>Math.min(100,s.sol)},
+  {id:'nofail',i:'🥇',n:'Abastecimiento perfecto',d:'Gana sin que se acabe nunca el oxígeno, el agua o la comida.',max:1,v:s=>W(s)&&!s.ach.anyShort?1:0}]},
  {g:'👥 Colonia',items:[
   {id:'family',i:'🏠',n:'Familia grande',d:'Llega a 30 colonos.',max:30,v:s=>Math.min(30,s.pop)},
   {id:'happy',i:'😊',n:'Todos contentos',d:'Mantén el ánimo por encima de 80 durante 15 soles seguidos.',max:15,v:s=>s.ach.moodRun},
-  {id:'lava',i:'🕳️',n:'Hogar volcánico',d:'Aloja a 12 colonos en un hábitat sobre un tubo de lava.',max:12,v:s=>s.blds.some(b=>b.t==='habitat'&&!b.broken&&footprint(b).includes('tube'))?Math.min(12,s.pop):0}]},
+  {id:'lava',i:'🕳️',n:'Hogar volcánico',d:'Aloja a 12 colonos en un hábitat sobre un tubo de lava.',max:12,v:s=>s.blds.some(b=>b.t==='habitat'&&!b.broken&&footprint(b).includes('tube'))?Math.min(12,s.pop):0},
+  {id:'metro',i:'🏙️',n:'Metrópolis marciana',d:'Llega a 60 colonos (puedes seguir construyendo tras ganar).',max:60,v:s=>Math.min(60,s.pop)}]},
  {g:'🏆 Retos difíciles',items:[
   {id:'speed',i:'⏱️',n:'Velocista',d:'Gana antes del sol 45.',max:1,v:s=>W(s)&&s.sol<45?1:0},
   {id:'nonuke',i:'☀️',n:'Sin nuclear',d:'Gana sin construir ningún reactor.',max:1,v:s=>W(s)&&!s.ach.nuke?1:0},
   {id:'nopilot',i:'🧑‍🚀',n:'Equipo inusual',d:'Gana sin el Piloto Haddad en la tripulación.',max:1,v:s=>W(s)&&!has(s,'com')?1:0},
-  {id:'minimal',i:'📐',n:'Ingeniero minimalista',d:'Gana con menos de 25 edificios (sin contar pasillos).',max:1,v:s=>W(s)&&nB(s)<25?1:0}]}
+  {id:'minimal',i:'📐',n:'Ingeniero minimalista',d:'Gana con menos de 25 edificios (sin contar pasillos).',max:1,v:s=>W(s)&&nB(s)<25?1:0},
+  {id:'veteranwin',i:'🚀',n:'Comandante veterano',d:'Gana una partida en dificultad Normal o Difícil.',max:1,v:s=>W(s)&&(s.diff||0)>=1?1:0},
+  {id:'legend',i:'☄️',n:'Leyenda de Marte',d:'Gana una partida en dificultad Difícil.',max:1,v:s=>W(s)&&s.diff===2?1:0},
+  {id:'flawless',i:'💎',n:'Misión impecable',d:'Gana en Difícil sin que la salud baje nunca de 70.',max:1,v:s=>W(s)&&s.diff===2&&s.ach.minSalud>=70?1:0},
+  {id:'collector',i:'🏆',n:'Coleccionista',d:'Consigue 25 logros.',max:25,v:()=>Object.keys(P.d).length},
+  {id:'frontier',i:'🌠',n:'Next Frontier',d:'Consigue todos los demás logros.',max:1,v:()=>0}]}
 ];
 const ACH_ALL=ACH.flatMap(g=>g.items);
+{const fr=ACH_ALL.find(a=>a.id==='frontier');fr.max=ACH_ALL.length-1;fr.v=()=>ACH_ALL.filter(a=>a.id!=='frontier'&&P.d[a.id]).length}
 function checkAch(){
   if(!S||!S.ach)return;const f=flows(S),got=[];
   for(const a of ACH_ALL){const v=Math.min(a.max,a.v(S,f)||0);if(v>(P.best[a.id]||0))P.best[a.id]=v;
