@@ -46,8 +46,13 @@ La partida se guarda automáticamente en el navegador.
 Se elige antes de la tripulación, en cada partida nueva:
 - **Fácil:** el juego base. Meta de 30 colonos; la puntuación vale la mitad.
 - **Normal:** más desastres y meteoritos, un 30% más de desgaste, construir e investigar cuesta un 25% más. Meta de 40 colonos.
-- **Difícil:** aún más desastres, un 70% más de desgaste, costes un 50% mayores, los edificios gastan un 20% más de energía y los colonos consumen un 25% más. Se empieza con algo menos de comida, Laika casi no da consejos y la meta son 50 colonos; la puntuación vale un 50% más.
+- **Difícil:** aún más desastres, un 70% más de desgaste, costes un 50% mayores, los edificios gastan un 20% más de energía y los colonos consumen un 25% más. Se empieza con más comida (110) para compensar el consumo, Laika casi no da consejos y la meta son 50 colonos; la puntuación vale un 50% más.
 
 Las preguntas del control de misión también dependen de la dificultad: 12 en fácil (8-10 años), 15 en normal (11-13) y 13 en difícil (14+).
 
 El refugio de regolito no necesita conexión con la base.
+
+## Naves
+- Cuantas más camas libres y mejor antena, más colonos trae cada nave (+2 por nivel de antena y +1 por cada 4 camas libres).
+- Desde la ficha de la antena se puede **llamar a una nave** al momento pagando 40 de material (más en normal y difícil).
+- Desmontar devuelve la mitad de todo lo pagado, mejoras incluidas.
