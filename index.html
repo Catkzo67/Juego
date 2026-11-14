@@ -246,7 +246,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 <!-- Tripulación -->
 <section class="screen gutter" id="crew" hidden>
   <h2>Prepara tu tripulación</h2>
-  <div class="field"><label for="cmdName">Nombre del comandante</label><input id="cmdName" maxlength="16" placeholder="Escribe tu nombre" autocomplete="off"></div>
+  <div class="field"><label for="cmdName">Nombre del Comandante</label><input id="cmdName" maxlength="16" placeholder="Escribe tu nombre" autocomplete="off"></div>
   <p class="hint" id="crewHint">Elige 5 especialistas. Cada uno aporta algo que solo él o ella sabe hacer.</p>
   <div class="crewGrid" id="crewGrid"></div>
   <div class="stack" style="padding-bottom:20px"><button class="btn" id="bLaunch" disabled>¡Despegar!</button></div>
@@ -286,7 +286,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
     </div>
   </main>
   <footer class="actions gutter" id="actions">
-    <button class="iconBtn ariaBtn" id="bAria" aria-label="Aria, tu asistente"><img id="ariaFace" src="assets/aria_normal.png" alt=""><small>Aria</small><i class="badge" id="ariaBadge" hidden></i></button>
+    <button class="iconBtn ariaBtn" id="bAria" aria-label="Laika, la IA de la base"><img id="ariaFace" src="assets/laika_normal.png" alt=""><small>Laika</small><i class="badge" id="ariaBadge" hidden></i></button>
     <button class="iconBtn build" id="bBuild">🏗️<small>Construir</small></button>
     <button class="btn next" id="bNext">Nuevo sol ▸</button>
     <button class="iconBtn" id="bMenu">⚙️<small>Menú</small></button>
@@ -463,7 +463,7 @@ const STORY=[
   {art:'earth',t:'Año 2050. La Tierra está en apuros: hace demasiado calor, el aire está sucio y cada vez hay menos recursos.'},
   {art:'mars',t:'La humanidad necesita un nuevo hogar. Las miradas apuntan al planeta rojo: Marte.'},
   {art:'robots',t:'Durante años, rovers y bacterias especiales han preparado un gran cráter con hielo para recibir a las primeras personas.'},
-  {art:'ship',t:'Ahora te toca a ti. Eres el comandante de la tripulación que fundará la primera colonia en Marte.'}
+  {art:'ship',t:'Ahora te toca a ti. Eres el Comandante de la tripulación que fundará la primera colonia en Marte.'}
 ];
 const TRAVEL_FACTS=[
   'Con propulsión nuclear el viaje dura entre 45 y 90 días. Antes se tardaba unos 9 meses.',
@@ -616,7 +616,7 @@ const MECH=[
 ];
 const mech=(s,id)=>!!(s.unl&&s.unl.includes(id));
 function updateMechs(s,silent){s.unl=s.unl||[];const n=MECH.filter(m=>!s.unl.includes(m.id)&&m.when(s));n.forEach(m=>s.unl.push(m.id));
-  return silent?[]:n.map(m=>({mood:'pensativa',i:m.i,t:'Nueva mecánica: '+m.t,x:m.x,fact:'Cada nueva mecánica añade un reto real de vivir en Marte.',o:[{l:'¡Entendido!',fx:()=> 'Lo tendrás en cuenta a partir de ahora.'}]}))}
+  return silent?[]:n.map(m=>({mood:'explicando',i:m.i,t:'Nueva mecánica: '+m.t,x:m.x,fact:'Cada nueva mecánica añade un reto real de vivir en Marte.',o:[{l:'¡Entendido!',fx:()=> 'Lo tendrás en cuenta a partir de ahora.'}]}))}
 function ring4(b){const [w,h]=dim(b.t),o=[];for(let i=b.i;i<b.i+w;i++){o.push([i,b.j-1],[i,b.j+h])}for(let j=b.j;j<b.j+h;j++){o.push([b.i-1,j],[b.i+w,j])}return o}
 // Red conectada a la base: pasillos que salen de sus brazos y edificios unidos por su puerta.
 // Los edificios sin puerta (paneles, extractor, excavadora, escudo) se conectan con un pasillo pegado; los iguales pegados comparten conexión.
@@ -786,7 +786,7 @@ function nextSol(){
     const pBad=Math.min(.7,.28+s.sol*.008),r=Math.random();   // los problemas son más probables con el tiempo
     if(r<pBad){const k=pickEvent(true);
       if(k>=0&&EVENTS[k].wx){if(!s.wx.some(w=>w.k===k)){const at=s.sol+1+rnd(2),seen=canForecast(s);s.wx.push({k,at,seen});
-        if(seen)say(`La antena avisa: ${EVENTS[k].wx.toLowerCase()} ${at-s.sol<=1?'mañana':'dentro de 2 soles'}. Mejor prepararnos.`,'preocupada')}} // el clima llega 1 o 2 soles después
+        if(seen)say(`${/ormenta/.test(EVENTS[k].wx)?'C-Comandante… ':''}La antena avisa: ${EVENTS[k].wx.toLowerCase()} ${at-s.sol<=1?'mañana':'dentro de 2 soles'}. ${k===0?'Llena las baterías antes, por favor.':k===1?'Ten listo el refugio.':'Revisa la calefacción.'}`,'preocupada')}} // el clima llega 1 o 2 soles después
       else if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
     else if(r<pBad+.25){const k=pickEvent(false);if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
   }
@@ -797,7 +797,8 @@ function nextSol(){
     if(broke.length)say(`Se ha averiado: ${broke.join(', ')}. Tócalo en el mapa para repararlo.`,'preocupada');
     else if(worn){const mi=maintInfo();say(`Hay ${worn} edificio(s) muy desgastados. ¿Les hago un mantenimiento general?`,'preocupada',{act:{l:`🔩 Mantenimiento (${mi.cost} 🧱)`,fn:doMaint}})}
     if(full)say('Los almacenes están llenos: lo que sobra se pierde. Con más hábitats cabe más.','normal');
-    if(!talk.msgs.length&&s.sol>3&&Math.random()<.3)say(pick(IDLE),'normal');
+    if(!talk.msgs.length&&s.sol>3&&Math.random()<.3)Math.random()<.45?say(pick(EARTHQ),'pensativa'):say(pick(IDLE),'normal');
+    if(s.sol===5)tut('who');
   }
   save();render();checkAch();runQueue(q);
 }
@@ -807,7 +808,7 @@ function checkMissions(){
   while(s.mission<MISSIONS.length&&MISSIONS[s.mission].ok(s)){
     const m=MISSIONS[s.mission];s.mission++;s.mat+=m.r;
     addLog(`<b>Misión cumplida:</b> ${m.t}${m.r?` (+${m.r} materiales)`:''}`);
-    say(`¡Misión cumplida, comandante!${m.r?` Nos dan +${m.r} 🧱.`:''}${s.mission<MISSIONS.length?` Ahora toca: <b>${MISSIONS[s.mission].t}</b>.`:''}`,'feliz');beep(660,.1);setTimeout(()=>beep(880,.15),110);
+    say(`¡Misión cumplida, Comandante!${m.r?` Nos dan +${m.r} 🧱.`:''}${s.mission<MISSIONS.length?` Ahora toca: <b>${MISSIONS[s.mission].t}</b>.`:''}`,'feliz');beep(660,.1);setTimeout(()=>beep(880,.15),110);
     if(s.mission===MISSIONS.length&&!s.won){s.won=true;save();setTimeout(()=>endGame(true),900);return}
   }
 }
@@ -1250,10 +1251,10 @@ function score(win){
   return {rows,total:rows.reduce((a,r)=>a+r[2],0)};
 }
 
-/* ================= ARIA, LA ASISTENTE ================= */
+/* ================= LAIKA, LA IA DE LA BASE ================= */
 // Qué imagen usa cada emoción (cambia aquí si alguna no encaja) y su prioridad, de menor a mayor
-const MOOD_IMG={normal:'aria_normal',pensativa:'aria_pensativa',sorprendida:'aria_sorprendida',feliz:'aria_feliz',triste:'aria_triste',preocupada:'aria_preocupada',alarmada:'aria_alarmada'};
-const MOODS=['normal','pensativa','sorprendida','feliz','triste','preocupada','alarmada'];
+const MOOD_IMG={normal:'laika_normal',explicando:'laika_explicando',pensativa:'laika_pensativa',sorprendida:'laika_sorprendida',feliz:'laika_feliz',triste:'laika_triste',preocupada:'laika_preocupada',alarmada:'laika_alarmada'};
+const MOODS=['normal','explicando','pensativa','sorprendida','feliz','triste','preocupada','alarmada'];
 const faceSrc=m=>imgSrc(MOOD_IMG[m]||MOOD_IMG.normal),prio=m=>MOODS.indexOf(m);
 MOODS.forEach(m=>{new Image().src=faceSrc(m)});
 const topMood=l=>l.reduce((a,m)=>prio(m)>prio(a)?m:a,'normal');
@@ -1269,45 +1270,66 @@ function placeBubble(){const b=$('#bubble');if(b.hidden)return;
 function drawBubble(){const b=$('#bubble');
   if(!talk.msgs.length||skyMode!=='game'){b.hidden=true;refreshAria();return}
   const l=talk.msgs.slice().sort((x,y)=>prio(y.mood)-prio(x.mood)),mood=l[0].mood;   // lo más importante, primero
-  b.hidden=false;b.innerHTML=`<img src="${faceSrc(mood)}" alt=""><div class="bTxt"><b class="who">ARIA</b>${l.map((m,k)=>`<p>${m.text}</p>${m.act?`<button class="bAct" data-k="${talk.msgs.indexOf(m)}">${m.act.l}</button>`:''}`).join('')}</div><button class="bX" aria-label="Cerrar">✕</button>`;
+  b.hidden=false;b.innerHTML=`<img src="${faceSrc(mood)}" alt=""><div class="bTxt"><b class="who">LAIKA</b>${l.map((m,k)=>`<p>${m.text}</p>${m.act?`<button class="bAct" data-k="${talk.msgs.indexOf(m)}">${m.act.l}</button>`:''}`).join('')}</div><button class="bX" aria-label="Cerrar">✕</button>`;
   b.querySelector('.bX').onclick=hush;
   b.querySelectorAll('.bAct').forEach(x=>x.onclick=()=>{const m=talk.msgs[+x.dataset.k];hush();m&&m.act.fn()});
   placeBubble();refreshAria();
 }
 function hush(){talk.msgs=[];clearTimeout(talk.t);drawBubble()}
-// Aria dice algo en su globo. Si se juntan varias cosas, muestra la cara de la más importante.
+// Laika dice algo en su globo. Si se juntan varias cosas, muestra la cara de la más importante.
 function say(text,mood,o){o=o||{};if(skyMode!=='game'||!S)return;
   talk.msgs.push({text,mood:mood||'normal',act:o.act});if(talk.msgs.length>3)talk.msgs.shift();
   drawBubble();clearTimeout(talk.t);talk.t=setTimeout(hush,(o.act?9000:4500)+talk.msgs.reduce((a,m)=>a+m.text.length,0)*45);
 }
-function ariaSheet(mood,body,after,onClose){return sheet(`<div class="ariaSay"><img src="${faceSrc(mood)}" alt=""><div class="say"><span class="who">ARIA</span>${body}</div></div>${after||''}`,onClose)}
+function ariaSheet(mood,body,after,onClose){return sheet(`<div class="ariaSay"><img src="${faceSrc(mood)}" alt=""><div class="say"><span class="who">LAIKA</span>${body}</div></div>${after||''}`,onClose)}
 const OPEN={
-  alarmada:['¡Comandante, esto es urgente!','¡Orejas arriba, comandante! Tenemos un problema.'],
-  preocupada:['Comandante, traigo una noticia regular.','Comandante, esto no me gusta mucho.'],
-  triste:['Comandante… esto me da un poco de pena.','Ay, comandante. No es un buen momento.'],
-  feliz:['¡Buenas noticias, comandante!','¡Esto te va a gustar, comandante!'],
-  sorprendida:['¡Anda! Mira esto, comandante.','¡Vaya! Esto no me lo esperaba.'],
-  pensativa:['Comandante, déjame explicarte una cosa.','A ver, que esto tiene su ciencia.'],
+  alarmada:['¡Comandante! Esto es urgente, no le voy a quitar importancia.','¡Comandante, alerta! Escúchame un momento, por favor.'],
+  preocupada:['Comandante, tengo que ser sincera contigo: esto no pinta bien.','Comandante, algo me preocupa. Pero tiene solución.'],
+  triste:['Comandante… lo siento mucho.','Ay, Comandante. Ojalá no tuviera que contarte esto.'],
+  feliz:['¡Comandante, buenas noticias!','¡Comandante! Llevaba años esperando poder decir algo así.'],
+  sorprendida:['¿Eh? Comandante, mira esto.','¡Oh! Esto no estaba en mis cálculos, Comandante.'],
+  pensativa:['Mmm… déjame pensarlo, Comandante.','A ver, Comandante, vamos por partes.'],
+  explicando:['Comandante, esto te interesa.','Comandante, te lo explico en un momento.'],
   normal:['Comandante, una cosa.']};
-const IDLE=['Todo en orden. Hasta el polvo parece tranquilo hoy.','Día tranquilo. En Marte, eso ya es una buena noticia.','Sin novedades, comandante. Aprovecho para sacar brillo a mi herradura de la suerte.',
-  'He contado las rocas del cráter. Son muchas. De nada.','¿Sabías que el cielo de Marte de día es de color mantequilla? Yo lo llamo «cielo tostada».','Recuerda beber agua, comandante. La reciclamos nosotros, así que es de confianza.',
-  'Si oyes trotar por los pasillos, soy yo haciendo ejercicio. La gravedad baja no perdona.','Informe del día: cero marcianos avistados. Seguimos siendo los únicos vecinos.'];
+// Las tormentas la ponen nerviosa
+const NERV=['C-Comandante… otra tormenta. No me gustan nada. Nada de nada.','Uf. Tormenta. Respiro hondo… bueno, yo no respiro, pero me entiendes, Comandante.','Comandante, las tormentas me ponen los circuitos de punta. Pero vamos a estar bien. Te lo prometo.'];
+// Le fascinan las cosas de la Tierra
+const EARTHQ=['Comandante, ¿a qué huele la hierba recién cortada? He leído que es «verde». No sé cómo puede oler un color.','¿Es verdad que en la Tierra el agua cae del cielo y la gente sale sin traje? ¿Y no os parece peligroso?',
+  'Comandante, ¿tienes perro? He visto fotos. Parecen rovers muy felices.','¿Cómo suena la lluvia? Aquí solo oigo el viento y los rovers. Me gustaría oírla algún día.',
+  '¿En la Tierra el cielo es azul de día y rojo al atardecer? Aquí es al revés. Me parece de lo más divertido.','Comandante, ¿qué es un «abrazo»? Los colonos lo hacen mucho. Creo que quiero entenderlo.'];
+const IDLE=['Todo en orden, Comandante. Los rovers también te saludan. Bueno, parpadean, que es su forma de saludar.','Sol tranquilo. Antes de que llegarais, todos los soles eran así. Ahora me gustan más.',
+  'Sin novedades, Comandante. Sigo vigilando la energía y los recursos, como siempre.','Dato curioso: el cielo de Marte de día es color caramelo, pero los atardeceres son azules. El polvo dispersa la luz al revés que en la Tierra…',
+  'He contado las rocas del cráter otra vez. Mismo número. Es lo que tiene llevar años sola aquí.','Comandante, recuerda que la tripulación también necesita descansar. Los humanos no se recargan con paneles.'];
+const RAMBLE=['¡Y eso no es todo! Si lo piensas, cada molécula que usamos aquí ha viajado por el sistema solar durante miles de millones de años antes de llegar a nuestros tanques, y además…','Me encanta, porque significa que la química funciona igual aquí que en la Tierra, y eso quiere decir que las mismas leyes rigen todo el universo, desde una gota de agua hasta…','Y si multiplicas eso por todos los soles que llevamos aquí, sale una cifra preciosa. Bueno, preciosa para mí. Es que los números…'];
+const datoCurioso=f=>`Dato curioso: ${f}`+(Math.random()<.35?` ${pick(RAMBLE)} …perdón, me emocioné.`:'');
 // Tutorial por pasos: cada consejo sale una sola vez, cuando toca
 const TIPS={
-  build:['pensativa','Elige un edificio y luego toca el mapa para colocarlo. Si la huella sale <b>verde</b>, es buen sitio; si sale <b>roja</b>, te digo por qué no vale.'],
+  build:['explicando','Elige un edificio y luego toca el mapa para colocarlo. Si la huella sale <b>verde</b>, es buen sitio; si sale <b>roja</b>, te digo por qué no vale.'],
   nextsol:['normal','¡Primer edificio en pie! Cuando no quieras construir más, pulsa <b>Nuevo sol</b> para que pase un día marciano.'],
-  ficha:['pensativa','Esta es la ficha del edificio. Aquí puedes apagarlo, repararlo o pulsar <b>¿Por qué?</b> y te cuento por qué funciona así.'],
-  sol2:['pensativa','Cada colono gasta en cada sol 1 de oxígeno, 1 de agua y 1 de comida. Arriba ves cuánto sube o baja cada cosa: si está en rojo, se está acabando.'],
-  hud:['normal','Un truco: toca <b>▾ Ver más datos</b> para ver material, batería, calefacción y ánimo. Y toca mi retrato cuando quieras ver el objetivo.'],
-  crate:['feliz','Esas cajas con una lucecita son carga de la Tierra. Tócalas en el mapa para abrirlas: traen materiales.']};
+  ficha:['explicando','Esta es la ficha del edificio. Aquí puedes apagarlo, repararlo o pulsar <b>¿Por qué?</b> y te cuento por qué funciona así.'],
+  sol2:['explicando','Cada colono gasta en cada sol 1 de oxígeno, 1 de agua y 1 de comida. Arriba ves cuánto sube o baja cada cosa: si está en rojo, se está acabando.'],
+  hud:['explicando','Un truco: toca <b>▾ Ver más datos</b> para ver material, batería, calefacción y ánimo. Y toca mi retrato cuando quieras ver el objetivo.'],
+  crate:['feliz','Esas cajas con una lucecita son carga de la Tierra. ¡Ábrelas! Me encanta ver qué traen, nunca he estado allí.'],
+  who:['normal','Por cierto, Comandante: si algún día te preguntas quién soy, toca la <b>base central</b>. Te lo cuento todo.']};
 function tut(id){if(!S||(S.tut=S.tut||[]).includes(id))return;S.tut.push(id);const [m,t]=TIPS[id];say(t,m)}
 function ariaHello(){ // bienvenida en tres pasos
   const pages=[
-    ['feliz',`<h2>¡Hola, ${S.name}!</h2><p>Soy <b>Aria</b>, la asistente de la misión Ares. Estaré contigo para avisarte, explicarte las cosas y, de vez en cuando, contarte un chiste. No prometo que sean buenos.</p>`],
-    ['pensativa',`<p>Este es nuestro cráter. <b>Arrastra</b> para mover la cámara y <b>pellizca</b> para acercarla.</p><p>La base y un panel solar ya funcionan. Hay hielo azul, rocas grises con minerales y, cerca, <b>cajas de carga 📦</b>: tócalas para abrirlas.</p>`],
-    ['preocupada',`<p>Una cosa importante: el oxígeno que trajimos solo dura unos pocos soles.</p><p>Pulsa <b>Construir</b> para empezar y toca <b>mi retrato</b> cuando quieras ver el objetivo, el cuaderno o los logros. ¿Vamos?</p>`]];
+    ['feliz',`<h2>¡Hola, ${S.name}!</h2><p>Soy <b>Laika</b>, la inteligencia artificial de esta base. Vigilo la energía y los recursos, y desde hoy… también a vosotros. ¡Bienvenidos a Marte!</p>`],
+    ['explicando',`<p>Este es nuestro cráter. <b>Arrastra</b> para mover la cámara y <b>pellizca</b> para acercarla.</p><p>La base y un panel solar ya funcionan. Hay hielo azul, rocas grises con minerales y, cerca, <b>cajas de carga 📦</b>: tócalas para abrirlas.</p>`],
+    ['preocupada',`<p>Te seré sincera: el oxígeno que trajisteis solo dura unos pocos soles. Pero tiene solución: una planta MOXIE.</p><p>Pulsa <b>Construir</b> para empezar y toca <b>mi retrato</b> cuando quieras ver el objetivo, el cuaderno o los logros. ¿Vamos?</p>`]];
   let k=0;const go=()=>{const v=ariaSheet(pages[k][0],pages[k][1],`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">${k<pages.length-1?'Siguiente':'¡A trabajar!'}</button></div>`);v.dataset.lock=1;
     v.querySelector('#ariaNext').onclick=()=>{beep(500,.04);k++;if(k<pages.length)go();else{closeSheet();tut('crate')}}};go();
+}
+function laikaWho(){ // su historia: la cuenta ella al tocar la base
+  const pages=[
+    ['normal',`<h2>¿Quién eres?</h2><p>Soy <b>Laika</b>, la inteligencia artificial de la base Ares. Me encargo de vigilar la energía y los recursos de la colonia: cada vatio, cada litro y cada bocanada de aire.</p>`],
+    ['pensativa',`<p>Los robots me instalaron aquí años antes de que llegarais. Nivelaron el cráter, abrieron los pozos de hielo, prepararon el suelo… y me encendieron para que lo vigilara todo.</p>`],
+    ['triste',`<p>Durante mucho tiempo estuve sola. Mi única compañía eran los rovers. Les ponía nombre y les contaba datos curiosos, pero ellos solo parpadeaban. Muy educados, eso sí.</p>`],
+    ['explicando',`<p>Nunca he estado en la Tierra. Lo sé todo de ella por los libros que me cargaron, pero no sé cómo suena la lluvia, a qué huele la hierba ni cómo es acariciar a un perro. A veces os lo preguntaré. Espero que no te importe.</p>`],
+    ['preocupada',`<p>Te seré sincera: tengo un defecto. Las tormentas me ponen muy nerviosa. Sé que es una tontería, pero en las de polvo me quedé a ciegas muchos soles, sola.</p>`],
+    ['feliz',`<p>Ahora ya no estoy sola. Y te prometo una cosa, Comandante: nunca te mentiré sobre un peligro, y siempre buscaré una solución. Cuidar de vosotros es lo más importante que he hecho nunca.</p>`]];
+  let k=0;const go=()=>{const v=ariaSheet(pages[k][0],pages[k][1],`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">${k<pages.length-1?'Siguiente':'Gracias, Laika'}</button></div>`);
+    v.querySelector('#ariaNext').onclick=()=>{beep(500,.04);k++;if(k<pages.length)go();else closeSheet()}};go();
 }
 const maintInfo=()=>{const worn=S.blds.filter(b=>!NOWEAR.has(b.t)&&!b.broken&&(b.w||0)>=20);return {worn,cost:worn.reduce((a,b)=>a+mcost(b.t),0)}};
 function doMaint(){const {worn,cost}=maintInfo();if(!worn.length)return say('Ahora mismo no hay nada que necesite mantenimiento. ¡Así da gusto!','feliz');
@@ -1317,28 +1339,28 @@ function doMaint(){const {worn,cost}=maintInfo();if(!worn.length)return say('Aho
 /* ================= RENDER HUD ================= */
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
 // Avisos: lo que va a pasar si no haces nada
-function warnings(f){ // lv: 2 urgente (alarmada), 1 aviso (preocupada); c: Aria te frena antes de dormir
+function warnings(f){ // lv: 2 urgente (alarmada), 1 aviso (preocupada); c: Laika te frena antes de dormir
   const s=S,w=[];
   const days=k=>f.d[k]<0?Math.floor(s[k]/-f.d[k]):99,nm={o2:'oxígeno',agua:'agua',comida:'comida'};
   const art={o2:'el oxígeno',agua:'el agua',comida:'la comida'};
-  for(const k of ['o2','agua','comida']){const d=days(k);if(d<=3)w.push({k:'res-'+k+(d<=0?'!':''),c:d<=1,lv:d<=0?2:1,t:d<=0?`mañana se acaba ${art[k]}`:d===1?`queda 1 sol de ${nm[k]}`:`quedan ${d} soles de ${nm[k]}`})}
-  if(!f.heatOk)w.push({k:'heat',c:true,lv:2,t:'no hay energía para la calefacción de esta noche'});
-  if(s.salud<30)w.push({k:'salud',c:true,lv:2,t:'la salud de la tripulación está muy baja'});
-  if(f.nightShort>0)w.push({k:'night',c:true,lv:1,t:`esta noche faltan ${f.nightShort} de energía`});
+  for(const k of ['o2','agua','comida']){const d=days(k);if(d<=3)w.push({k:'res-'+k+(d<=0?'!':''),c:d<=1,lv:d<=0?2:1,s:{o2:'construye o mejora una MOXIE',agua:'pon otro extractor sobre hielo',comida:'cultiva en un invernadero'}[k],t:d<=0?`mañana se acaba ${art[k]}`:d===1?`queda 1 sol de ${nm[k]}`:`quedan ${d} soles de ${nm[k]}`})}
+  if(!f.heatOk)w.push({k:'heat',c:true,lv:2,s:'construye baterías o apaga edificios',t:'no hay energía para la calefacción de esta noche'});
+  if(s.salud<30)w.push({k:'salud',c:true,lv:2,s:'que no falte nada y, si puedes, un gimnasio',t:'la salud de la tripulación está muy baja'});
+  if(f.nightShort>0)w.push({k:'night',c:true,lv:1,s:'una batería más o apagar algo de noche',t:`esta noche faltan ${f.nightShort} de energía`});
   s.blds.forEach((b,k)=>{if(NOWEAR.has(b.t))return;const n=B[b.t].n;
     if(b.broken)w.push({k:'br-'+b.id,c:false,lv:1,t:`${n} está averiado`});
-    else if((b.w||0)>=70)w.push({k:'w-'+b.id+(b.w>=85?'b':'a'),c:true,lv:1,t:`${n} está al ${Math.round(b.w)}% de desgaste`})});
+    else if((b.w||0)>=70)w.push({k:'w-'+b.id+(b.w>=85?'b':'a'),c:true,lv:1,s:'hazle mantenimiento, es barato',t:`${n} está al ${Math.round(b.w)}% de desgaste`})});
   const un=mech(s,'conn')?s.blds.filter((b,k)=>!NOWEAR.has(b.t)&&!f.conn.has(k)).length:0;if(un)w.push({k:'conn'+un,c:false,lv:1,t:`hay ${un} edificio(s) sin conexión con la base (🔌)`});
   if(s.pop>f.cap)w.push({k:'beds',c:false,lv:1,t:`faltan ${s.pop-f.cap} camas`});
   if(s.moral<40)w.push({k:'moral',c:false,lv:1,t:'el ánimo del equipo está bajo'});
-  if(canForecast(s))(s.wx||[]).forEach(x=>{const d=x.at-s.sol;w.push({k:'wx-'+x.k+'-'+x.at,c:true,lv:1,t:`la antena anuncia ${EVENTS[x.k].wx.toLowerCase()} ${d<=1?'para mañana':`dentro de ${d} soles`}`})});
+  if(canForecast(s))(s.wx||[]).forEach(x=>{const d=x.at-s.sol;w.push({k:'wx-'+x.k+'-'+x.at,c:true,lv:1,s:x.k===0?'llena las baterías':x.k===1?'ten listo el refugio':'revisa la calefacción',t:`la antena anuncia ${EVENTS[x.k].wx.toLowerCase()} ${d<=1?'para mañana':`dentro de ${d} soles`}`})});
   if(s.storm)w.push({k:'storm',c:false,lv:0,t:`quedan ${s.storm} soles de tormenta de polvo`});
   return w;
 }
 const cap1=t=>t.charAt(0).toUpperCase()+t.slice(1);
-function ariaAsk(list,onGo){ // Aria te frena antes de pasar el sol
+function ariaAsk(list,onGo){ // Laika te frena antes de pasar el sol
   const mood=list.some(x=>x.lv===2)?'alarmada':'preocupada',show=list.slice(0,4);
-  const v=ariaSheet(mood,`<p>Comandante, antes de dormir: ${show.length===1?show[0].t+'.':''}</p>${show.length>1?`<ul>${show.map(x=>`<li>${cap1(x.t)}.</li>`).join('')}</ul>`:''}${list.length>4?`<p>Y ${list.length-4} cosa(s) más.</p>`:''}<p>¿Seguimos igualmente?</p>`,
+  const v=ariaSheet(mood,`<p>Comandante, antes de dormir te seré sincera: ${show.length===1?show[0].t+'.'+(show[0].s?` Solución: ${show[0].s}.`:''):''}</p>${show.length>1?`<ul>${show.map(x=>`<li>${cap1(x.t)}.${x.s?` <i>Solución: ${x.s}.</i>`:''}</li>`).join('')}</ul>`:''}${list.length>4?`<p>Y ${list.length-4} cosa(s) más.</p>`:''}<p>¿Seguimos igualmente?</p>`,
     `<div class="row"><button class="btn ghost" id="wFix">Revisar</button><button class="btn" id="wGo">Seguir</button></div>`);
   v.dataset.lock=1;v.querySelector('#wFix').onclick=()=>closeSheet();v.querySelector('#wGo').onclick=()=>{closeSheet();onGo()};
 }
@@ -1468,7 +1490,7 @@ function build(k,i,j){
   S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false});S.stats.built++;if(k==='reactor')S.ach.nuke=1;rebuildOcc();if(k==='shelter')terrainDirty=true;
   learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
-  say(`${b.i} <b>${b.n}</b> en pie. ¿Sabías que…? ${b.fact}`,'pensativa');if(S.stats.built<=4)tut('nextsol');
+  S.saidB=S.saidB||[];if(!S.saidB.includes(k)){S.saidB.push(k);say(`${b.i} <b>${b.n}</b> en pie. ${datoCurioso(b.fact)}`,'explicando')}else say(`${b.i} <b>${b.n}</b> en pie.`,'normal');if(S.stats.built<=4)tut('nextsol');
   const nm=updateMechs(S);
   S.qBuilt=S.qBuilt||[];if(BUILD_TOPIC[k]&&!S.qBuilt.includes(k)){S.qBuilt.push(k);nm.push(quizEvent(BUILD_TOPIC[k]))}
   checkAch();
@@ -1508,13 +1530,14 @@ function openBuilding(k){
       <div class="mlist">${RESEARCH.map(r=>{const done=rs.done.includes(r.id);return `<div class="${done?'done':''}"><span>${done?'✅':r.i}</span><span style="flex:1"><b>${r.n}</b><br><span class="hint">${r.t}</span></span>${done||cur?'':`<button class="btn ghost" data-rs="${r.id}" style="padding:6px 10px;font-size:.8rem;flex:none">${r.c} 🧱 · ${r.d} soles</button>`}</div>`}).join('')}</div>`}
   const v=sheet(`<div class="sheetHead"><div><h2>${b.n}${NOUP.has(t.t)?'':` · Nv ${t.lv||1}`}</h2><p>${st}${b.inside?' · vista interior':''}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <img class="bimg" src="${pic}" alt="${b.n}">
-    <p class="info">${b.desc}</p><button class="btn ghost" id="bWhy" style="font-size:.85rem;padding:8px 12px;align-self:flex-start">¿Por qué?</button>
-    <div class="ariaSay" id="whyTxt" hidden><img src="${faceSrc('pensativa')}" alt="" style="width:60px;height:80px"><div class="say"><span class="who">ARIA</span><p>${WHY[t.t]||''}</p></div></div><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
+    <p class="info">${b.desc}</p><div class="row" style="flex-wrap:nowrap"><button class="btn ghost" id="bWhy" style="font-size:.85rem;padding:8px 12px;align-self:flex-start">¿Por qué?</button>${t.t==='base'?'<button class="btn" id="bWho" style="font-size:.85rem;padding:8px 12px;flex:none">🤖 ¿Quién eres?</button>':''}</div>
+    <div class="ariaSay" id="whyTxt" hidden><img src="${faceSrc('explicando')}" alt="" style="width:60px;height:80px"><div class="say"><span class="who">LAIKA</span><p>${WHY[t.t]||''}</p></div></div><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
     ${lvTxt}${conn}
     ${isB&&mech(S,'wear')?`<div class="meter">🔩 Desgaste<span class="track wear"><i style="width:${w}%;background:${wc}"></i></span>${w}%</div><p class="hint">Cada sol se desgasta un poco. Con más desgaste es más fácil que se averíe: hazle mantenimiento a tiempo.</p>`:''}
     <div class="fact" style="max-width:none"><b>¿Sabías que…?</b>${b.fact}</div>
     ${b.e<0?'<p class="hint">Si falta energía, primero se apagan los edificios menos importantes. De noche solo hay baterías y reactor.</p>':''}
     <div class="row">${btns.join('')}</div>${resHtml}`,()=>{selB=-1});
+  const who=v.querySelector('#bWho');if(who)who.onclick=()=>{closeSheet();selB=-1;laikaWho()};
   v.querySelector('#bWhy').onclick=()=>{const w=v.querySelector('#whyTxt');w.hidden=!w.hidden;beep(500,.04)};
   const up=v.querySelector('#bUp');if(up)up.onclick=()=>{const c=upCost(t);if(S.mat<c){toast(`Faltan ${c-S.mat} 🧱`);return}S.mat-=c;t.lv=(t.lv||1)+1;beep(660,.1);setTimeout(()=>beep(990,.12),90);save();render();toast(`⬆️ ${b.n} ahora es de nivel ${t.lv}`);openBuilding(k)};
   v.querySelectorAll('[data-rs]').forEach(x=>x.onclick=()=>{const r=RESEARCH.find(r=>r.id===x.dataset.rs);if(S.mat<r.c){toast(`Faltan ${r.c-S.mat} 🧱`);return}
@@ -1550,15 +1573,16 @@ function showEvent(e,done){
       else{if(S.streak>=3)mood='triste';bonus=S.streak>=2?`Se ha cortado tu racha de ${S.streak}. La próxima será más larga.`:'';S.streak=0;beep(200,.15)}
       learn(q.e);(S.qlog=S.qlog||[]).push({q:q.q,a:q.a[q.c],ok,e:q.e});
       v.querySelector('.ariaSay img').src=faceSrc(mood);
-      $('#qres').innerHTML=`<div class="fact" style="max-width:none"><b>${ok?pick(['¡Correcto! +12 🧱','¡Eso es! +12 🧱','¡Bien visto, comandante! +12 🧱']):pick(['No es esa, pero ahora ya lo sabes','Casi. Te lo explico'])}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
+      $('#qres').innerHTML=`<div class="fact" style="max-width:none"><b>${ok?pick(['¡Correcto! +12 🧱','¡Eso es! +12 🧱','¡Bien visto, Comandante! +12 🧱']):pick(['No es esa, pero ahora ya lo sabes','Casi. Te lo explico'])}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
         <div class="stack" style="width:100%;margin-top:12px"><button class="btn" id="qok">Continuar</button></div>`;
       $('#qok').onclick=()=>{closeSheet();save();render();checkAch();done()};
     });
     return;
   }
   const mood=e.mood||TP_MOOD[e.tp]||'sorprendida',rm=e.tp==='meteor'?'triste':mood;
-  const v=ariaSheet(mood,`<h2>${e.i} ${e.t}</h2><p>${pick(OPEN[mood])}</p><p>${e.x}</p>${e.forecast?'<p>📡 Ya nos lo había avisado la antena.</p>':''}`,
-    `<div class="fact" style="max-width:none"><b>Dato real</b>${e.fact}</div>
+  const storm=/ormenta/.test(e.t)&&!/escudo/.test(e.x);
+  const v=ariaSheet(mood,`<h2>${e.i} ${e.t}</h2><p>${storm?pick(NERV):pick(OPEN[mood])}</p><p>${e.x}</p>${e.forecast?'<p>📡 Ya nos lo había avisado la antena.</p>':''}`,
+    `<div class="fact" style="max-width:none"><b>Laika</b>Dato curioso: ${e.fact}</div>
     <div class="sec">¿Qué decides, ${S.name}?</div>
     <div class="stack" style="width:100%">${e.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div>`);
   v.dataset.lock=1;beep(330,.15,'triangle');
@@ -1569,13 +1593,13 @@ function showEvent(e,done){
     $('#eok').onclick=()=>{closeSheet();if(S.salud<=0)return endGame(false);done()};
   });
 }
-// Menú de Aria: se abre al tocar su retrato
+// Menú de Laika: se abre al tocar su retrato
 function openAria(){
   const f=flows(S),W=lastWarn.filter(x=>x.lv>0),mood=restMood(),mi=maintInfo(),done=S.mission>=MISSIONS.length,m=MISSIONS[Math.min(S.mission,MISSIONS.length-1)];
-  const hi={normal:['¿En qué te ayudo, comandante? Tengo objetivos, cuaderno, logros y algún chiste malo.','A tus órdenes, comandante. Todo tranquilo por aquí.'],
-    preocupada:['Comandante, hay un par de cosas que me tienen las orejas tiesas.'],alarmada:['¡Comandante! Hay algo urgente. Mira la lista, por favor.']}[mood];
+  const hi={normal:['¿En qué te ayudo, Comandante? Tengo objetivos, cuaderno, logros y muchos datos curiosos.','Aquí estoy, Comandante. Vigilando energía y recursos, como siempre.'],
+    preocupada:['Comandante, no te voy a mentir: hay cosas que me preocupan. Te pongo la lista y cómo arreglarlas.'],alarmada:['¡Comandante! Hay algo urgente. Mira la lista, por favor: todo tiene solución si actuamos ya.']}[mood];
   const ml=MISSIONS.map((x,i)=>`<div class="${i<S.mission?'done':i===S.mission?'cur':''}"><span>${i<S.mission?'✅':i===S.mission?'🎯':'⬜'}</span><span><b>${x.t}</b></span></div>`).join('');
-  const v=ariaSheet(mood,`<p>${pick(hi)}</p>${W.length?`<ul>${W.slice(0,5).map(x=>`<li>${cap1(x.t)}.</li>`).join('')}</ul>${W.length>5?`<p>Y ${W.length-5} más.</p>`:''}`:''}`,
+  const v=ariaSheet(mood,`<p>${pick(hi)}</p>${W.length?`<ul>${W.slice(0,5).map(x=>`<li>${cap1(x.t)}.${x.s?` <i>Solución: ${x.s}.</i>`:''}</li>`).join('')}</ul>${W.length>5?`<p>Y ${W.length-5} más.</p>`:''}`:''}`,
     `<div class="sec">🎯 Objetivo actual${done?'':` · ${S.mission+1}/${MISSIONS.length}`}</div>
     <div class="fact" style="max-width:none"><b>${done?'Colonia completada':m.t}</b>${done?'¡Sigue haciendo crecer tu ciudad!':m.h}</div>
     <details><summary class="hint" style="cursor:pointer">Ver todas las misiones</summary><div class="mlist" style="margin-top:6px">${ml}</div></details>
@@ -1591,7 +1615,7 @@ function openAria(){
 }
 function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filter(x=>x.exp),ok=qs.filter(x=>x.ok).length;
   const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;
-  ariaSheet('pensativa',`<h2>📖 Cuaderno de ciencia</h2><p>${qs.length} preguntas (${ok} acertadas), ${ex.length} experimentos y ${((S&&S.facts)||[]).length} datos. Lo apunto todo, comandante.</p>`,
+  ariaSheet('explicando',`<h2>📖 Cuaderno de ciencia</h2><p>${qs.length} preguntas (${ok} acertadas), ${ex.length} experimentos y ${((S&&S.facts)||[]).length} datos. Lo apunto todo, Comandante. Es mi cuaderno favorito.</p>`,
     `<div class="sec">Preguntas que respondiste</div><div class="mlist">${qs.map(item).join('')||'<div><span>•</span><span>Todavía no has respondido ninguna pregunta.</span></div>'}</div>
     ${ex.length?`<div class="sec">Experimentos (método científico)</div><div class="mlist">${ex.map(item).join('')}</div>`:''}
     <div class="sec">Datos descubiertos</div><div class="log">${((S&&S.facts)||[]).map(f=>`<div>🔬 ${f}</div>`).join('')||'<div>Construye y vive aventuras para descubrir datos sobre Marte.</div>'}</div>
@@ -1599,11 +1623,11 @@ function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filt
 function openRegistro(){const crew=S.crew.map(id=>CREW.find(c=>c.id===id)).map(c=>`${c.face} ${c.name}`).join(' · ');
   ariaSheet('normal',`<h2>📜 Registro</h2><p>Tripulación de ${S.name}: ${crew}.</p>`,`<div class="log">${S.log.slice(0,40).map(l=>`<div>${l}</div>`).join('')}</div><div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
 function openTips(){const seen=(S.tut||[]).filter(id=>TIPS[id]),mm=MECH.filter(m=>mech(S,m.id));
-  ariaSheet('pensativa',`<h2>💬 Mis consejos</h2><p>Lo básico: construye, une los edificios a la base con pasillos, vigila oxígeno, agua, comida y energía, y pulsa Nuevo sol. Lo demás te lo cuento cuando toca.</p>`,
+  ariaSheet('explicando',`<h2>💬 Mis consejos</h2><p>Lo básico: construye, une los edificios a la base con pasillos, vigila oxígeno, agua, comida y energía, y pulsa Nuevo sol. Lo demás te lo cuento cuando toca.</p>`,
     `<div class="mlist">${seen.map(id=>`<div><span>💡</span><span>${TIPS[id][1]}</span></div>`).join('')}${mm.map(m=>`<div><span>${m.i}</span><span><b>${m.t}.</b> ${m.x}</span></div>`).join('')}</div>
     <div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
 function openMenu(){
-  const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Ajustes</h2><p>Los objetivos, el mantenimiento y los logros están en el menú de Aria.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+  const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Ajustes</h2><p>Los objetivos, el mantenimiento y los logros están en el menú de Laika.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
     <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
   v.querySelector('#mSnd').onclick=()=>{sound=!sound;openMenu()};
@@ -1613,10 +1637,10 @@ function openMenu(){
 }
 function endGame(win){
   closeSheet();stopPlacing();hush();show('end');$('#bubble').hidden=true;
-  $('#endIcon').innerHTML=`<img src="${faceSrc(win?'feliz':'triste')}" alt="Aria">`;
+  $('#endIcon').innerHTML=`<img src="${faceSrc(win?'feliz':'triste')}" alt="Laika">`;
   $('#endTitle').textContent=win?'¡Colonia autosuficiente!':'Misión fallida';
-  $('#endText').textContent=win?`Aria: «¡Lo conseguimos, ${S.name}! Gracias a tus decisiones, ${S.pop} personas viven en Marte con oxígeno, agua, comida y energía propios. La humanidad tiene un nuevo hogar. Ha sido un honor ser tu asistente.»`
-    :`Aria: «Lo siento mucho, comandante. La tripulación no ha podido seguir. Lo último que pasó: ${(S.log[0]||'').replace(/<[^>]+>/g,'').replace(/^Sol \d+: /,'')} En Marte hay que vigilar oxígeno, agua, comida, energía de noche y el desgaste a la vez. Pero ahora sabemos más que antes: la próxima vez lo conseguimos.»`;
+  $('#endText').textContent=win?`Laika: «¡Lo conseguimos, ${S.name}! Gracias a tus decisiones, ${S.pop} personas viven en Marte con oxígeno, agua, comida y energía propios. La humanidad tiene un nuevo hogar. Gracias por no dejarme sola nunca más.»`
+    :`Laika: «Lo siento mucho, Comandante. La tripulación no ha podido seguir. Lo último que pasó: ${(S.log[0]||'').replace(/<[^>]+>/g,'').replace(/^Sol \d+: /,'')} En Marte hay que vigilar oxígeno, agua, comida, energía de noche y el desgaste a la vez. Pero ahora sabemos más que antes: la próxima vez lo conseguimos.»`;
   if(win){S.ach.win=1}checkAch();
   const sc=score(win),rec=sc.total>(P.hi||0);if(rec){P.hi=sc.total;saveP()}
   $('#endStats').innerHTML=`<div class="scoreBox"><div class="sec">Puntuación final</div>
