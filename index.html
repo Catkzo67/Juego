@@ -184,12 +184,13 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 .ariaBtn img{width:46px;height:44px;object-fit:cover;object-position:50% 16%;border-radius:4px;background:var(--navy-2)}
 .ariaBtn .badge{position:absolute;right:-5px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--bad);color:#fff;font:800 .72rem var(--body);display:grid;place-items:center;font-style:normal;border:2px solid var(--night)}
 .ariaBtn .badge.soft{background:var(--warn);color:var(--navy)}
-.bubble{position:fixed;left:max(10px, env(safe-area-inset-left,0px));right:max(10px, env(safe-area-inset-right,0px));z-index:30;display:flex;gap:10px;align-items:flex-end;margin:0 auto;max-width:540px;animation:fade .2s}
+.bubble{pointer-events:none;position:fixed;left:max(10px, env(safe-area-inset-left,0px));right:max(10px, env(safe-area-inset-right,0px));z-index:30;display:flex;gap:10px;align-items:flex-end;margin:0 auto;max-width:540px;animation:fade .2s}
 .bubble>img{width:66px;height:84px;object-fit:cover;object-position:50% 0;flex:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.4))}
 .bubble .bTxt{flex:1;min-width:0;background:var(--cream);color:var(--navy);border:2px solid var(--gold);border-radius:10px 10px 10px 2px;padding:8px 12px;box-shadow:0 4px 0 #0d1022;font-weight:700;font-size:.88rem;line-height:1.35;display:flex;flex-direction:column;gap:5px}
 .bubble .bTxt b.who{font-family:var(--display);font-size:.8rem;letter-spacing:.08em;color:#8a5a12}
 .bubble .bTxt p{margin:0}
 .bubble .bTxt p+p{border-top:1px dashed #c9bfa5;padding-top:5px}
+.bubble .bAct,.bubble .bX,.bubble .gl{pointer-events:auto}
 .bubble .bAct{align-self:flex-start;background:var(--navy);color:var(--cream);border-radius:5px;padding:6px 10px;font-weight:800;font-size:.8rem}
 .bubble .bX{position:absolute;right:4px;top:-10px;width:26px;height:26px;border-radius:50%;background:var(--navy);border:2px solid var(--gold);font-size:.75rem}
 .ariaSay{display:flex;gap:10px;align-items:flex-start}
@@ -660,7 +661,7 @@ const MECH=[
 ];
 const mech=(s,id)=>!!(s.unl&&s.unl.includes(id));
 function updateMechs(s,silent){s.unl=s.unl||[];const n=MECH.filter(m=>!s.unl.includes(m.id)&&m.when(s));n.forEach(m=>s.unl.push(m.id));
-  return silent?[]:n.map(m=>({mood:'explicando',i:m.i,t:'Nueva mecánica: '+m.t,x:m.x,fact:'Cada nueva mecánica añade un reto real de vivir en Marte.',o:[{l:'¡Entendido!',fx:()=> 'Lo tendrás en cuenta a partir de ahora.'}]}))}
+  return silent?[]:n.map(m=>({mech:1,mood:'explicando',i:m.i,t:'Nueva mecánica: '+m.t,x:m.x,fact:'Cada nueva mecánica añade un reto real de vivir en Marte.',o:[{l:'¡Entendido!',fx:()=> 'Lo tendrás en cuenta a partir de ahora.'}]}))}
 function ring4(b){const [w,h]=dim(b.t),o=[];for(let i=b.i;i<b.i+w;i++){o.push([i,b.j-1],[i,b.j+h])}for(let j=b.j;j<b.j+h;j++){o.push([b.i-1,j],[b.i+w,j])}return o}
 // Red conectada a la base: pasillos que salen de sus brazos y edificios unidos por su puerta.
 // Los edificios sin puerta (paneles, extractor, excavadora, escudo) se conectan con un pasillo pegado; los iguales pegados comparten conexión.
@@ -1220,12 +1221,16 @@ function hitBuilding(wx,wy){
     return o.k}
   return -1;
 }
+let ghostUntil=0;
+document.addEventListener('click',e=>{if(performance.now()<ghostUntil&&!e.target.closest('#mapCanvas')){ghostUntil=0;e.stopPropagation();e.preventDefault()}},true);
 function tapMap(sx,sy){
   if($('#veil'))return;
   const [wx,wy]=toWorld(sx,sy),[ti,tj]=worldToTile(wx,wy);
   if(placing){const [w,h]=dim(placing.t);placing.i=ti-Math.floor((w-1)/2);placing.j=tj-Math.floor((h-1)/2);updatePlaceBar();beep(400,.03);return}
-  const ci=S.crates.findIndex(c=>c.i===ti&&c.j===tj);
-  if(ci>=0)return openCrate(ci);
+  ghostUntil=performance.now()+450;   // el mismo toque no debe pulsar la ficha que se abre
+  const cs=IMG.cajas;let crate=S.crates.find(c=>c.i===ti&&c.j===tj);
+  if(!crate&&cs.ok)crate=S.crates.find(c=>{const [X,Y]=tileTop(c.i,c.j),w=TW*.62+10,h=w*cs.h/cs.w+10;return wx>X-w/2&&wx<X+w/2&&wy>Y+TH*.75-h&&wy<Y+TH*.85});
+  if(crate)return openCrate(crate);
   let k=hitBuilding(wx,wy);
   if(k<0&&inMap(ti,tj))k=OCC[idx(ti,tj)];
   if(k>=0){selB=k;return openBuilding(k)}
@@ -1677,13 +1682,13 @@ function build(k,i,j){
   if(nm.length)setTimeout(()=>{if(!$('#veil'))runQueue(nm)},900);
   save();
 }
-function openCrate(ci){
+function openCrate(cr){
   const item=pick(MANIFEST);
   const v=sheet(`<div class="sheetHead"><img src="${imgSrc('cajas')}" alt="" style="width:56px"><div><h2>Caja de carga</h2><p>Enviada desde la Tierra</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <div class="fact" style="max-width:none"><b>Contenido</b>${item}</div>
     <p class="info">Solo se envían desde la Tierra los materiales que todavía no se pueden fabricar en Marte.</p>
     <div class="stack" style="width:100%"><button class="btn" id="cOk">Abrir caja (+10 🧱)</button></div>`);
-  v.querySelector('#cOk').onclick=()=>{if(S.crates[ci].init)S.ach.crInit++;S.crates.splice(ci,1);S.mat+=10;learn('Carga desde la Tierra: '+item);beep(700,.08);setTimeout(()=>beep(900,.1),80);closeSheet();render();save();say(pick(['¡Caja abierta! +10 🧱. Me encanta abrir regalos.','+10 🧱 de la Tierra. Y ni una nota de «frágil», menos mal.','¡Carga recogida! +10 🧱 para la colonia.']),'feliz');checkAch()};
+  v.querySelector('#cOk').onclick=()=>{const ci=S.crates.indexOf(cr);if(ci<0){closeSheet();return}if(cr.init)S.ach.crInit++;S.crates.splice(ci,1);S.mat+=10;learn('Carga desde la Tierra: '+item);beep(700,.08);setTimeout(()=>beep(900,.1),80);closeSheet();render();save();say(pick(['¡Caja abierta! +10 🧱. Me encanta abrir regalos.','+10 🧱 de la Tierra. Y ni una nota de «frágil», menos mal.','¡Carga recogida! +10 🧱 para la colonia.']),'feliz');checkAch()};
 }
 function openBuilding(k){
   setTimeout(()=>tut('ficha'),50);
@@ -1745,6 +1750,9 @@ function openBuilding(k){
 const TP_MOOD={dust:'preocupada',radiation:'alarmada',comms:'alarmada',health:'triste',cold:'preocupada',meteor:'alarmada',travel:'feliz'};
 function showEvent(e,done){
   learn(e.fact);hush();
+  if(e.mech){ // nueva mecánica: un único aviso de Laika
+    const v=ariaSheet('explicando',`<h2>${e.i} ${e.t}</h2><p>${e.x}</p><p>Lo tendrás en cuenta a partir de ahora.</p>`,`<div class="stack" style="width:100%"><button class="btn" id="eok">¡Entendido!</button></div>`);
+    v.dataset.lock=1;addLog(`Sol ${S.sol}: <b>${e.t}</b>`);v.querySelector('#eok').onclick=()=>{closeSheet();done()};return}
   if(e.quiz){
     const q=e.quiz,order=q.a.map((a,i)=>i).sort(()=>Math.random()-.5);
     const v=ariaSheet('pensativa',`<h2>${e.t}</h2><p>${e.ctx?'Sobre lo que acaba de pasar. ':'El control de misión quiere ponernos a prueba. '}Racha: ${S.streak||0} (3 seguidas dan premio).</p><p style="font-size:1.05rem">${q.q}</p>`,
