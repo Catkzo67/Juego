@@ -48,6 +48,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 
 /* ---------- Pantallas de historia ---------- */
 #title,#story,#crew,#diff,#travel,#end{justify-content:center;align-items:center;text-align:center;gap:16px;padding-block:24px}
+.musBtn{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:max(12px, env(safe-area-inset-right,0px));width:44px;height:44px;border-radius:8px;background:rgba(21,17,31,.7);border:2px solid #b3301a;font-size:1.3rem;z-index:2}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 #title{background:linear-gradient(180deg,transparent 58%,rgba(21,17,31,.9) 72%,#15111f 86%),url("assets/portada.jpg") center top/auto 84% no-repeat,#15111f;justify-content:flex-end;padding-bottom:max(28px, env(safe-area-inset-bottom,0px));gap:12px}
 /* Letras de la portada con el estilo del título: degradado anaranjado, sombra roja oscura y brillo */
@@ -238,6 +239,7 @@ details summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:
 
 <!-- Portada -->
 <section class="screen gutter" id="title">
+  <button class="musBtn" id="bMus" aria-label="Música sí o no">🎵</button>
   <h1 class="sr">Misión Marte</h1>
   <p class="fire fireY">PROYECTO ARES · 2050</p>
   <p class="fire fireTag">Dirige a la primera tripulación y convierte un cráter rojo y helado en el nuevo hogar de la humanidad.</p>
@@ -1521,7 +1523,7 @@ function doMaint(){const {worn,cost}=maintInfo();if(!worn.length)return say('Aho
   S.mat-=cost;worn.forEach(b=>b.w=0);beep(700,.1);save();render();say(`Mantenimiento hecho en ${worn.length} edificio(s). Han quedado como nuevos.`,'feliz')}
 
 /* ================= RENDER HUD ================= */
-function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id;musicSet(id==='game'?'game':'menu')}
 // Avisos: lo que va a pasar si no haces nada
 function warnings(f){ // lv: 2 urgente (alarmada), 1 aviso (preocupada); c: Laika te frena antes de dormir
   const s=S,w=[];
@@ -1826,9 +1828,10 @@ function openTips(){const seen=(S.tut||[]).filter(id=>TIPS[id]),mm=MECH.filter(m
     <div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
 function openMenu(){
   const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Ajustes</h2><p>Los objetivos, el mantenimiento y los logros están en el menú de Laika.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
-    <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
+    <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mMus">Música: ${musicOn?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
     <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
   v.querySelector('#mSnd').onclick=()=>{sound=!sound;openMenu()};
+  v.querySelector('#mMus').onclick=()=>{setMusic(!musicOn);openMenu()};
   const r=v.querySelector('#mRes');r.onclick=()=>{if(!r.dataset.sure){r.dataset.sure=1;r.textContent='¿Seguro? Toca otra vez';return}
     try{localStorage.removeItem(SAVE)}catch(e){}S=null;closeSheet();toTitle();};
   v.querySelector('#mTitle').onclick=()=>{closeSheet();toTitle()};
@@ -1912,9 +1915,46 @@ $('#bMenu').onclick=openMenu;
 
 $('#bEndMain').onclick=()=>{S=null;try{localStorage.removeItem(SAVE)}catch(e){}toTitle()};
 $('#bEndKeep').onclick=()=>startGame();
+
 $('#bEndAch').onclick=openAch;$('#bAch').onclick=openAch;
 $('#bEndFacts').onclick=openNotebook;
 window.addEventListener('resize',()=>{if(!$('#game').hidden){resizeMap();clampCam()}});
+
+/* ================= MÚSICA ================= */
+// Menús (portada, historia, dificultad, tripulación, viaje y final): música de menú en bucle.
+// Partida: la pista de la dificultad suena de vez en cuando, empieza en cualquier momento y se apaga poco a poco al final.
+const MUSIC={menu:'assets/musica_facil.mp3',   // hueco para la música de menú (provisional: la de fácil)
+  game:['assets/musica_facil.mp3','assets/musica_normal.mp3','assets/musica_dificil.mp3']};
+const VOL={menu:.4,game:.35},FADE_END=25;   // segundos finales en los que baja el volumen
+let musicOn=true;try{musicOn=localStorage.getItem('ares-music')!=='0'}catch(e){}
+const mus={el:new Audio(),mode:null,timer:0,ramp:0,base:0};
+mus.el.preload='auto';
+function rampTo(v,ms,cb){clearInterval(mus.ramp);const a=mus.el.volume,t0=performance.now();
+  mus.ramp=setInterval(()=>{const p=Math.min(1,(performance.now()-t0)/ms);mus.el.volume=Math.max(0,Math.min(1,a+(v-a)*p));if(p>=1){clearInterval(mus.ramp);cb&&cb()}},50)}
+function playNow(src,loop,vol){clearTimeout(mus.timer);mus.base=vol;
+  if(!mus.el.src.endsWith(src)){mus.el.src=src}else if(!loop)mus.el.currentTime=0;
+  mus.el.loop=loop;mus.el.volume=0;
+  if(!musicOn)return;const pr=mus.el.play();if(pr)pr.catch(()=>{});rampTo(vol,2500);
+}
+function nextGameTrack(first){clearTimeout(mus.timer);if(mus.mode!=='game')return;
+  const wait=first?8000+Math.random()*37000:60000+Math.random()*120000;   // silencios entre canción y canción
+  mus.timer=setTimeout(()=>{if(mus.mode==='game'&&S)playNow(MUSIC.game[S.diff||0],false,VOL.game)},wait)}
+function musicSet(mode){
+  if(mode===mus.mode)return;const prev=mus.mode;mus.mode=mode;clearTimeout(mus.timer);
+  const go=()=>{if(mode==='menu')playNow(MUSIC.menu,true,VOL.menu);else{mus.el.pause();nextGameTrack(true)}};
+  if(prev&&!mus.el.paused)rampTo(0,900,()=>{mus.el.pause();go()});else go();
+}
+// al final de la canción el volumen baja poco a poco hasta apagarse
+mus.el.addEventListener('timeupdate',()=>{if(mus.el.loop||!mus.el.duration)return;const left=mus.el.duration-mus.el.currentTime;
+  if(left<FADE_END){clearInterval(mus.ramp);mus.el.volume=Math.max(0,mus.base*left/FADE_END)}});
+mus.el.addEventListener('ended',()=>{if(mus.mode==='game')nextGameTrack(false)});
+// los navegadores solo dejan sonar música después de un toque
+document.addEventListener('pointerdown',()=>{if(musicOn&&mus.mode==='menu'&&mus.el.paused){const pr=mus.el.play();if(pr)pr.catch(()=>{});rampTo(VOL.menu,2500)}},true);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)mus.el.pause();else if(musicOn&&(mus.mode==='menu'||(mus.mode==='game'&&mus.el.currentTime>0&&!mus.el.ended))){const pr=mus.el.play();if(pr)pr.catch(()=>{})}});
+function setMusic(on){musicOn=on;try{localStorage.setItem('ares-music',on?'1':'0')}catch(e){}
+  if(!on){clearInterval(mus.ramp);mus.el.pause()}else{const m=mus.mode;mus.mode=null;musicSet(m)}
+  const b=$('#bMus');if(b)b.textContent=on?'🎵':'🔇'}
+$('#bMus').onclick=e=>{e.stopPropagation();setMusic(!musicOn)};$('#bMus').textContent=musicOn?'🎵':'🔇';
 
 /* ================= SONIDO ================= */
 let AC=null;
