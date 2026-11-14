@@ -191,6 +191,10 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 .ariaSay .say p{margin:0}
 .ariaSay .say .who{font-family:var(--display);font-size:.8rem;letter-spacing:.08em;color:#8a5a12}
 .ariaSay .say ul{margin:0;padding-left:18px}
+.gl{text-decoration:underline dotted var(--gold);text-decoration-thickness:2px;text-underline-offset:3px;cursor:help;color:inherit}
+.say .gl,.fact .gl{text-decoration-color:#b8862a}
+details summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center}
+.mlist details{padding:6px 8px;border-radius:5px;background:var(--navy-2)}
 .amenu{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .amenu button{background:var(--navy-2);border:2px solid var(--navy-3);border-radius:6px;padding:10px;text-align:left;font-weight:800;box-shadow:var(--bevel);display:flex;flex-direction:column;gap:2px}
 .amenu button small{font-weight:700;color:var(--muted);font-size:.74rem}
@@ -1220,12 +1224,128 @@ function tapMap(sx,sy){
   if(inMap(ti,tj))openTile(ti,tj);
 }
 
+/* ================= GLOSARIO ================= */
+// Palabras difíciles: se subrayan en fichas, sucesos y preguntas; al tocarlas, Laika las explica.
+const GLOSARIO=[
+  // ---------- Marte y el espacio ----------
+  {g:'Marte y el espacio',t:'Sol (día marciano)',nu:1,al:['sol','soles'],d:'Un día en Marte. Dura 24 horas y 39 minutos, solo un poco más que un día en la Tierra.'},
+  {g:'Marte y el espacio',t:'Atmósfera',al:['atmósfera','aire marciano'],d:'La capa de gases que rodea un planeta. La de Marte es muy fina y casi toda de dióxido de carbono.'},
+  {g:'Marte y el espacio',t:'Presión del aire',al:['presión'],d:'La fuerza con la que el aire empuja. En Marte es menos del 1% que en la Tierra, por eso hace falta traje.'},
+  {g:'Marte y el espacio',t:'Gravedad',al:['gravedad'],d:'La fuerza que nos atrae hacia el suelo. En Marte es el 38% de la de la Tierra: todo pesa menos.'},
+  {g:'Marte y el espacio',t:'Regolito',al:['regolito'],d:'El polvo y las piedras sueltas que cubren el suelo de Marte. Sirve para construir y para protegerse.'},
+  {g:'Marte y el espacio',t:'Cráter',nu:1,al:['cráter','cráteres'],d:'Un hoyo redondo que deja una roca del espacio al chocar contra el suelo.'},
+  {g:'Marte y el espacio',t:'Tubo de lava',al:['tubo de lava','tubos de lava'],d:'Una cueva larga que dejó la lava de un volcán al vaciarse. Protege de la radiación.'},
+  {g:'Marte y el espacio',t:'Glaciar',al:['glaciar','glaciares'],d:'Una gran masa de hielo. En Marte están escondidos bajo polvo y rocas.'},
+  {g:'Marte y el espacio',t:'Casquete polar',al:['casquete','casquetes polares','polos'],d:'La zona de hielo que cubre los polos de un planeta, arriba y abajo.'},
+  {g:'Marte y el espacio',t:'Micrometeorito',al:['micrometeorito','micrometeoritos'],d:'Un meteorito diminuto, como un grano de arena, pero tan rápido que puede romper máquinas.'},
+  {g:'Marte y el espacio',t:'Fobos y Deimos',al:['Fobos','Deimos'],d:'Las dos lunas de Marte. Son pequeñas y con forma de patata.'},
+  {g:'Marte y el espacio',t:'Monte Olimpo',al:['Monte Olimpo'],d:'El volcán más alto de Marte: unos 22 km, más del doble que el Everest.'},
+  {g:'Marte y el espacio',t:'Valles Marineris',al:['Valles Marineris'],d:'Un enorme sistema de cañones en Marte, de unos 4.000 km de largo.'},
+  {g:'Marte y el espacio',t:'Tormenta de polvo',al:['tormenta de polvo','tormentas de polvo'],d:'Viento que levanta el polvo fino y tapa el Sol. Algunas cubren todo el planeta durante semanas.'},
+  {g:'Marte y el espacio',t:'Tormenta solar',al:['tormenta solar','tormentas solares'],d:'Una explosión en el Sol que lanza muchas partículas peligrosas hacia los planetas.'},
+  {g:'Marte y el espacio',t:'Viento solar',al:['viento solar'],d:'Un chorro de partículas que el Sol lanza al espacio todo el tiempo.'},
+
+  // ---------- Radiación y protección ----------
+  {g:'Radiación y protección',t:'Radiación',al:['radiación'],d:'Energía invisible que viene del Sol y del espacio. En grandes cantidades daña el cuerpo.'},
+  {g:'Radiación y protección',t:'Partículas',al:['partícula','partículas'],d:'Trocitos de materia diminutos, mucho más pequeños que un grano de polvo.'},
+  {g:'Radiación y protección',t:'Campo magnético',al:['campo magnético','magnético'],d:'Una fuerza invisible, como la de un imán. La de la Tierra nos protege de las partículas del Sol; Marte no la tiene.'},
+  {g:'Radiación y protección',t:'Carga electrostática',al:['electrostática','electrostáticas','electrostático'],d:'Electricidad quieta que atrae o empuja cosas, como cuando un globo frotado levanta tu pelo.'},
+
+  // ---------- Química y materiales ----------
+  {g:'Química y materiales',t:'Dióxido de carbono (CO₂)',al:['CO₂','dióxido de carbono'],d:'Un gas que expulsamos al respirar. Es casi todo el aire de Marte.'},
+  {g:'Química y materiales',t:'Nitrógeno',al:['nitrógeno'],d:'Un gas sin color ni olor. En la Tierra es la mayor parte del aire; en Marte hay muy poco.'},
+  {g:'Química y materiales',t:'Argón',al:['argón'],d:'Un gas que casi no reacciona con nada. Hay un poco en el aire de Marte.'},
+  {g:'Química y materiales',t:'Metano',al:['metano'],d:'Un gas que arde muy bien. Se puede fabricar en Marte y usarlo como combustible de cohetes.'},
+  {g:'Química y materiales',t:'Átomo y molécula',al:['átomo','átomos','molécula','moléculas'],d:'Los átomos son las piezas más pequeñas de todo. Unidos forman moléculas, como el agua (H₂O).'},
+  {g:'Química y materiales',t:'Reacción química',al:['reacción','reacciones'],d:'Cuando unas sustancias se transforman en otras nuevas, como al quemar madera.'},
+  {g:'Química y materiales',t:'Reacción de Sabatier',al:['Sabatier'],d:'Una reacción que junta CO₂ e hidrógeno para fabricar metano y agua.'},
+  {g:'Química y materiales',t:'Catalizador',al:['catalizador','catalizadores'],d:'Una sustancia que acelera una reacción química sin gastarse.'},
+  {g:'Química y materiales',t:'Rutenio y níquel',al:['rutenio','níquel'],d:'Metales que sirven como catalizadores para fabricar oxígeno o combustible.'},
+  {g:'Química y materiales',t:'Percloratos',al:['perclorato','percloratos'],d:'Sustancias tóxicas del suelo de Marte. Dañan la glándula tiroides, por eso hay que limpiar el suelo.'},
+  {g:'Química y materiales',t:'Óxido de hierro',al:['óxido de hierro'],d:'Hierro oxidado, como la herrumbre de un clavo viejo. Hace que Marte sea rojo.'},
+  {g:'Química y materiales',t:'Aleación',al:['aleación','aleaciones'],d:'Una mezcla de metales que es más fuerte o ligera que cada metal por separado.'},
+  {g:'Química y materiales',t:'Titanio',al:['titanio'],d:'Un metal muy fuerte y ligero que aguanta bien el frío.'},
+  {g:'Química y materiales',t:'Silicio',al:['silicio'],d:'El material con el que se fabrican casi todos los paneles solares y chips.'},
+  {g:'Química y materiales',t:'Perovskita',al:['perovskita'],d:'Un material nuevo para paneles solares, muy fino, que aprovecha más la luz.'},
+  {g:'Química y materiales',t:'Aerogel de sílice',al:['aerogel','aerogeles','sílice'],d:'Un material casi todo hecho de aire atrapado. Pesa poquísimo y aísla mucho del frío.'},
+  {g:'Química y materiales',t:'Kevlar y Vectran',al:['Kevlar','Vectran'],d:'Fibras artificiales muy resistentes, que se usan en chalecos y cúpulas inflables.'},
+  {g:'Química y materiales',t:'ETFE',al:['ETFE'],d:'Un plástico transparente, ligero y muy duro, que se usa en cúpulas y techos.'},
+  {g:'Química y materiales',t:'Liofilizar',al:['liofilizado','liofilizados','liofilizar'],d:'Congelar la comida y quitarle el agua para que dure años sin estropearse.'},
+  {g:'Química y materiales',t:'Evaporación',al:['evaporación','evapora'],d:'Cuando el agua se convierte en vapor y se escapa al aire.'},
+
+  // ---------- Vida y cuerpo humano ----------
+  {g:'Vida y cuerpo humano',t:'Bacteria',al:['bacteria','bacterias'],d:'Un ser vivo diminuto de una sola célula. Algunas son útiles, como las que limpian el suelo.'},
+  {g:'Vida y cuerpo humano',t:'Microorganismo',al:['microorganismo','microorganismos','microbios'],d:'Cualquier ser vivo tan pequeño que solo se ve con microscopio.'},
+  {g:'Vida y cuerpo humano',t:'Cepa',al:['cepa','cepas'],d:'Un grupo de microbios de la misma familia, con las mismas características.'},
+  {g:'Vida y cuerpo humano',t:'Cianobacteria',al:['cianobacteria','cianobacterias'],d:'Una bacteria que hace la fotosíntesis, como las plantas, y produce oxígeno.'},
+  {g:'Vida y cuerpo humano',t:'Espirulina',al:['espirulina'],d:'Un alga diminuta muy nutritiva, que se puede cultivar y comer.'},
+  {g:'Vida y cuerpo humano',t:'ADN',al:['ADN'],d:'Las instrucciones que tiene cada ser vivo dentro de sus células.'},
+  {g:'Vida y cuerpo humano',t:'Glándula tiroides',al:['tiroides'],d:'Un órgano del cuello que controla cómo usa el cuerpo la energía.'},
+  {g:'Vida y cuerpo humano',t:'Proto-suelo',al:['proto-suelo'],d:'El primer suelo fértil, creado por microbios a partir del polvo, donde luego pueden crecer plantas.'},
+  {g:'Vida y cuerpo humano',t:'Hidroponía',al:['hidropónicas','hidropónico','hidroponía'],d:'Cultivar plantas sin tierra, con las raíces en agua con nutrientes.'},
+  {g:'Vida y cuerpo humano',t:'Soporte vital',al:['soporte vital'],d:'Las máquinas que dan aire, agua y temperatura buena para vivir en un lugar sin ellos.'},
+  {g:'Vida y cuerpo humano',t:'Confinamiento',al:['confinamiento'],d:'Vivir mucho tiempo en un espacio pequeño y cerrado, lejos de los demás.'},
+
+  // ---------- Tecnología y misiones ----------
+  {g:'Tecnología y misiones',t:'Rover',al:['rover','rovers'],d:'Un vehículo robot que recorre otro planeta haciendo fotos y experimentos.'},
+  {g:'Tecnología y misiones',t:'Perseverance',al:['Perseverance'],d:'Un rover de la NASA que llegó a Marte en 2021. Llevaba el experimento MOXIE.'},
+  {g:'Tecnología y misiones',t:'Opportunity',al:['Opportunity'],d:'Un rover de la NASA que exploró Marte durante casi 15 años, hasta 2018.'},
+  {g:'Tecnología y misiones',t:'MOXIE',al:['MOXIE'],d:'Un experimento del rover Perseverance que fabricó oxígeno con el aire de Marte.'},
+  {g:'Tecnología y misiones',t:'Fisión nuclear',al:['fisión','nuclear'],d:'Romper átomos muy pesados para obtener mucha energía. Así funcionan los reactores.'},
+  {g:'Tecnología y misiones',t:'Microrreactor',al:['microrreactor','microrreactores','reactor'],d:'Un reactor nuclear pequeño que da electricidad constante, haya Sol o no.'},
+  {g:'Tecnología y misiones',t:'Propulsión',al:['propulsión'],d:'Lo que empuja una nave hacia delante, como sus motores.'},
+  {g:'Tecnología y misiones',t:'Retropropulsión',al:['retropropulsión'],d:'Frenar una nave encendiendo sus motores hacia abajo para aterrizar suavemente.'},
+  {g:'Tecnología y misiones',t:'Paseo espacial',al:['paseo espacial'],d:'Salir fuera de la nave o de la base con traje espacial.'},
+  {g:'Tecnología y misiones',t:'Esclusa',al:['esclusa','esclusas'],d:'Una sala con dos puertas para entrar y salir sin que se escape el aire.'},
+  {g:'Tecnología y misiones',t:'Presurizado',al:['presurizado','presurizada'],d:'Un lugar cerrado con aire a la presión adecuada para respirar sin traje.'},
+  {g:'Tecnología y misiones',t:'LiDAR',al:['LiDAR'],d:'Un sensor que mide distancias con láser para que un robot "vea" lo que tiene alrededor.'},
+  {g:'Tecnología y misiones',t:'Fibra óptica',al:['fibra óptica'],d:'Hilos muy finos de vidrio que llevan luz de un lugar a otro.'},
+  {g:'Tecnología y misiones',t:'Sonda térmica',al:['sonda','sondas'],d:'Una herramienta que se mete bajo tierra y la calienta, por ejemplo para derretir hielo.'},
+  {g:'Tecnología y misiones',t:'Inteligencia artificial (IA)',al:['inteligencia artificial','IA'],d:'Un programa de ordenador que puede aprender, decidir y conversar. Como Laika.'},
+  {g:'Tecnología y misiones',t:'El "Arca"',al:['Arca'],d:'En el juego, el depósito de semillas y microbios que se trae de la Tierra para empezar a cultivar.'},
+
+  // ---------- Ciencia y colonia ----------
+  {g:'Ciencia y colonia',t:'Método científico',al:['método científico'],d:'La forma de investigar de la ciencia: preguntar, predecir, experimentar y comparar el resultado.'},
+  {g:'Ciencia y colonia',t:'Hipótesis',al:['hipótesis'],d:'Lo que crees que va a pasar en un experimento, antes de hacerlo.'},
+  {g:'Ciencia y colonia',t:'Colono',nu:1,al:['colono','colonos'],d:'Una persona que va a vivir a un lugar nuevo para fundar una colonia.'},
+  {g:'Ciencia y colonia',t:'Autosuficiente',al:['autosuficiente'],d:'Que puede conseguir todo lo que necesita por sí mismo, sin ayuda de fuera.'},
+  {g:'Ciencia y colonia',t:'Dispersión de la luz',al:['dispersa','dispersión'],d:'Cuando la luz rebota en partículas y se reparte por colores. Por eso el cielo tiene color.'}
+];
+const GL_ALIAS=[];GLOSARIO.forEach((g,k)=>{if(!g.nu)g.al.forEach(a=>GL_ALIAS.push([a,k]))});
+GL_ALIAS.sort((a,b)=>b[0].length-a[0].length);
+const GL_MAP=new Map(GL_ALIAS.map(([a,k])=>[a.toLowerCase(),[a,k]]));
+const GL_RE=new RegExp(`(?<![\\p{L}\\p{N}])(${GL_ALIAS.map(([a])=>a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')})(?![\\p{L}\\p{N}])`,'giu');
+const isAcr=a=>a.length<=6&&a===a.toUpperCase()&&/[A-Z]/.test(a);
+function gloss(html){ // subraya solo la primera vez que sale cada palabra; nunca dentro de botones
+  const used=new Set();let inBtn=0;
+  return html.split(/(<[^>]+>)/).map(seg=>{
+    if(seg.startsWith('<')){if(/^<button\b/i.test(seg))inBtn++;else if(/^<\/button/i.test(seg))inBtn=Math.max(0,inBtn-1);return seg}
+    if(inBtn||!seg.trim())return seg;
+    return seg.replace(GL_RE,(m)=>{const hit=GL_MAP.get(m.toLowerCase());if(!hit)return m;const [a,k]=hit;
+      if(isAcr(a)&&m!==a)return m;if(used.has(k))return m;used.add(k);return `<span class="gl" data-g="${k}" role="button" tabindex="0">${m}</span>`});
+  }).join('');
+}
+function explainWord(k){const g=GLOSARIO[k];if(!g)return;
+  if(!P.gl.includes(g.t)){P.gl.push(g.t);saveP();checkAch()}
+  say(`<b>${g.t}</b>: ${g.d}`,'explicando');beep(620,.04);
+}
+document.addEventListener('click',e=>{const w=e.target.closest('.gl');if(w){e.stopPropagation();explainWord(+w.dataset.g)}},true);
+function openDict(){
+  const groups=[...new Set(GLOSARIO.map(g=>g.g))],n=GLOSARIO.filter(g=>P.gl.includes(g.t)).length;
+  const v=sheet(`<div class="ariaSay"><img src="${faceSrc('explicando')}" alt=""><div class="say"><span class="who">LAIKA</span><h2>📚 Diccionario de Laika</h2><p>Llevas ${n} de ${GLOSARIO.length} palabras aprendidas. Toca una para ver qué significa. ¡Me encantan las palabras difíciles!</p></div></div>
+    ${groups.map(gr=>`<div class="sec">${gr}</div><div class="mlist">${GLOSARIO.map((g,k)=>g.g!==gr?'':`<details data-k="${k}"><summary><span>${P.gl.includes(g.t)?'✅':'📘'}</span> <b>${g.t}</b></summary><p class="hint" style="margin:6px 0 0">${g.d}</p></details>`).join('')}</div>`).join('')}
+    <div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`,null,{nogl:1});
+  v.querySelectorAll('details').forEach(d=>d.addEventListener('toggle',()=>{if(!d.open)return;const g=GLOSARIO[+d.dataset.k];
+    if(!P.gl.includes(g.t)){P.gl.push(g.t);saveP();d.querySelector('summary span').textContent='✅';checkAch()}}));
+}
+
 /* ================= LOGROS Y PUNTUACIÓN ================= */
 const ACH_KEY='ares2050-logros';
 function newAch(){return {nightRun:0,battRun:0,moodRun:0,noBreak:0,wearBreaks:0,minSalud:100,shield:0,crInit:0,nuke:0,shelter:0,giant:0,giantOn:false,giantFail:false,win:0}}
 // Guardado propio de los logros: no se borra al perder ni al empezar de nuevo
-let P={d:{},best:{},qOk:[],facts:[],hi:0,qv:2};
+let P={d:{},best:{},qOk:[],facts:[],hi:0,qv:2,gl:[]};
 try{const r=JSON.parse(localStorage.getItem(ACH_KEY)||'null');if(r)P=Object.assign(P,r)}catch(e){}
+P.gl=P.gl||[];
 if(P.qv!==2){P.qOk=[];P.qv=2}   // las preguntas se reorganizaron: se guardan por su texto
 function saveP(){try{localStorage.setItem(ACH_KEY,JSON.stringify(P))}catch(e){}}
 const UNIV=[...new Set([...Object.values(B).map(b=>b.fact),...QUIZ.map(q=>q.e),...RESEARCH.map(r=>r.f)])];   // todos los datos del cuaderno
@@ -1242,6 +1362,7 @@ const ACH=[
   {id:'encyc',i:'🎓',n:'Enciclopedia marciana',d:'Descubre todos los datos del juego (entre todas tus partidas).',max:UNIV.length,v:()=>P.facts.length},
   {id:'streak',i:'🔥',n:'Racha perfecta',d:'Acierta 5 preguntas seguidas.',max:5,v:s=>s.streak||0},
   {id:'allq',i:'🧠',n:'Sabelotodo',d:'Acierta cada pregunta del juego al menos una vez, en las tres dificultades (entre todas tus partidas).',max:QUIZ.length,v:()=>P.qOk.filter(t=>QUIZ.some(q=>q.q===t)).length},
+  {id:'dict',i:'📖',n:'Diccionario andante',d:'Consulta 40 palabras del diccionario de Laika (tocándolas en los textos o en su menú).',max:40,v:()=>P.gl.length},
   {id:'sci',i:'🧫',n:'Científico jefe',d:'Termina las 9 investigaciones.',max:9,v:s=>s.rs?s.rs.done.length:0}]},
  {g:'🔧 Gestión e ingeniería',items:[
   {id:'mech',i:'🔩',n:'Mecánico de guardia',d:'Pasa 20 soles seguidos sin ninguna avería.',max:20,v:s=>s.ach.noBreak},
@@ -1465,10 +1586,10 @@ function addLog(t){S.log.unshift(t);if(S.log.length>60)S.log.pop()}
 function learn(f){if(f&&!S.facts.includes(f))S.facts.push(f);if(f&&UNIV.includes(f)&&!P.facts.includes(f)){P.facts.push(f);saveP()}}
 
 /* ---------- hojas ---------- */
-function sheet(html,onClose){
+function sheet(html,onClose,o){
   closeSheet();
   const v=document.createElement('div');v.className='veil';v.id='veil';
-  v.innerHTML=`<div class="sheet gutter" role="dialog" aria-modal="true">${html}</div>`;
+  v.innerHTML=`<div class="sheet gutter" role="dialog" aria-modal="true">${o&&o.nogl?html:gloss(html)}</div>`;
   v.addEventListener('click',e=>{if(e.target===v&&!v.dataset.lock){closeSheet();onClose&&onClose()}});
   document.body.appendChild(v);placeBubble();
   v.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{closeSheet();onClose&&onClose()});
@@ -1632,8 +1753,8 @@ function showEvent(e,done){
       else{if(S.streak>=3)mood='triste';bonus=S.streak>=2?`Se ha cortado tu racha de ${S.streak}. La próxima será más larga.`:'';S.streak=0;beep(200,.15)}
       learn(q.e);(S.qlog=S.qlog||[]).push({q:q.q,a:q.a[q.c],ok,e:q.e});
       v.querySelector('.ariaSay img').src=faceSrc(mood);
-      $('#qres').innerHTML=`<div class="fact" style="max-width:none"><b>${ok?pick(['¡Correcto! +12 🧱','¡Eso es! +12 🧱','¡Bien visto, Comandante! +12 🧱']):pick(['No es esa, pero ahora ya lo sabes','Casi. Te lo explico'])}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
-        <div class="stack" style="width:100%;margin-top:12px"><button class="btn" id="qok">Continuar</button></div>`;
+      $('#qres').innerHTML=gloss(`<div class="fact" style="max-width:none"><b>${ok?pick(['¡Correcto! +12 🧱','¡Eso es! +12 🧱','¡Bien visto, Comandante! +12 🧱']):pick(['No es esa, pero ahora ya lo sabes','Casi. Te lo explico'])}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
+        <div class="stack" style="width:100%;margin-top:12px"><button class="btn" id="qok">Continuar</button></div>`);
       $('#qok').onclick=()=>{closeSheet();save();render();checkAch();done()};
     });
     return;
@@ -1668,10 +1789,11 @@ function openAria(){
       <button id="aNote">📖 Cuaderno de ciencia<small>${S.facts.length} datos · ${(S.qlog||[]).length} respuestas</small></button>
       <button id="aAch">🏆 Logros<small>${ACH_ALL.filter(a=>P.d[a.id]).length}/${ACH_ALL.length} conseguidos</small></button>
       <button id="aLog">📜 Registro<small>Lo que ha pasado cada sol</small></button>
+      <button id="aDict">📚 Diccionario<small>${GLOSARIO.filter(g=>P.gl.includes(g.t)).length}/${GLOSARIO.length} palabras</small></button>
       <button id="aTips">💬 Repasar consejos<small>Lo que te he ido explicando</small></button>
     </div><div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`);
   v.querySelector('#aMant').onclick=()=>{closeSheet();doMaint()};
-  v.querySelector('#aNote').onclick=openNotebook;v.querySelector('#aAch').onclick=openAch;v.querySelector('#aLog').onclick=openRegistro;v.querySelector('#aTips').onclick=openTips;
+  v.querySelector('#aNote').onclick=openNotebook;v.querySelector('#aAch').onclick=openAch;v.querySelector('#aLog').onclick=openRegistro;v.querySelector('#aTips').onclick=openTips;v.querySelector('#aDict').onclick=openDict;
 }
 function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filter(x=>x.exp),ok=qs.filter(x=>x.ok).length;
   const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;

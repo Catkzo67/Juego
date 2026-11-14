@@ -56,3 +56,7 @@ El refugio de regolito no necesita conexión con la base.
 - Cuantas más camas libres y mejor antena, más colonos trae cada nave (+2 por nivel de antena y +1 por cada 4 camas libres).
 - Desde la ficha de la antena se puede **llamar a una nave** al momento pagando 40 de material (más en normal y difícil).
 - Desmontar devuelve la mitad de todo lo pagado, mejoras incluidas.
+
+## Glosario
+- Las palabras difíciles aparecen subrayadas en las fichas, sucesos y preguntas (solo la primera vez en cada texto). Al tocarlas, Laika las explica en su globo.
+- En el menú de Laika está el **Diccionario**, con todas las palabras por grupos y las ya consultadas marcadas. Consultar 40 da el logro *Diccionario andante*.
