@@ -63,7 +63,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 .logo .n{display:block;font-size:clamp(2.8rem,14vw,5rem);color:var(--cream);text-shadow:0 4px 0 var(--navy),0 0 24px rgba(200,85,43,.55)}
 .tag{color:var(--muted);max-width:32ch;line-height:1.5;margin:0}
 .stack{display:flex;flex-direction:column;gap:12px;width:min(320px,100%)}
-#storyArt{width:min(260px,68vw);height:min(260px,68vw)}
+#storyArt{width:min(320px,84vw);height:min(320px,84vw)}
 .storyText{max-width:32ch;font-size:1.1rem;line-height:1.55;min-height:7.5em;margin:0}
 .dots{display:flex;gap:8px}
 .dots i{width:10px;height:10px;background:var(--navy-3)}
@@ -2037,18 +2037,44 @@ function rocket(c,x,y,s,ang,t){
   c.fillStyle='#8fd8ec';c.beginPath();c.arc(0,-6,4,0,7);c.fill();
   c.restore();
 }
+// Escena del cráter preparado por los robots (historia): se dibuja una vez y se reutiliza
+let storySc=null;
+function storyScene(W){
+  if(storySc)return storySc;const bs=IMG.base,ex=IMG.excavadora;if(!bs.ok||!ex.ok)return null;
+  const c=document.createElement('canvas');c.width=W;c.height=W;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+  const n=8,tw=Math.round(W/8.2),th=tw/2,ox=W/2,oy=W*.26;
+  const top=(i,j)=>[ox+(i-j)*tw/2,oy+(i+j)*th/2];
+  const kind=(i,j)=>i<=1&&j>=5?'ice':(i>=6&&j<=2?'rock':'soil');
+  const dia=(X,Y)=>{x.beginPath();x.moveTo(X,Y);x.lineTo(X+tw/2,Y+th/2);x.lineTo(X,Y+th);x.lineTo(X-tw/2,Y+th/2);x.closePath()};
+  // canto del terreno
+  const [lx,ly]=top(0,n),[bx,by]=top(n,n),[rx,ry]=top(n,0);
+  x.fillStyle='#5a2616';x.beginPath();x.moveTo(lx,ly);x.lineTo(bx,by);x.lineTo(bx,by+16);x.lineTo(lx,ly+16);x.fill();
+  x.fillStyle='#3e190e';x.beginPath();x.moveTo(bx,by);x.lineTo(rx,ry);x.lineTo(rx,ry+16);x.lineTo(bx,by+16);x.fill();
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){const [X,Y]=top(i,j),k=kind(i,j),pal=TONES[k];
+    x.save();dia(X,Y);x.clip();
+    // manchas y grano con varios tonos, como en el mapa del juego
+    for(let py=Y;py<Y+th;py+=3)for(let px=X-tw/2;px<X+tw/2;px+=3){
+      const u=(px-ox)/(tw/2),v=(py-oy)/(th/2),fi=(u+v)/2,fj=(v-u)/2;
+      let q=(k==='ice'?fbm(fi*.8+3,fj*.8+7):fbm(fi*.45,fj*.45)*.6+fbm(fi*1.6+40,fj*1.6+40)*.4)+(hash(px|0,py|0)-.5)*.18;
+      const col=pal[clamp(Math.floor(q*pal.length*1.15-.4),0,pal.length-1)];x.fillStyle=`rgb(${col[0]},${col[1]},${col[2]})`;x.fillRect(px,py,3,3)}
+    if(k==='soil'&&hash(i*5,j*3)<.45){const cx=X-8+hash(i,j)*16,cy=Y+th*.45+hash(j,i)*th*.2;x.fillStyle='rgba(60,20,10,.45)';x.fillRect(cx-6,cy+3,14,3);x.fillStyle='#c8784a';x.fillRect(cx-5,cy-1,10,4);x.fillStyle='#e09868';x.fillRect(cx-3,cy-3,5,2)}
+    if(k==='rock')for(let r=0;r<2;r++){const cx=X-14+hash(i+r*9,j)*24,cy=Y+th*.35+hash(i,j+r*7)*th*.3;x.fillStyle='rgba(30,18,14,.55)';x.fillRect(cx,cy+6,16,3);x.fillStyle='#8a7064';x.fillRect(cx,cy,14,7);x.fillStyle='#b49a88';x.fillRect(cx+2,cy,8,2)}
+    if(k==='ice'){x.fillStyle='#ffffff';x.fillRect(X-6+hash(i,j)*12|0,Y+th*.5|0,5,2)}
+    x.restore();x.strokeStyle='rgba(0,0,0,.08)';dia(X,Y);x.stroke();
+  }
+  // excavadora quieta sobre la roca y la base en el centro
+  {const [X,Y]=top(6.5,1),w=tw*2,h=w*ex.h/ex.w;x.drawImage(ex.img,X-w/2,Y+th*1.2-h,w,h)}
+  {const [X,Y]=top(3.5,4),w=tw*3.5,h=w*bs.h/bs.w;x.drawImage(bs.img,X-w/2,Y+th*.95-h*.82,w,h)}
+  storySc=c;return c;
+}
 function drawStoryArt(t){
   const cv=$('#storyArt'),c=cv.getContext('2d'),W=cv.width;c.clearRect(0,0,W,W);
   const m=W/2;
   if(storyArt==='earth'){planet(c,m,m,W*.36,'earth',t);c.fillStyle='rgba(255,120,60,.18)';c.beginPath();c.arc(m,m,W*.42,0,7);c.fill()}
   else if(storyArt==='mars'){c.fillStyle='rgba(208,88,44,.18)';c.beginPath();c.arc(m,m,W*.45,0,7);c.fill();planet(c,m,m,W*.36,'mars',t)}
   else if(storyArt==='robots'){
-    c.fillStyle='#c4562a';c.beginPath();c.moveTo(0,W*.62);c.lineTo(m,W*.4);c.lineTo(W,W*.62);c.lineTo(m,W*.84);c.closePath();c.fill();
-    c.fillStyle='#b8d8e4';c.beginPath();c.moveTo(m*.6,W*.7);c.lineTo(m*.9,W*.62);c.lineTo(m*1.1,W*.7);c.lineTo(m*.8,W*.77);c.fill();
-    const rf=IMG.refugio,rv=IMG.excavadora;
-    if(rf.ok){const w=W*.55;c.drawImage(rf.img,m-w*.35,W*.36,w,w*rf.h/rf.w)}
-    if(rv.ok){const w=W*.34,p=(t*.12)%1;c.drawImage(rv.img,W*.05+p*W*.5,W*.62-w*rv.h/rv.w*.6+Math.sin(t*6)*2,w,w*rv.h/rv.w)}
-    c.font=`${W*.1}px serif`;c.textAlign='center';c.fillText('🦠',m+W*.32,W*.3+Math.sin(t*2)*8);
+    const sc=storyScene(W);if(sc)c.drawImage(sc,0,0);
+    c.font=`${W*.09}px serif`;c.textAlign='center';c.fillText('🦠',m+W*.33,W*.2+Math.sin(t*2)*6);
   }else{
     planet(c,W*.2,W*.8,W*.16,'earth',t);planet(c,W*.82,W*.2,W*.12,'mars',t);
     const p=(t*.15)%1;rocket(c,W*.2+p*W*.6,W*.8-p*W*.6,2.2,Math.PI/4,t);
