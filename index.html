@@ -399,50 +399,61 @@ const MISSIONS=[
   {t:'Llega a 30 colonos: ¡ciudad autosuficiente!',h:'Más hábitats, más comida, más oxígeno, más agua y más energía.',ok:s=>s.pop>=DIFF[s.diff||0].goal,r:0}
 ];
 
-const QUIZ=[
-  {q:'¿Qué parte del aire de Marte es dióxido de carbono?',a:['Alrededor del 95%','Alrededor del 75%','Alrededor del 50%','Alrededor del 21%'],c:0,e:'Es un 95,3% de CO₂, un 2,6% de nitrógeno y un 1,9% de argón.'},
-  {q:'¿Cuál es el segundo gas más abundante en la atmósfera marciana?',a:['Nitrógeno','Oxígeno','Hidrógeno','Metano'],c:0,e:'El nitrógeno es el 2,6%. El oxígeno apenas llega al 0,1%.'},
-  {q:'Si en la Tierra saltas 50 cm, ¿cuánto saltarías en Marte con la misma fuerza?',a:['Unos 130 cm','Unos 80 cm','Unos 50 cm','Unos 19 cm'],c:0,e:'Con un 38% de la gravedad, el salto es unas 2,6 veces más alto: 50 ÷ 0,38 ≈ 130 cm.'},
-  {q:'¿Cuánto dura exactamente un sol marciano?',a:['24 h y 39 min','23 h y 56 min','25 h y 10 min','26 h y 39 min'],c:0,e:'Un sol dura 24 horas y 39 minutos. 23 h y 56 min es lo que tarda la Tierra en girar.'},
-  {q:'¿Qué presión tiene el aire en Marte comparada con la de la Tierra?',a:['Menos del 1%','Cerca del 10%','Cerca del 38%','Casi la mitad'],c:0,e:'Es menos del 1% de la terrestre: el agua líquida hierve o se congela enseguida.'},
-  {q:'¿Cuánto puede tardar, como máximo, una señal de radio de Marte a la Tierra?',a:['Unos 24 minutos','Unos 8 minutos','Unas 2 horas','Unos 4 segundos'],c:0,e:'Según la posición de los planetas tarda entre 4 y 24 minutos en un solo sentido.'},
-  {q:'¿Qué hacía el experimento MOXIE del rover Perseverance?',a:['Sacaba oxígeno del CO₂','Sacaba agua del hielo','Medía la radiación solar','Buscaba fósiles en rocas'],c:0,e:'MOXIE separaba el oxígeno del dióxido de carbono del aire marciano.'},
-  {q:'¿Por qué son peligrosos los percloratos del suelo marciano?',a:['Dañan la glándula tiroides','Son muy radiactivos','Congelan el agua al tocarla','Atraen a los meteoritos'],c:0,e:'Los percloratos (0,5% a 1% del suelo) interfieren con la tiroides y corroen equipos.'},
-  {q:'¿Qué bacteria terrestre resiste dosis enormes de radiación?',a:['Deinococcus radiodurans','Escherichia coli','Lactobacillus casei','Bacillus subtilis'],c:0,e:'Deinococcus radiodurans repara su ADN tras dosis de radiación que matarían a casi cualquier ser vivo.'},
-  {q:'¿Qué cianobacteria del desierto sirve de modelo para crear el primer "proto-suelo"?',a:['Chroococcidiopsis','Penicillium notatum','Streptococcus mutans','Salmonella enterica'],c:0,e:'Chroococcidiopsis vive en desiertos extremos y fija carbono produciendo oxígeno.'},
-  {q:'¿Qué reacción química une CO₂ e hidrógeno para fabricar metano?',a:['La reacción de Sabatier','La reacción de Maillard','La fotosíntesis inversa','La fusión nuclear fría'],c:0,e:'La reacción de Sabatier produce metano y agua: combustible para volver a casa.'},
-  {q:'¿Cuánto tardaba el viaje a Marte con cohetes químicos tradicionales?',a:['Unos 9 meses','Unos 3 meses','Unos 2 años','Unas 6 semanas'],c:0,e:'Con propulsión química unos 9 meses. Con motores nucleares, de 45 a 90 días.'},
-  {q:'¿Por qué se cubren los refugios con 3 a 5 metros de regolito?',a:['Para frenar la radiación','Para guardar el frío','Para ocultarlos del polvo','Para que pesen menos'],c:0,e:'Varios metros de suelo bloquean gran parte de la radiación cósmica y solar.'},
-  {q:'¿Dónde está la mayor parte del agua de Marte hoy en día?',a:['En hielo bajo tierra y polos','En lagos bajo la superficie','En nubes de vapor de agua','En ríos que corren de día'],c:0,e:'Está congelada en los casquetes polares y en glaciares enterrados bajo polvo y roca.'},
-  {q:'¿Qué provoca las grandes tormentas de polvo de Marte?',a:['El Sol calienta y agita el aire','La gravedad levanta el polvo','Los volcanes expulsan ceniza','Los meteoritos lo esparcen'],c:0,e:'El Sol calienta el suelo y el aire de forma desigual: los vientos levantan el polvo fino.'},
-  {q:'¿Qué temperatura mínima puede alcanzar la superficie de Marte?',a:['Unos −153 °C','Unos −53 °C','Unos −253 °C','Unos −13 °C'],c:0,e:'De noche y en los polos puede bajar hasta unos −153 °C.'},
-  {q:'¿Qué les pasa a los huesos tras meses en baja gravedad?',a:['Pierden densidad','Crecen más largos','Ganan calcio extra','Se vuelven elásticos'],c:0,e:'Sin peso que soportar, el cuerpo pierde masa ósea y muscular. Por eso hay que hacer ejercicio.'},
-  {q:'¿Qué es un "tubo de lava"?',a:['Una cueva hecha por lava antigua','Una tubería para calentar la base','Un volcán que todavía está activo','Un río de lava que corre bajo el hielo'],c:0,e:'La lava fluyó por dentro, se vació y dejó un túnel natural que protege de la radiación.'},
-  {q:'¿Por qué Marte no protege de la radiación como la Tierra?',a:['No tiene campo magnético global','Está más cerca del Sol que la Tierra','Su suelo es de color rojo oscuro','Gira más despacio que la Tierra'],c:0,e:'Sin campo magnético global y con un aire tan fino, las partículas del Sol llegan al suelo.'},
-  {q:'¿Qué combustible pueden fabricar los cohetes con recursos de Marte?',a:['Metano y oxígeno líquidos','Gasolina y aire comprimido','Hidrógeno y helio líquidos','Carbón y agua destilada'],c:0,e:'Con CO₂ del aire y agua del hielo se obtienen metano y oxígeno líquidos.'},
-  {q:'¿Qué luna de Marte se estudia como posible mina de metales?',a:['Fobos','Titán','Europa','Calisto'],c:0,e:'Marte tiene dos lunas pequeñas, Fobos y Deimos. Titán, Europa y Calisto son de Saturno y Júpiter.'},
-  {q:'¿Qué material ligero y casi transparente aísla muy bien del frío?',a:['Aerogel de sílice','Vidrio de ventana','Plástico de botella','Papel de aluminio'],c:0,e:'El aerogel es casi todo aire atrapado: pesa poquísimo y aísla muchísimo.'},
-  {q:'¿Qué energía da electricidad constante durante una tormenta de polvo?',a:['Fisión nuclear','Energía solar','Energía eólica','Energía de mareas'],c:0,e:'Los microrreactores de fisión (como Kilopower) no dependen de la luz del Sol.'},
-  {q:'Una persona respira unos 0,84 kg de oxígeno al día. ¿Cuánto necesitan 10 personas en una semana?',a:['Unos 59 kg','Unos 84 kg','Unos 30 kg','Unos 8 kg'],c:0,e:'0,84 × 10 personas × 7 días ≈ 59 kg de oxígeno.'},
-  {q:'¿De dónde recupera agua el soporte vital de una base?',a:['Del sudor, la orina y el vapor','Del polvo y las rocas de Marte','Solo de tanques de la Tierra','Del hielo de los cometas'],c:0,e:'Los sistemas de la NASA reciclan casi toda el agua: la del sudor, la orina y la humedad del aire.'},
-  {q:'¿Por qué hay que quitar el polvo de los trajes al entrar en la base?',a:['Es fino, abrasivo y tóxico','Es pegajoso como la miel','Es radiactivo como el uranio','Huele muy mal al calentarse'],c:0,e:'El polvo marciano es muy fino, raya los equipos y contiene percloratos.'},
-  {q:'¿Qué tamaño tiene Marte comparado con la Tierra?',a:['Casi la mitad de ancho','El doble de ancho','Exactamente igual','Una décima parte'],c:0,e:'Su diámetro es un 53% del de la Tierra y su gravedad, un 38%.'},
-  {q:'Si de día sobran 10 de energía y de noche faltan 12, ¿qué pasará?',a:['Faltarán 2 de noche','Sobrarán 2 de día','No pasará nada','Faltarán 22 de noche'],c:0,e:'La batería guarda los 10 del día, pero de noche hacen falta 12: faltan 2.'}
-,
-  {q:'¿Por qué en Marte llegan al suelo más meteoritos que en la Tierra?',a:['Su aire es tan fino que no los quema','Su gravedad es el doble que la terrestre','Su suelo rojo los atrae como un imán','Sus dos lunas los empujan hacia abajo'],c:0,e:'En la Tierra la mayoría se queman al atravesar la atmósfera. La de Marte es unas 100 veces más fina.'},
-  {q:'¿Cómo se llama una roca del espacio que llega a tocar el suelo?',a:['Meteorito','Cometa','Asteroide','Estrella fugaz'],c:0,e:'En el espacio es un meteoroide; al cruzar el aire brilla como meteoro; si llega al suelo es un meteorito.'},
-  {q:'¿Qué cultivo del plan Ares crece muy rápido y da mucha proteína?',a:['La espirulina, un alga','El arroz de secano','El cacao tropical','La uva de mesa'],c:0,e:'La espirulina es un alga (cianobacteria) que crece rápido en agua y tiene muchísima proteína.'},
-  {q:'¿Por qué en Marte las plantas deben crecer en invernaderos cerrados?',a:['El aire es fino, frío y sin oxígeno','Porque allí no llega la luz del Sol','Porque la lluvia marciana es ácida','Porque los robots podrían pisarlas'],c:0,e:'Fuera, el agua se congelaría o herviría y las plantas no podrían respirar ni mantenerse calientes.'},
-  {q:'Según la NASA, ¿qué es uno de los mayores riesgos de una misión larga?',a:['El aislamiento y el encierro','Comer demasiado cada día','Los dolores de muelas','El calor excesivo del Sol'],c:0,e:'La NASA estudia cinco grandes peligros: radiación, aislamiento, distancia, gravedad y entornos cerrados.'},
-  {q:'¿Por qué de noche la base gasta más en calefacción?',a:['Sin Sol, el frío baja de −80 °C','La gente duerme con la ventana abierta','Las baterías se enfrían y se paran','Los paneles absorben el calor de la base'],c:0,e:'El aire fino de Marte casi no guarda calor: cuando se pone el Sol, la temperatura cae en picado.'},
-  {q:'¿Por qué los rovers de Marte no se manejan en directo con un mando?',a:['Las órdenes tardan minutos en llegar','Los mandos no funcionan en el espacio','El polvo bloquea todas las ondas','Es más barato no moverlos nunca'],c:0,e:'Con hasta 24 minutos de retraso, los rovers reciben una lista de tareas y deciden solos muchos detalles.'},
-  {q:'¿Qué daño hace sobre todo el polvo marciano a los paneles solares?',a:['Tapa la luz y raya la superficie','Los calienta hasta derretirlos','Los vuelve radiactivos para siempre','Los hace girar sin control'],c:0,e:'El polvo es muy fino y abrasivo: tapa la luz y, con el viento, va rayando el cristal.'}
+// Preguntas por dificultad: fácil (8-10 años), normal (11-13) y difícil (14+). Cada partida usa las de su nivel.
+const QUIZ_FACIL=[
+  {q:'¿Por qué Marte es de color rojo?',a:['Su suelo tiene mucho óxido de hierro','Porque hace mucho calor','Porque está cubierto de lava','Porque refleja el Sol rojo'],c:0,e:'El óxido de hierro es como la herrumbre de un clavo viejo.'},
+  {q:'¿Qué planeta es Marte contando desde el Sol?',a:['El cuarto','El tercero','El quinto','El segundo'],c:0,e:'Mercurio, Venus, la Tierra y luego Marte.'},
+  {q:'¿Cuántas lunas tiene Marte?',a:['Dos','Una','Ninguna','Cuatro'],c:0,e:'Se llaman Fobos y Deimos, y son pequeñas y con forma de patata.'},
+  {q:'¿Se puede respirar el aire de Marte?',a:['No, casi todo es dióxido de carbono','Sí, es igual que el de la Tierra','Sí, pero solo de día','No, porque no hay nada de aire'],c:0,e:'El aire de Marte es muy fino y casi todo es CO₂. Hace falta casco.'},
+  {q:'¿Qué es un rover?',a:['Un vehículo robot que explora','Un tipo de nave tripulada','Una roca muy rara de Marte','Un traje para pasear fuera'],c:0,e:'Los rovers como Perseverance recorren Marte haciendo fotos y experimentos.'},
+  {q:'¿Qué hacía el experimento MOXIE del rover Perseverance?',a:['Sacaba oxígeno del aire','Sacaba agua del hielo','Buscaba dinosaurios','Hacía llover en Marte'],c:0,e:'MOXIE separaba el oxígeno del dióxido de carbono del aire marciano.'},
+  {q:'¿Dónde está casi toda el agua de Marte hoy?',a:['Congelada, bajo tierra y en los polos','En ríos y lagos','En nubes de lluvia','En el centro del planeta'],c:0,e:'Está en forma de hielo, escondida bajo el polvo y en los casquetes polares.'},
+  {q:'¿Qué tamaño tiene Marte comparado con la Tierra?',a:['Casi la mitad de ancho','El doble de ancho','Exactamente igual','Diez veces más grande'],c:0,e:'Su diámetro es un 53% del de la Tierra.'},
+  {q:'¿Por qué los astronautas hacen ejercicio en Marte?',a:['Para no perder fuerza en huesos y músculos','Para no aburrirse','Para calentar la base','Para gastar oxígeno'],c:0,e:'Con poca gravedad el cuerpo se debilita si no se mueve.'},
+  {q:'¿Qué es un tubo de lava?',a:['Una cueva hecha por lava antigua','Una tubería para calentar la base','Un volcán todavía activo','Un río de lava bajo el hielo'],c:0,e:'La lava fluyó por dentro, se vació y dejó un túnel que protege de la radiación.'},
+  {q:'¿Qué energía funciona igual de día, de noche y con tormenta?',a:['La nuclear','La solar','La del viento','La de las mareas'],c:0,e:'Un microrreactor no depende de la luz del Sol.'},
+  {q:'¿Por qué cubrimos los refugios con mucha tierra marciana?',a:['Para frenar la radiación','Para que no se vean','Para que pesen menos','Para guardar el frío'],c:0,e:'Varios metros de regolito bloquean gran parte de la radiación del espacio.'}
 ];
 
-// Tema de cada pregunta (mismo orden que QUIZ): permite preguntar sobre lo que acaba de pasar
-const QTOPIC=['co2','co2','gravity','night','co2','comms','co2','soil','bio','bio','co2','travel','radiation','water','dust','cold','gravity','home','radiation','co2','travel','cold','energy','co2','water','dust','travel','night',
-  'meteor','meteor','food','food','health','night','comms','dust'];
-QUIZ.forEach((q,i)=>q.tp=QTOPIC[i]||'travel');
+const QUIZ_NORMAL=[
+  {q:'¿Qué parte del aire de Marte es dióxido de carbono?',a:['Alrededor del 95%','Alrededor del 75%','Alrededor del 50%','Alrededor del 21%'],c:0,e:'Es un 95% de CO₂. El resto es sobre todo nitrógeno y argón.'},
+  {q:'¿Cuál es el segundo gas más abundante en la atmósfera marciana?',a:['Nitrógeno','Oxígeno','Hidrógeno','Metano'],c:0,e:'El nitrógeno es cerca del 2,6%. El oxígeno apenas llega al 0,1%.'},
+  {q:'Si en la Tierra saltas 50 cm, ¿cuánto saltarías en Marte con la misma fuerza?',a:['Unos 130 cm','Unos 80 cm','Unos 50 cm','Unos 19 cm'],c:0,e:'Con un 38% de la gravedad: 50 ÷ 0,38 ≈ 130 cm.'},
+  {q:'¿Cuánto dura un sol marciano?',a:['24 h y 39 min','23 h y 56 min','25 h y 10 min','26 h y 39 min'],c:0,e:'Casi igual que un día en la Tierra, solo 39 minutos más.'},
+  {q:'¿Cuánto puede tardar, como máximo, una señal de radio de Marte a la Tierra?',a:['Unos 24 minutos','Unos 8 minutos','Unas 2 horas','Unos 4 segundos'],c:0,e:'Según la posición de los planetas, entre 4 y 24 minutos en un solo sentido.'},
+  {q:'¿Cómo se llaman las dos lunas de Marte?',a:['Fobos y Deimos','Ío y Europa','Titán y Rea','Luna y Selene'],c:0,e:'Sus nombres significan "miedo" y "terror" en griego, los hijos del dios Marte.'},
+  {q:'¿Cuál es el volcán más alto que se conoce en Marte?',a:['El Monte Olimpo','El Everest','El Teide','El Kilimanjaro'],c:0,e:'Mide unos 22 km de alto: más del doble que el Everest.'},
+  {q:'¿De qué color se ven los atardeceres en Marte?',a:['Azules','Rojos','Verdes','Morados'],c:0,e:'El polvo fino dispersa la luz de forma distinta que el aire de la Tierra.'},
+  {q:'¿Qué temperatura mínima puede alcanzar la superficie de Marte?',a:['Unos −153 °C','Unos −53 °C','Unos −253 °C','Unos −13 °C'],c:0,e:'De noche y en los polos. Por eso la calefacción es vital.'},
+  {q:'¿Cuánto tardaba el viaje a Marte con cohetes químicos tradicionales?',a:['Unos 9 meses','Unos 3 meses','Unos 2 años','Unas 6 semanas'],c:0,e:'Un viaje más corto reduciría la radiación que recibe la tripulación.'},
+  {q:'¿Qué provoca las grandes tormentas de polvo de Marte?',a:['El Sol calienta y agita el aire','La gravedad levanta el polvo','Los volcanes expulsan ceniza','Los meteoritos lo esparcen'],c:0,e:'El Sol calienta el suelo de forma desigual y los vientos levantan el polvo fino.'},
+  {q:'¿Por qué Marte no protege de la radiación como la Tierra?',a:['No tiene campo magnético global','Está más cerca del Sol','Su suelo es rojo oscuro','Gira más despacio'],c:0,e:'Sin campo magnético global y con un aire tan fino, las partículas del Sol llegan al suelo.'},
+  {q:'¿De dónde recupera agua el soporte vital de una base?',a:['Del sudor, la orina y el vapor','Del polvo y las rocas','Solo de tanques de la Tierra','Del hielo de los cometas'],c:0,e:'Los sistemas de la NASA reciclan casi toda el agua.'},
+  {q:'Si de día sobran 10 de energía y de noche faltan 12, ¿qué pasará?',a:['Faltarán 2 de noche','Sobrarán 2 de día','No pasará nada','Faltarán 22 de noche'],c:0,e:'La batería guarda los 10 del día, pero de noche hacen falta 12.'},
+  {q:'¿Qué material ligero y casi transparente aísla muy bien del frío?',a:['Aerogel de sílice','Vidrio de ventana','Plástico de botella','Papel de aluminio'],c:0,e:'El aerogel es casi todo aire atrapado: pesa poquísimo y aísla muchísimo.'}
+];
+
+const QUIZ_DIFICIL=[
+  {q:'¿Qué presión tiene el aire en Marte comparada con la de la Tierra?',a:['Menos del 1%','Cerca del 10%','Cerca del 38%','Casi la mitad'],c:0,e:'Con tan poca presión, el agua líquida hierve o se congela enseguida.'},
+  {q:'¿Por qué son peligrosos los percloratos del suelo marciano?',a:['Dañan la glándula tiroides','Son muy radiactivos','Congelan el agua al tocarla','Atraen a los meteoritos'],c:0,e:'Interfieren con la tiroides, por eso hay que limpiar el suelo antes de cultivar.'},
+  {q:'¿Qué bacteria terrestre resiste dosis enormes de radiación?',a:['Deinococcus radiodurans','Escherichia coli','Lactobacillus casei','Bacillus subtilis'],c:0,e:'Repara su ADN tras dosis que matarían a casi cualquier ser vivo.'},
+  {q:'¿Qué cianobacteria del desierto sirve de modelo para crear el primer "proto-suelo"?',a:['Chroococcidiopsis','Penicillium notatum','Streptococcus mutans','Salmonella enterica'],c:0,e:'Vive en desiertos extremos y produce oxígeno con la luz.'},
+  {q:'¿Qué reacción química une CO₂ e hidrógeno para fabricar metano?',a:['La reacción de Sabatier','La reacción de Maillard','La fotosíntesis inversa','La fusión nuclear fría'],c:0,e:'Produce metano y agua: combustible para volver a casa.'},
+  {q:'¿Qué combustible pueden fabricar los cohetes con recursos de Marte?',a:['Metano y oxígeno líquidos','Gasolina y aire comprimido','Hidrógeno y helio líquidos','Carbón y agua destilada'],c:0,e:'Con CO₂ del aire y agua del hielo se obtienen metano y oxígeno.'},
+  {q:'Una persona respira unos 0,84 kg de oxígeno al día. ¿Cuánto necesitan 10 personas en una semana?',a:['Unos 59 kg','Unos 84 kg','Unos 30 kg','Unos 8 kg'],c:0,e:'0,84 × 10 personas × 7 días ≈ 59 kg.'},
+  {q:'¿Cuánto dura un año en Marte?',a:['Unos 687 días terrestres','Unos 365 días terrestres','Unos 1.000 días terrestres','Unos 225 días terrestres'],c:0,e:'Casi dos años de la Tierra. 225 días es el año de Venus.'},
+  {q:'¿Qué le pasó al rover Opportunity en 2018?',a:['Una tormenta de polvo global tapó sus paneles','Lo destruyó un meteorito','Cayó dentro de un cráter','Se congeló en un polo'],c:0,e:'Sin luz no pudo recargar sus baterías y dejó de comunicarse.'},
+  {q:'¿Qué luna de Marte se acerca al planeta poco a poco y algún día se romperá?',a:['Fobos','Deimos','Titán','Europa'],c:0,e:'Fobos baja unos 2 metros cada siglo. En decenas de millones de años se hará pedazos.'},
+  {q:'¿Qué es el Valles Marineris?',a:['Un sistema de cañones de unos 4.000 km','Un mar seco del polo sur','Una cadena de volcanes','El lugar donde aterrizó Perseverance'],c:0,e:'Es tan largo que en la Tierra iría de una costa a otra de Estados Unidos.'},
+  {q:'¿Por qué hay que quitar el polvo de los trajes al entrar en la base?',a:['Es fino, abrasivo y tóxico','Es pegajoso como la miel','Es radiactivo como el uranio','Huele muy mal al calentarse'],c:0,e:'Raya los equipos y contiene percloratos.'},
+  {q:'Con un 38% de gravedad, ¿cuánto pesa en Marte una mochila de 20 kg de la Tierra?',a:['Lo que pesarían unos 7,6 kg en la Tierra','Lo que pesarían unos 12 kg en la Tierra','Lo que pesarían unos 3 kg en la Tierra','Igual que en la Tierra'],c:0,e:'20 × 0,38 = 7,6. Su masa es la misma: lo que cambia es la fuerza con que la atrae el planeta.'}
+];
+// Tema de cada pregunta (en el mismo orden): permite preguntar sobre lo que acaba de pasar
+const QT_FACIL=['soil','travel','travel','co2','comms','co2','water','gravity','gravity','home','energy','radiation'];
+const QT_NORMAL=['co2','co2','gravity','night','comms','travel','soil','dust','cold','travel','dust','radiation','water','night','cold'];
+const QT_DIFICIL=['co2','soil','bio','bio','co2','co2','health','travel','dust','meteor','soil','dust','gravity'];
+const QUIZ=[];
+[[QUIZ_FACIL,QT_FACIL],[QUIZ_NORMAL,QT_NORMAL],[QUIZ_DIFICIL,QT_DIFICIL]].forEach(([L,T],lv)=>L.forEach((q,i)=>QUIZ.push(Object.assign(q,{lv,tp:T[i]||'travel'}))));
 const BUILD_TOPIC={moxie:'co2',ice:'water',solar:'energy',battery:'night',farm:'food',vfarm:'food',bio:'bio',shelter:'radiation',antenna:'comms',habitat:'home',gym:'gravity',reactor:'energy',shield:'radiation',miner:'soil',mess:'health'};
 // "¿Por qué?" de cada edificio, en dos frases
 const WHY={
@@ -941,7 +952,8 @@ const EVENTS=[
   {w:4,c:()=>true,mk:()=>quizEvent()}
 ];
 function quizEvent(tp){ // pregunta del tema que toca (o cualquiera que no se haya hecho)
-  let pool=QUIZ.map((q,i)=>i).filter(i=>!S.quizUsed.includes(i));if(!pool.length){S.quizUsed=[];pool=QUIZ.map((q,i)=>i)}
+  const lvl=QUIZ.map((q,i)=>i).filter(i=>QUIZ[i].lv===(S.diff||0));   // solo las preguntas de la dificultad elegida
+  let pool=lvl.filter(i=>!S.quizUsed.includes(i));if(!pool.length){S.quizUsed=S.quizUsed.filter(i=>!lvl.includes(i));pool=lvl}
   const on=tp?pool.filter(i=>QUIZ[i].tp===tp):[];const qi=pick(on.length?on:pool);S.quizUsed.push(qi);
   return {quiz:QUIZ[qi],i:'🛰️',t:'Pregunta del control de misión',x:QUIZ[qi].q,ctx:!!(tp&&on.length)};
 }
@@ -1209,8 +1221,9 @@ function tapMap(sx,sy){
 const ACH_KEY='ares2050-logros';
 function newAch(){return {nightRun:0,battRun:0,moodRun:0,noBreak:0,wearBreaks:0,minSalud:100,shield:0,crInit:0,nuke:0,shelter:0,giant:0,giantOn:false,giantFail:false,win:0}}
 // Guardado propio de los logros: no se borra al perder ni al empezar de nuevo
-let P={d:{},best:{},qOk:[],facts:[],hi:0};
+let P={d:{},best:{},qOk:[],facts:[],hi:0,qv:2};
 try{const r=JSON.parse(localStorage.getItem(ACH_KEY)||'null');if(r)P=Object.assign(P,r)}catch(e){}
+if(P.qv!==2){P.qOk=[];P.qv=2}   // las preguntas se reorganizaron: se guardan por su texto
 function saveP(){try{localStorage.setItem(ACH_KEY,JSON.stringify(P))}catch(e){}}
 const UNIV=[...new Set([...Object.values(B).map(b=>b.fact),...QUIZ.map(q=>q.e),...RESEARCH.map(r=>r.f)])];   // todos los datos del cuaderno
 const nB=s=>s.blds.filter(b=>!NOWEAR.has(b.t)).length;
@@ -1225,7 +1238,7 @@ const ACH=[
   {id:'facts',i:'📖',n:'Mente curiosa',d:'Ten 15 datos en el cuaderno en una partida.',max:15,v:s=>s.facts.length},
   {id:'encyc',i:'🎓',n:'Enciclopedia marciana',d:'Descubre todos los datos del juego (entre todas tus partidas).',max:UNIV.length,v:()=>P.facts.length},
   {id:'streak',i:'🔥',n:'Racha perfecta',d:'Acierta 5 preguntas seguidas.',max:5,v:s=>s.streak||0},
-  {id:'allq',i:'🧠',n:'Sabelotodo',d:'Acierta cada pregunta del juego al menos una vez (entre todas tus partidas).',max:QUIZ.length,v:()=>P.qOk.length},
+  {id:'allq',i:'🧠',n:'Sabelotodo',d:'Acierta cada pregunta del juego al menos una vez, en las tres dificultades (entre todas tus partidas).',max:QUIZ.length,v:()=>P.qOk.filter(t=>QUIZ.some(q=>q.q===t)).length},
   {id:'sci',i:'🧫',n:'Científico jefe',d:'Termina las 9 investigaciones.',max:9,v:s=>s.rs?s.rs.done.length:0}]},
  {g:'🔧 Gestión e ingeniería',items:[
   {id:'mech',i:'🔩',n:'Mecánico de guardia',d:'Pasa 20 soles seguidos sin ninguna avería.',max:20,v:s=>s.ach.noBreak},
@@ -1604,7 +1617,7 @@ function showEvent(e,done){
       if(v.dataset.ans)return;v.dataset.ans=1;const ok=+b.dataset.i===q.c;
       v.querySelectorAll('.opt').forEach(x=>{if(+x.dataset.i===q.c)x.classList.add('right');else if(x===b)x.classList.add('wrong')});
       let bonus='',mood=ok?'feliz':'pensativa';
-      if(ok){const qi=QUIZ.indexOf(q);if(qi>=0&&!P.qOk.includes(qi)){P.qOk.push(qi);saveP()}S.streak=(S.streak||0)+1;S.mat+=12;S.moral+=3;S.stats.quiz++;beep(880,.12);
+      if(ok){if(!P.qOk.includes(q.q)){P.qOk.push(q.q);saveP()}S.streak=(S.streak||0)+1;S.mat+=12;S.moral+=3;S.stats.quiz++;beep(880,.12);
         if(S.streak%5===0){S.mat+=40;S.moral+=8;bonus=`🏅 ¡Racha de ${S.streak}! Premio extra: +40 🧱 y +8 de ánimo.`}
         else if(S.streak%3===0){S.mat+=20;S.moral+=4;bonus=`🔥 ¡Racha de ${S.streak}! Premio extra: +20 🧱.`}
         else bonus=`Racha: ${S.streak} seguidas. A las 3 seguidas hay premio extra.`}

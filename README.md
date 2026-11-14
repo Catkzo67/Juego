@@ -48,4 +48,6 @@ Se elige antes de la tripulación, en cada partida nueva:
 - **Normal:** más desastres y meteoritos, un 30% más de desgaste, construir e investigar cuesta un 25% más. Meta de 40 colonos.
 - **Difícil:** aún más desastres, un 70% más de desgaste, costes un 50% mayores, los edificios gastan un 20% más de energía y los colonos consumen un 25% más. Se empieza con algo menos de comida, Laika casi no da consejos y la meta son 50 colonos; la puntuación vale un 50% más.
 
+Las preguntas del control de misión también dependen de la dificultad: 12 en fácil (8-10 años), 15 en normal (11-13) y 13 en difícil (14+).
+
 El refugio de regolito no necesita conexión con la base.
