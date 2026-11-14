@@ -380,7 +380,7 @@ const TERR={
 const MISSIONS=[
   {t:'Construye un segundo panel solar',h:'Pulsa Construir, elige Panel solar y colócalo en el mapa.',ok:s=>count(s,'solar')>=2,r:10},
   {t:'Fabrica oxígeno con una planta MOXIE',h:'Sin oxígeno nadie puede respirar. ¡Es urgente!',ok:s=>count(s,'moxie')>=1,r:10},
-  {t:'Une la planta MOXIE a la base con pasillos',h:'Lleva pasillos desde un brazo de la base hasta su puerta. Sin conexión rinde menos.',ok:s=>{const f=flows(s);return s.blds.some((b,k)=>b.t==='moxie'&&f.conn.has(k))},r:10},
+  {t:'Une la planta MOXIE a la base con pasillos',h:'Lleva pasillos desde un brazo de la base hasta su puerta. Sin conexión rinde menos.',ok:s=>{const f=flows(s);return s.blds.some((b,k)=>b.t==='moxie'&&!(b.bt>0)&&f.conn.has(k))},r:10},
   {t:'Saca agua del hielo',h:'El extractor debe tocar alguna baldosa azul de hielo.',ok:s=>count(s,'ice')>=1,r:10},
   {t:'Pon a trabajar una excavadora minera',h:'Los materiales sirven para construir. Mejor si toca roca gris.',ok:s=>count(s,'miner')>=1,r:10},
   {t:'Limpia el suelo con un bio-laboratorio',h:'Las bacterias quitan los percloratos tóxicos.',ok:s=>count(s,'bio')>=1,r:15},
@@ -514,7 +514,9 @@ const thumb=k=>{const b=B[k];return b.ph?SPR[k].url:imgSrc(b.img)};
 let S=null, pickedCrew=[], sound=true;
 let selB=-1;                 // edificio seleccionado
 let placing=null;            // {t,i,j}
-const count=(s,t)=>s.blds.filter(b=>b.t===t).length;
+const count=(s,t)=>s.blds.filter(b=>b.t===t&&!(b.bt>0)).length;   // solo edificios terminados
+// Soles que tarda cada obra en terminarse (los pasillos son instantáneos)
+const BUILD_T={solar:1,ice:1,miner:1,battery:1,moxie:2,bio:2,farm:2,gym:2,antenna:2,mess:2,shelter:3,repair:3,habitat:3,vfarm:3,reactor:4,shield:4};
 const has=(s,id)=>s.crew.includes(id);
 const idx=(i,j)=>j*N+i;
 const inMap=(i,j)=>i>=0&&j>=0&&i<N&&j<N;
@@ -649,7 +651,7 @@ function flows(s){
     batMax:20+(has(s,'ing')?10:0),heatOk:true,conn:network(s),stor:mech(s,'storage')?60:9999,matCap:mech(s,'storage')?200:9999,act:new Set(),nightShort:0,dayProd:0,nightProd:0};
   const sf=solarFactor(s),cons=[];let dayP=0,nightP=0;
   s.blds.forEach((t,k)=>{
-    const b=B[t.t];
+    const b=B[t.t];if(t.bt>0)return;   // en obras: aún no funciona
     if(b.cap&&!t.broken)f.cap+=Math.round(b.cap*LV(t)*(t.t==='habitat'&&footprint(t).includes('tube')?2:1));
     if(t.t==='habitat'&&!t.broken)f.stor+=Math.round(25*LV(t));
     if(b.store&&!t.broken)f.batMax+=Math.round((b.store+(has(s,'ing')?10:0))*LV(t));
@@ -737,7 +739,7 @@ function nextSol(){
   // desgaste: crece cada sol; cuanto más alto, más fácil que falle
   const wr=(has(s,'mec')?.65:1)*(f.act.has('repair')?[0,.5,.38,.25][f.lvAct.repair]:1)*(hasR(s,'tial')?.75:1),broke=[];
   s.blds.forEach((b,k)=>{
-    if(NOWEAR.has(b.t)||b.broken||!mech(s,'wear'))return;
+    if(NOWEAR.has(b.t)||b.broken||b.bt>0||!mech(s,'wear'))return;
     let r=b.on?2.5:.8;
     const exposed=b.t==='solar'||b.t==='miner';
     if(s.storm>0)r+=exposed?(has(s,'met')?3.5:7)*(b.t==='solar'&&hasR(s,'dust')?.5:1):.8;
@@ -766,6 +768,8 @@ function nextSol(){
   if(s.storm>0){s.storm--;if(!s.storm)msgs.push('La tormenta de polvo ha terminado. ¡Vuelve el Sol!')}
   if(s.cold>0)s.cold--;
   if(s.dirty>0)s.dirty--;
+  const fin=[];s.blds.forEach(b=>{if(b.bt>0){b.bt--;if(!b.bt){fin.push(B[b.t]);b.w=0}}});   // avanzan las obras
+  if(fin.length){msgs.push(`Obras terminadas: ${fin.map(b=>b.n).join(', ')}.`);rebuildOcc()}
   s.sol++;
   addLog(`Sol ${s.sol}: `+(msgs.length?msgs.join(' '):'Todo funciona con normalidad.'));
   nightT=performance.now();flashSol();floatDeltas(before);
@@ -790,6 +794,7 @@ function nextSol(){
       else if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
     else if(r<pBad+.25){const k=pickEvent(false);if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
   }
+  if(fin.length)say(`¡Obra terminada, Comandante! ${fin.map(b=>`${b.i} <b>${b.n}</b>`).join(', ')} ya ${fin.length>1?'funcionan':'funciona'}.`,'feliz');
   if(s.sol===2)tut('sol2');if(s.sol===3)tut('hud');
   if(!q.length){
     if(short)say(cap1(msgs[0].replace(/^¡|!.*$/g,''))+'. La tripulación pierde salud: hay que producir más ya.','alarmada');
@@ -1109,13 +1114,16 @@ function drawMap(t){
     if(b.t==='corridor'){const sh=it.ghost?'straight':corridorShape(b);cname=sh==='cross'?'cruce':sh==='alongI'?'pasillo_v':'pasillo';sp=IMG[cname]}
     if(!sp||!sp.ok)continue;
     const r=cname?corridorRect(b,cname):spriteBox(b,b.t,sp);
-    const fr=f.frac.get(it.k)??0,off=!it.ghost&&(b.broken||!b.on||(B[b.t].e<0&&fr===0));
-    if(it.ghost)x.globalAlpha=.72+Math.sin(t*6)*.12;
+    const fr=f.frac.get(it.k)??0,wip=!it.ghost&&b.bt>0,off=!it.ghost&&!wip&&(b.broken||!b.on||(B[b.t].e<0&&fr===0));
+    if(it.ghost)x.globalAlpha=.72+Math.sin(t*6)*.12;else if(wip)x.globalAlpha=.45;
     const src=off&&sp.dim?sp.dim:sp.img;
     if(flip){x.save();x.translate(r.x+r.w/2,0);x.scale(-1,1);x.drawImage(src,-r.w/2,r.y,r.w,r.h);x.restore()}
     else x.drawImage(src,r.x,r.y,r.w,r.h);
     x.globalAlpha=1;
-    if(!it.ghost){
+    if(wip){const fx=r.x+r.w/2,fy=r.y+r.h*.55;   // cartel de obra con los soles que faltan
+      x.fillStyle='#d8ab4c';x.strokeStyle='#222a4c';x.lineWidth=2;x.beginPath();x.roundRect?x.roundRect(fx-24,fy-12,48,24,5):x.rect(fx-24,fy-12,48,24);x.fill();x.stroke();
+      x.fillStyle='#222a4c';x.font='700 13px "Pixelify Sans", monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(`🏗️ ${b.bt}`,fx,fy+1)}
+    if(!it.ghost&&!wip){
       let flag='';const isB=!NOWEAR.has(b.t);
       if(b.broken)flag='🔧';else if(!b.on)flag='⏸️';else if(B[b.t].e<0&&fr===0)flag='⚡';else if(B[b.t].e<0&&fr<1)flag='🌙';
       else if(isB&&!f.conn.has(it.k)&&mech(S,'conn'))flag='🔌';else if(isB&&(b.w||0)>=60)flag='⚠️';
@@ -1301,11 +1309,11 @@ const IDLE=['Todo en orden, Comandante. Los rovers también te saludan. Bueno, p
   'Sin novedades, Comandante. Sigo vigilando la energía y los recursos, como siempre.','Dato curioso: el cielo de Marte de día es color caramelo, pero los atardeceres son azules. El polvo dispersa la luz al revés que en la Tierra…',
   'He contado las rocas del cráter otra vez. Mismo número. Es lo que tiene llevar años sola aquí.','Comandante, recuerda que la tripulación también necesita descansar. Los humanos no se recargan con paneles.'];
 const RAMBLE=['¡Y eso no es todo! Si lo piensas, cada molécula que usamos aquí ha viajado por el sistema solar durante miles de millones de años antes de llegar a nuestros tanques, y además…','Me encanta, porque significa que la química funciona igual aquí que en la Tierra, y eso quiere decir que las mismas leyes rigen todo el universo, desde una gota de agua hasta…','Y si multiplicas eso por todos los soles que llevamos aquí, sale una cifra preciosa. Bueno, preciosa para mí. Es que los números…'];
-const datoCurioso=f=>`Dato curioso: ${f}`+(Math.random()<.35?` ${pick(RAMBLE)} …perdón, me emocioné.`:'');
+const datoCurioso=f=>`Dato curioso: ${f}`+(Math.random()<.35?` ${pick(RAMBLE).replace(/…$/,'')}… perdón, me emocioné.`:'');
 // Tutorial por pasos: cada consejo sale una sola vez, cuando toca
 const TIPS={
   build:['explicando','Elige un edificio y luego toca el mapa para colocarlo. Si la huella sale <b>verde</b>, es buen sitio; si sale <b>roja</b>, te digo por qué no vale.'],
-  nextsol:['normal','¡Primer edificio en pie! Cuando no quieras construir más, pulsa <b>Nuevo sol</b> para que pase un día marciano.'],
+  nextsol:['explicando','Las obras tardan unos soles: el cartel 🏗️ dice cuántos faltan. Pulsa <b>Nuevo sol</b> para que avancen. Los pasillos, en cambio, se ponen al momento.'],
   ficha:['explicando','Esta es la ficha del edificio. Aquí puedes apagarlo, repararlo o pulsar <b>¿Por qué?</b> y te cuento por qué funciona así.'],
   sol2:['explicando','Cada colono gasta en cada sol 1 de oxígeno, 1 de agua y 1 de comida. Arriba ves cuánto sube o baja cada cosa: si está en rojo, se está acabando.'],
   hud:['explicando','Un truco: toca <b>▾ Ver más datos</b> para ver material, batería, calefacción y ánimo. Y toca mi retrato cuando quieras ver el objetivo.'],
@@ -1347,10 +1355,10 @@ function warnings(f){ // lv: 2 urgente (alarmada), 1 aviso (preocupada); c: Laik
   if(!f.heatOk)w.push({k:'heat',c:true,lv:2,s:'construye baterías o apaga edificios',t:'no hay energía para la calefacción de esta noche'});
   if(s.salud<30)w.push({k:'salud',c:true,lv:2,s:'que no falte nada y, si puedes, un gimnasio',t:'la salud de la tripulación está muy baja'});
   if(f.nightShort>0)w.push({k:'night',c:true,lv:1,s:'una batería más o apagar algo de noche',t:`esta noche faltan ${f.nightShort} de energía`});
-  s.blds.forEach((b,k)=>{if(NOWEAR.has(b.t))return;const n=B[b.t].n;
+  s.blds.forEach((b,k)=>{if(NOWEAR.has(b.t)||b.bt>0)return;const n=B[b.t].n;
     if(b.broken)w.push({k:'br-'+b.id,c:false,lv:1,t:`${n} está averiado`});
     else if((b.w||0)>=70)w.push({k:'w-'+b.id+(b.w>=85?'b':'a'),c:true,lv:1,s:'hazle mantenimiento, es barato',t:`${n} está al ${Math.round(b.w)}% de desgaste`})});
-  const un=mech(s,'conn')?s.blds.filter((b,k)=>!NOWEAR.has(b.t)&&!f.conn.has(k)).length:0;if(un)w.push({k:'conn'+un,c:false,lv:1,t:`hay ${un} edificio(s) sin conexión con la base (🔌)`});
+  const un=mech(s,'conn')?s.blds.filter((b,k)=>!NOWEAR.has(b.t)&&!(b.bt>0)&&!f.conn.has(k)).length:0;if(un)w.push({k:'conn'+un,c:false,lv:1,t:`hay ${un} edificio(s) sin conexión con la base (🔌)`});
   if(s.pop>f.cap)w.push({k:'beds',c:false,lv:1,t:`faltan ${s.pop-f.cap} camas`});
   if(s.moral<40)w.push({k:'moral',c:false,lv:1,t:'el ánimo del equipo está bajo'});
   if(canForecast(s))(s.wx||[]).forEach(x=>{const d=x.at-s.sol;w.push({k:'wx-'+x.k+'-'+x.at,c:true,lv:1,s:x.k===0?'llena las baterías':x.k===1?'ten listo el refugio':'revisa la calefacción',t:`la antena anuncia ${EVENTS[x.k].wx.toLowerCase()} ${d<=1?'para mañana':`dentro de ${d} soles`}`})});
@@ -1487,10 +1495,11 @@ $('#pbCancel').onclick=stopPlacing;
 $('#pbOk').onclick=()=>{if(!placing)return;const {t,i,j}=placing;if(!validSpot(t,i,j).ok)return;stopPlacing();build(t,i,j)};
 function build(k,i,j){
   const b=B[k];if(S.mat<b.cost){toast(`Faltan ${b.cost-S.mat} 🧱`);return}
-  S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false});S.stats.built++;if(k==='reactor')S.ach.nuke=1;rebuildOcc();if(k==='shelter')terrainDirty=true;
-  learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
+  const bt=BUILD_T[k]||0;S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false,bt});S.stats.built++;if(k==='reactor')S.ach.nuke=1;rebuildOcc();if(k==='shelter')terrainDirty=true;
+  learn(b.fact);addLog(`Sol ${S.sol}: ${bt?`empieza la obra de ${b.n} (${bt} sol${bt>1?'es':''})`:`construido ${b.n}`}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
-  S.saidB=S.saidB||[];if(!S.saidB.includes(k)){S.saidB.push(k);say(`${b.i} <b>${b.n}</b> en pie. ${datoCurioso(b.fact)}`,'explicando')}else say(`${b.i} <b>${b.n}</b> en pie.`,'normal');if(S.stats.built<=4)tut('nextsol');
+  const obra=bt?`${b.i} Obra de <b>${b.n}</b> en marcha: estará lista en ${bt} sol${bt>1?'es':''}.`:`${b.i} <b>${b.n}</b> en pie.`;
+  S.saidB=S.saidB||[];if(!S.saidB.includes(k)){S.saidB.push(k);say(`${obra} ${datoCurioso(b.fact)}`,'explicando')}else say(obra,'normal');if(S.stats.built<=4)tut('nextsol');
   const nm=updateMechs(S);
   S.qBuilt=S.qBuilt||[];if(BUILD_TOPIC[k]&&!S.qBuilt.includes(k)){S.qBuilt.push(k);nm.push(quizEvent(BUILD_TOPIC[k]))}
   checkAch();
@@ -1509,6 +1518,9 @@ function openBuilding(k){
   setTimeout(()=>tut('ficha'),50);
   const t=S.blds[k],b=B[t.t],f=flows(S),fr=f.frac.get(k)??0,isB=!NOWEAR.has(t.t),linked=f.conn.has(k)||!isB||!mech(S,'conn'),w=Math.round(t.w||0);
   let st='✅ Funcionando';
+  if(t.bt>0){const v=ariaSheet('explicando',`<h2>🏗️ ${b.n} en obras</h2><p>Los rovers están trabajando, Comandante. Faltan <b>${t.bt} sol${t.bt>1?'es':''}</b> para que funcione.</p><p>Si cambias de idea puedes cancelar la obra y te devuelvo todo el material.</p>`,
+    `<div class="row"><button class="btn ghost" id="bCancel">Cancelar obra (+${b.cost} 🧱)</button><button class="btn" data-close>Vale</button></div>`,()=>{selB=-1});
+    v.querySelector('#bCancel').onclick=()=>{S.mat+=b.cost;S.blds.splice(k,1);rebuildOcc();if(t.t==='shelter')terrainDirty=true;save();closeSheet();selB=-1;render()};return}
   if(t.broken)st='🔧 Averiado';else if(!t.on)st='⏸️ Apagado';else if(b.e<0&&fr===0)st='⚡ Sin energía';else if(b.e<0&&fr<1)st='🌙 Sin batería por la noche: rinde a la mitad';
   const btns=[];
   if(t.broken)btns.push(`<button class="btn" id="bRep">Reparar (${rcost(t.t)} 🧱)</button>`);

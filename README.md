@@ -16,6 +16,7 @@ Videojuego educativo para móviles (niños de 7 a 12 años) sobre cómo fundar l
 - Los edificios se desgastan y se averían si no se les hace mantenimiento; con el tiempo llegan tormentas largas y meteoritos que dejan muy averiado todo lo que haya en una zona de 4×4 (el escudo magnético los evita).
 - Las mecánicas se desbloquean poco a poco: noche (misión 1), conexiones (misión 2), desgaste (sol 4), mejoras (misión 4), comida que se estropea (misión 5), investigación (sol 6), almacenes con límite (misión 7) y meteoritos (misión 9 y sol 12).
 - Tripulación de 6: tú y 5 especialistas elegidos entre 10, cada uno con una habilidad propia.
+- Las obras tardan en terminarse: paneles, extractor, excavadora y batería 1 sol; MOXIE, laboratorio, invernadero, gimnasio, antena y comedor 2; refugio, taller, hábitat y granja vertical 3; reactor y escudo 4. Los pasillos son instantáneos.
 - Mejora los edificios hasta nivel 3 (cada nivel ×1,5 de producción o capacidad); el nivel se ve en el mapa.
 - Avisos antes de que pase algo (desgaste alto, energía de la noche, recursos que se acaban, previsión del clima) y confirmación al pasar el sol si hay avisos nuevos.
 - La antena (o la meteoróloga) anuncia tormentas y olas de frío 1 o 2 soles antes.
