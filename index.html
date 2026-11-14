@@ -172,6 +172,30 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 .mlist div.cur{outline:2px solid var(--gold)}
 .log{display:flex;flex-direction:column;gap:4px;font-size:.84rem;line-height:1.4;color:var(--muted)}
 .log b{color:var(--ink)}
+.ariaBtn{position:relative;padding:3px 6px;border-color:var(--gold)}
+.ariaBtn img{width:46px;height:44px;object-fit:cover;object-position:50% 16%;border-radius:4px;background:var(--navy-2)}
+.ariaBtn .badge{position:absolute;right:-5px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--bad);color:#fff;font:800 .72rem var(--body);display:grid;place-items:center;font-style:normal;border:2px solid var(--night)}
+.ariaBtn .badge.soft{background:var(--warn);color:var(--navy)}
+.bubble{position:fixed;left:max(10px, env(safe-area-inset-left,0px));right:max(10px, env(safe-area-inset-right,0px));z-index:30;display:flex;gap:10px;align-items:flex-end;margin:0 auto;max-width:540px;animation:fade .2s}
+.bubble>img{width:66px;height:84px;object-fit:cover;object-position:50% 0;flex:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.4))}
+.bubble .bTxt{flex:1;min-width:0;background:var(--cream);color:var(--navy);border:2px solid var(--gold);border-radius:10px 10px 10px 2px;padding:8px 12px;box-shadow:0 4px 0 #0d1022;font-weight:700;font-size:.88rem;line-height:1.35;display:flex;flex-direction:column;gap:5px}
+.bubble .bTxt b.who{font-family:var(--display);font-size:.8rem;letter-spacing:.08em;color:#8a5a12}
+.bubble .bTxt p{margin:0}
+.bubble .bTxt p+p{border-top:1px dashed #c9bfa5;padding-top:5px}
+.bubble .bAct{align-self:flex-start;background:var(--navy);color:var(--cream);border-radius:5px;padding:6px 10px;font-weight:800;font-size:.8rem}
+.bubble .bX{position:absolute;right:4px;top:-10px;width:26px;height:26px;border-radius:50%;background:var(--navy);border:2px solid var(--gold);font-size:.75rem}
+.ariaSay{display:flex;gap:10px;align-items:flex-start}
+.ariaSay>img{width:84px;height:112px;object-fit:cover;object-position:50% 0;flex:none}
+.ariaSay .say{flex:1;min-width:0;background:var(--cream);color:var(--navy);border:2px solid var(--gold);border-radius:2px 10px 10px 10px;padding:10px 12px;line-height:1.45;font-weight:700;display:flex;flex-direction:column;gap:6px}
+.ariaSay .say h2{font-size:1.15rem;color:var(--navy)}
+.ariaSay .say p{margin:0}
+.ariaSay .say .who{font-family:var(--display);font-size:.8rem;letter-spacing:.08em;color:#8a5a12}
+.ariaSay .say ul{margin:0;padding-left:18px}
+.amenu{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.amenu button{background:var(--navy-2);border:2px solid var(--navy-3);border-radius:6px;padding:10px;text-align:left;font-weight:800;box-shadow:var(--bevel);display:flex;flex-direction:column;gap:2px}
+.amenu button small{font-weight:700;color:var(--muted);font-size:.74rem}
+.amenu button[disabled]{opacity:.5}
+#endIcon img{width:120px;height:150px;object-fit:cover;object-position:50% 0}
 .toast{position:fixed;left:50%;top:44%;transform:translateX(-50%);z-index:30;background:var(--navy);border:2px solid var(--gold);
   border-radius:6px;padding:10px 16px;font-weight:800;max-width:min(90vw,360px);text-align:center;box-shadow:0 6px 0 #0d1022,0 10px 30px rgba(0,0,0,.5);animation:fade .2s}
 .solflash{position:fixed;inset:0;z-index:15;display:grid;place-items:center;pointer-events:none;font-family:var(--display);font-weight:700;font-size:3.4rem;
@@ -248,7 +272,6 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
     <div class="res" id="res"></div>
     <div id="resMore" hidden><div class="res" id="res2"></div><div class="meters" id="meters"></div></div>
     <button class="hudTog" id="hudTog" aria-expanded="false">▾ Ver más datos</button>
-    <button class="mission" id="missionBtn"></button>
   </header>
   <main class="mapwrap" id="mapwrap">
     <canvas id="mapCanvas" aria-label="Mapa isométrico del cráter. Arrastra para moverte y pellizca para hacer zoom."></canvas>
@@ -263,7 +286,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
     </div>
   </main>
   <footer class="actions gutter" id="actions">
-    <button class="iconBtn" id="bLog">📜<small>Diario</small></button>
+    <button class="iconBtn ariaBtn" id="bAria" aria-label="Aria, tu asistente"><img id="ariaFace" src="assets/aria_normal.png" alt=""><small>Aria</small><i class="badge" id="ariaBadge" hidden></i></button>
     <button class="iconBtn build" id="bBuild">🏗️<small>Construir</small></button>
     <button class="btn next" id="bNext">Nuevo sol ▸</button>
     <button class="iconBtn" id="bMenu">⚙️<small>Menú</small></button>
@@ -272,7 +295,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 
 <!-- Final -->
 <section class="screen gutter" id="end" hidden>
-  <div style="font-size:4rem" id="endIcon">🏙️</div>
+  <div id="endIcon"></div>
   <h1 id="endTitle">¡Colonia autosuficiente!</h1>
   <p class="tag" id="endText"></p>
   <div class="endStats" id="endStats"></div>
@@ -282,6 +305,8 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
     <button class="btn ghost" id="bEndKeep" hidden>Seguir construyendo</button>
   </div>
 </section>
+
+<div class="bubble" id="bubble" hidden></div>
 
 <script>
 (()=>{
@@ -591,7 +616,7 @@ const MECH=[
 ];
 const mech=(s,id)=>!!(s.unl&&s.unl.includes(id));
 function updateMechs(s,silent){s.unl=s.unl||[];const n=MECH.filter(m=>!s.unl.includes(m.id)&&m.when(s));n.forEach(m=>s.unl.push(m.id));
-  return silent?[]:n.map(m=>({i:m.i,t:'Nueva mecánica: '+m.t,x:m.x,fact:'Cada nueva mecánica añade un reto real de vivir en Marte.',o:[{l:'¡Entendido!',fx:()=> 'Lo tendrás en cuenta a partir de ahora.'}]}))}
+  return silent?[]:n.map(m=>({mood:'pensativa',i:m.i,t:'Nueva mecánica: '+m.t,x:m.x,fact:'Cada nueva mecánica añade un reto real de vivir en Marte.',o:[{l:'¡Entendido!',fx:()=> 'Lo tendrás en cuenta a partir de ahora.'}]}))}
 function ring4(b){const [w,h]=dim(b.t),o=[];for(let i=b.i;i<b.i+w;i++){o.push([i,b.j-1],[i,b.j+h])}for(let j=b.j;j<b.j+h;j++){o.push([b.i-1,j],[b.i+w,j])}return o}
 // Red conectada a la base: pasillos que salen de sus brazos y edificios unidos por su puerta.
 // Los edificios sin puerta (paneles, extractor, excavadora, escudo) se conectan con un pasillo pegado; los iguales pegados comparten conexión.
@@ -760,11 +785,20 @@ function nextSol(){
   if(!q.length&&s.sol>=3){
     const pBad=Math.min(.7,.28+s.sol*.008),r=Math.random();   // los problemas son más probables con el tiempo
     if(r<pBad){const k=pickEvent(true);
-      if(k>=0&&EVENTS[k].wx){if(!s.wx.some(w=>w.k===k))s.wx.push({k,at:s.sol+1+rnd(2),seen:canForecast(s)})} // el clima llega 1 o 2 soles después
+      if(k>=0&&EVENTS[k].wx){if(!s.wx.some(w=>w.k===k)){const at=s.sol+1+rnd(2),seen=canForecast(s);s.wx.push({k,at,seen});
+        if(seen)say(`La antena avisa: ${EVENTS[k].wx.toLowerCase()} ${at-s.sol<=1?'mañana':'dentro de 2 soles'}. Mejor prepararnos.`,'preocupada')}} // el clima llega 1 o 2 soles después
       else if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
     else if(r<pBad+.25){const k=pickEvent(false);if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
   }
-  if(!q.length){if(broke.length)toast(`🔧 Avería: ${broke.join(', ')}`);else if(short||!f.heatOk)toast(msgs[0]);else if(worn)toast(`⚠️ ${worn} edificio(s) muy desgastados: hazles mantenimiento.`);else if(full)toast('📦 Almacenes llenos');}
+  if(s.sol===2)tut('sol2');if(s.sol===3)tut('hud');
+  if(!q.length){
+    if(short)say(cap1(msgs[0].replace(/^¡|!.*$/g,''))+'. La tripulación pierde salud: hay que producir más ya.','alarmada');
+    if(!f.heatOk)say('Esta noche no ha habido energía para la calefacción. ¡Qué frío hemos pasado! Hacen falta más baterías.','alarmada');
+    if(broke.length)say(`Se ha averiado: ${broke.join(', ')}. Tócalo en el mapa para repararlo.`,'preocupada');
+    else if(worn){const mi=maintInfo();say(`Hay ${worn} edificio(s) muy desgastados. ¿Les hago un mantenimiento general?`,'preocupada',{act:{l:`🔩 Mantenimiento (${mi.cost} 🧱)`,fn:doMaint}})}
+    if(full)say('Los almacenes están llenos: lo que sobra se pierde. Con más hábitats cabe más.','normal');
+    if(!talk.msgs.length&&s.sol>3&&Math.random()<.3)say(pick(IDLE),'normal');
+  }
   save();render();checkAch();runQueue(q);
 }
 
@@ -773,7 +807,7 @@ function checkMissions(){
   while(s.mission<MISSIONS.length&&MISSIONS[s.mission].ok(s)){
     const m=MISSIONS[s.mission];s.mission++;s.mat+=m.r;
     addLog(`<b>Misión cumplida:</b> ${m.t}${m.r?` (+${m.r} materiales)`:''}`);
-    toast(`✅ ¡Misión cumplida! ${m.r?`+${m.r} 🧱`:''}`);beep(660,.1);setTimeout(()=>beep(880,.15),110);
+    say(`¡Misión cumplida, comandante!${m.r?` Nos dan +${m.r} 🧱.`:''}${s.mission<MISSIONS.length?` Ahora toca: <b>${MISSIONS[s.mission].t}</b>.`:''}`,'feliz');beep(660,.1);setTimeout(()=>beep(880,.15),110);
     if(s.mission===MISSIONS.length&&!s.won){s.won=true;save();setTimeout(()=>endGame(true),900);return}
   }
 }
@@ -791,7 +825,7 @@ function addDeposit(s,type){ // nuevo depósito de hielo o roca cerca de la base
 }
 function evResult(d){ // paso final del método científico: comparar el resultado con la hipótesis
   const r=RESEARCH.find(x=>x.id===d.id),ok=d.pred===r.hc;
-  return {i:'🧫',t:`Resultado: ${r.n}`,x:`<b>Pregunta:</b> ${r.hq}<br><b>Tu hipótesis:</b> ${r.ha[d.pred]}<br><b>Resultado del experimento:</b> ${r.hr}`,
+  return {mood:ok?'feliz':'sorprendida',i:'🧫',t:`Resultado: ${r.n}`,x:`<b>Pregunta:</b> ${r.hq}<br><b>Tu hipótesis:</b> ${r.ha[d.pred]}<br><b>Resultado del experimento:</b> ${r.hr}`,
     fact:`${r.f} Mejora conseguida: ${r.t}`,
     o:[{l:ok?'¡Mi hipótesis era correcta!':'Mi hipótesis no se cumplió',s:ok?'Premio por acertar: +10 🧱':'En ciencia, equivocarse también enseña.',fx:s=>{if(ok)s.mat+=10;
       (s.qlog=s.qlog||[]).push({exp:1,q:r.hq,a:r.ha[r.hc],ok,e:r.hr});return ok?'Has comprobado tu hipótesis con un experimento. ¡Así trabaja la ciencia! (+10 🧱)':'El experimento no salió como esperabas. Ahora sabes algo nuevo, y eso también es ciencia.'}}]};
@@ -1191,7 +1225,7 @@ function checkAch(){
   for(const a of ACH_ALL){const v=Math.min(a.max,a.v(S,f)||0);if(v>(P.best[a.id]||0))P.best[a.id]=v;
     if(v>=a.max&&!P.d[a.id]){P.d[a.id]=Date.now();got.push(a)}}
   saveP();
-  got.forEach((a,k)=>setTimeout(()=>{toast(`🏆 ¡Logro conseguido!<br>${a.i} ${a.n}`);beep(784,.1);setTimeout(()=>beep(1046,.18),110);addLog(`<b>Logro:</b> ${a.i} ${a.n}`)},k*2700));
+  got.forEach((a,k)=>setTimeout(()=>{say(`¡Logro conseguido! ${a.i} <b>${a.n}</b>. Lo apunto en tu vitrina.`,'feliz');beep(784,.1);setTimeout(()=>beep(1046,.18),110);addLog(`<b>Logro:</b> ${a.i} ${a.n}`)},k*2700));
 }
 function openAch(){
   const f=S&&S.ach?flows(S):null,done=ACH_ALL.filter(a=>P.d[a.id]).length;
@@ -1216,30 +1250,97 @@ function score(win){
   return {rows,total:rows.reduce((a,r)=>a+r[2],0)};
 }
 
+/* ================= ARIA, LA ASISTENTE ================= */
+// Qué imagen usa cada emoción (cambia aquí si alguna no encaja) y su prioridad, de menor a mayor
+const MOOD_IMG={normal:'aria_normal',pensativa:'aria_pensativa',sorprendida:'aria_sorprendida',feliz:'aria_feliz',triste:'aria_triste',preocupada:'aria_preocupada',alarmada:'aria_alarmada'};
+const MOODS=['normal','pensativa','sorprendida','feliz','triste','preocupada','alarmada'];
+const faceSrc=m=>imgSrc(MOOD_IMG[m]||MOOD_IMG.normal),prio=m=>MOODS.indexOf(m);
+MOODS.forEach(m=>{new Image().src=faceSrc(m)});
+const topMood=l=>l.reduce((a,m)=>prio(m)>prio(a)?m:a,'normal');
+const talk={msgs:[],t:0};
+function restMood(){if(!S||skyMode!=='game')return 'normal';if(lastWarn.some(x=>x.lv===2))return 'alarmada';if(lastWarn.some(x=>x.lv===1))return 'preocupada';return 'normal'}
+function refreshAria(){ // cara del retrato y contador de cosas que le preocupan
+  const m=talk.msgs.length?topMood(talk.msgs.map(x=>x.mood)):restMood();$('#ariaFace').src=faceSrc(m);
+  const n=lastWarn.filter(x=>x.lv>0).length,bd=$('#ariaBadge');bd.hidden=!n;bd.textContent=n;bd.classList.toggle('soft',!lastWarn.some(x=>x.lv===2));
+}
+function placeBubble(){const b=$('#bubble');if(b.hidden)return;
+  if($('#veil')||placing){b.style.top='calc(env(safe-area-inset-top, 0px) + 8px)';b.style.bottom='auto';b.style.alignItems='flex-start'}
+  else{b.style.top='auto';b.style.bottom=($('#actions').offsetHeight+10)+'px';b.style.alignItems='flex-end'}}
+function drawBubble(){const b=$('#bubble');
+  if(!talk.msgs.length||skyMode!=='game'){b.hidden=true;refreshAria();return}
+  const l=talk.msgs.slice().sort((x,y)=>prio(y.mood)-prio(x.mood)),mood=l[0].mood;   // lo más importante, primero
+  b.hidden=false;b.innerHTML=`<img src="${faceSrc(mood)}" alt=""><div class="bTxt"><b class="who">ARIA</b>${l.map((m,k)=>`<p>${m.text}</p>${m.act?`<button class="bAct" data-k="${talk.msgs.indexOf(m)}">${m.act.l}</button>`:''}`).join('')}</div><button class="bX" aria-label="Cerrar">✕</button>`;
+  b.querySelector('.bX').onclick=hush;
+  b.querySelectorAll('.bAct').forEach(x=>x.onclick=()=>{const m=talk.msgs[+x.dataset.k];hush();m&&m.act.fn()});
+  placeBubble();refreshAria();
+}
+function hush(){talk.msgs=[];clearTimeout(talk.t);drawBubble()}
+// Aria dice algo en su globo. Si se juntan varias cosas, muestra la cara de la más importante.
+function say(text,mood,o){o=o||{};if(skyMode!=='game'||!S)return;
+  talk.msgs.push({text,mood:mood||'normal',act:o.act});if(talk.msgs.length>3)talk.msgs.shift();
+  drawBubble();clearTimeout(talk.t);talk.t=setTimeout(hush,(o.act?9000:4500)+talk.msgs.reduce((a,m)=>a+m.text.length,0)*45);
+}
+function ariaSheet(mood,body,after,onClose){return sheet(`<div class="ariaSay"><img src="${faceSrc(mood)}" alt=""><div class="say"><span class="who">ARIA</span>${body}</div></div>${after||''}`,onClose)}
+const OPEN={
+  alarmada:['¡Comandante, esto es urgente!','¡Orejas arriba, comandante! Tenemos un problema.'],
+  preocupada:['Comandante, traigo una noticia regular.','Comandante, esto no me gusta mucho.'],
+  triste:['Comandante… esto me da un poco de pena.','Ay, comandante. No es un buen momento.'],
+  feliz:['¡Buenas noticias, comandante!','¡Esto te va a gustar, comandante!'],
+  sorprendida:['¡Anda! Mira esto, comandante.','¡Vaya! Esto no me lo esperaba.'],
+  pensativa:['Comandante, déjame explicarte una cosa.','A ver, que esto tiene su ciencia.'],
+  normal:['Comandante, una cosa.']};
+const IDLE=['Todo en orden. Hasta el polvo parece tranquilo hoy.','Día tranquilo. En Marte, eso ya es una buena noticia.','Sin novedades, comandante. Aprovecho para sacar brillo a mi herradura de la suerte.',
+  'He contado las rocas del cráter. Son muchas. De nada.','¿Sabías que el cielo de Marte de día es de color mantequilla? Yo lo llamo «cielo tostada».','Recuerda beber agua, comandante. La reciclamos nosotros, así que es de confianza.',
+  'Si oyes trotar por los pasillos, soy yo haciendo ejercicio. La gravedad baja no perdona.','Informe del día: cero marcianos avistados. Seguimos siendo los únicos vecinos.'];
+// Tutorial por pasos: cada consejo sale una sola vez, cuando toca
+const TIPS={
+  build:['pensativa','Elige un edificio y luego toca el mapa para colocarlo. Si la huella sale <b>verde</b>, es buen sitio; si sale <b>roja</b>, te digo por qué no vale.'],
+  nextsol:['normal','¡Primer edificio en pie! Cuando no quieras construir más, pulsa <b>Nuevo sol</b> para que pase un día marciano.'],
+  ficha:['pensativa','Esta es la ficha del edificio. Aquí puedes apagarlo, repararlo o pulsar <b>¿Por qué?</b> y te cuento por qué funciona así.'],
+  sol2:['pensativa','Cada colono gasta en cada sol 1 de oxígeno, 1 de agua y 1 de comida. Arriba ves cuánto sube o baja cada cosa: si está en rojo, se está acabando.'],
+  hud:['normal','Un truco: toca <b>▾ Ver más datos</b> para ver material, batería, calefacción y ánimo. Y toca mi retrato cuando quieras ver el objetivo.'],
+  crate:['feliz','Esas cajas con una lucecita son carga de la Tierra. Tócalas en el mapa para abrirlas: traen materiales.']};
+function tut(id){if(!S||(S.tut=S.tut||[]).includes(id))return;S.tut.push(id);const [m,t]=TIPS[id];say(t,m)}
+function ariaHello(){ // bienvenida en tres pasos
+  const pages=[
+    ['feliz',`<h2>¡Hola, ${S.name}!</h2><p>Soy <b>Aria</b>, la asistente de la misión Ares. Estaré contigo para avisarte, explicarte las cosas y, de vez en cuando, contarte un chiste. No prometo que sean buenos.</p>`],
+    ['pensativa',`<p>Este es nuestro cráter. <b>Arrastra</b> para mover la cámara y <b>pellizca</b> para acercarla.</p><p>La base y un panel solar ya funcionan. Hay hielo azul, rocas grises con minerales y, cerca, <b>cajas de carga 📦</b>: tócalas para abrirlas.</p>`],
+    ['preocupada',`<p>Una cosa importante: el oxígeno que trajimos solo dura unos pocos soles.</p><p>Pulsa <b>Construir</b> para empezar y toca <b>mi retrato</b> cuando quieras ver el objetivo, el cuaderno o los logros. ¿Vamos?</p>`]];
+  let k=0;const go=()=>{const v=ariaSheet(pages[k][0],pages[k][1],`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">${k<pages.length-1?'Siguiente':'¡A trabajar!'}</button></div>`);v.dataset.lock=1;
+    v.querySelector('#ariaNext').onclick=()=>{beep(500,.04);k++;if(k<pages.length)go();else{closeSheet();tut('crate')}}};go();
+}
+const maintInfo=()=>{const worn=S.blds.filter(b=>!NOWEAR.has(b.t)&&!b.broken&&(b.w||0)>=20);return {worn,cost:worn.reduce((a,b)=>a+mcost(b.t),0)}};
+function doMaint(){const {worn,cost}=maintInfo();if(!worn.length)return say('Ahora mismo no hay nada que necesite mantenimiento. ¡Así da gusto!','feliz');
+  if(S.mat<cost)return say(`Para el mantenimiento general nos faltan ${cost-S.mat} 🧱. Podemos hacerlo edificio a edificio.`,'preocupada');
+  S.mat-=cost;worn.forEach(b=>b.w=0);beep(700,.1);save();render();say(`Mantenimiento hecho en ${worn.length} edificio(s). Han quedado como nuevos.`,'feliz')}
+
 /* ================= RENDER HUD ================= */
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id}
 // Avisos: lo que va a pasar si no haces nada
-function warnings(f){
+function warnings(f){ // lv: 2 urgente (alarmada), 1 aviso (preocupada); c: Aria te frena antes de dormir
   const s=S,w=[];
   const days=k=>f.d[k]<0?Math.floor(s[k]/-f.d[k]):99,nm={o2:'oxígeno',agua:'agua',comida:'comida'};
   const art={o2:'el oxígeno',agua:'el agua',comida:'la comida'};
-  for(const k of ['o2','agua','comida']){const d=days(k);if(d<=3)w.push({k:'res-'+k,c:d<=1,t:d<=0?`¡Mañana se acaba ${art[k]}!`:`Quedan ${d} soles de ${nm[k]}.`})}
-  if(f.nightShort>0)w.push({k:'night',c:true,t:`Esta noche faltarán ${f.nightShort} de energía: algunos edificios rendirán la mitad.`});
-  if(!f.heatOk)w.push({k:'heat',c:true,t:'No hay energía para la calefacción de esta noche: la tripulación perderá salud.'});
+  for(const k of ['o2','agua','comida']){const d=days(k);if(d<=3)w.push({k:'res-'+k+(d<=0?'!':''),c:d<=1,lv:d<=0?2:1,t:d<=0?`mañana se acaba ${art[k]}`:d===1?`queda 1 sol de ${nm[k]}`:`quedan ${d} soles de ${nm[k]}`})}
+  if(!f.heatOk)w.push({k:'heat',c:true,lv:2,t:'no hay energía para la calefacción de esta noche'});
+  if(s.salud<30)w.push({k:'salud',c:true,lv:2,t:'la salud de la tripulación está muy baja'});
+  if(f.nightShort>0)w.push({k:'night',c:true,lv:1,t:`esta noche faltan ${f.nightShort} de energía`});
   s.blds.forEach((b,k)=>{if(NOWEAR.has(b.t))return;const n=B[b.t].n;
-    if(b.broken)w.push({k:'br-'+b.id,c:false,t:`${n} está averiado: no funciona hasta que lo repares.`});
-    else if((b.w||0)>=70)w.push({k:'w-'+b.id+(b.w>=85?'b':'a'),c:true,t:`${n} está al ${Math.round(b.w)}% de desgaste: puede averiarse pronto.`})});
-  const un=mech(s,'conn')?s.blds.filter((b,k)=>!NOWEAR.has(b.t)&&!f.conn.has(k)).length:0;if(un)w.push({k:'conn'+un,c:false,t:`${un} edificio(s) sin conexión con la base (🔌): rinden menos.`});
-  if(s.pop>f.cap)w.push({k:'beds',c:false,t:`Faltan ${s.pop-f.cap} camas: el ánimo bajará.`});
-  if(canForecast(s))(s.wx||[]).forEach(x=>{const d=x.at-s.sol;w.push({k:'wx-'+x.k+'-'+x.at,c:true,t:`📡 Previsión: ${EVENTS[x.k].wx.toLowerCase()} ${d<=1?'mañana':`dentro de ${d} soles`}.`})});
-  if(s.storm)w.push({k:'storm',c:false,t:`Tormenta de polvo: quedan ${s.storm} soles. Desgasta paneles y excavadoras.`});
+    if(b.broken)w.push({k:'br-'+b.id,c:false,lv:1,t:`${n} está averiado`});
+    else if((b.w||0)>=70)w.push({k:'w-'+b.id+(b.w>=85?'b':'a'),c:true,lv:1,t:`${n} está al ${Math.round(b.w)}% de desgaste`})});
+  const un=mech(s,'conn')?s.blds.filter((b,k)=>!NOWEAR.has(b.t)&&!f.conn.has(k)).length:0;if(un)w.push({k:'conn'+un,c:false,lv:1,t:`hay ${un} edificio(s) sin conexión con la base (🔌)`});
+  if(s.pop>f.cap)w.push({k:'beds',c:false,lv:1,t:`faltan ${s.pop-f.cap} camas`});
+  if(s.moral<40)w.push({k:'moral',c:false,lv:1,t:'el ánimo del equipo está bajo'});
+  if(canForecast(s))(s.wx||[]).forEach(x=>{const d=x.at-s.sol;w.push({k:'wx-'+x.k+'-'+x.at,c:true,lv:1,t:`la antena anuncia ${EVENTS[x.k].wx.toLowerCase()} ${d<=1?'para mañana':`dentro de ${d} soles`}`})});
+  if(s.storm)w.push({k:'storm',c:false,lv:0,t:`quedan ${s.storm} soles de tormenta de polvo`});
   return w;
 }
-function openWarnings(list,onGo){
-  const v=sheet(`<div class="sheetHead"><span class="big">⚠️</span><div><h2>Avisos</h2><p>${onGo?'Antes de pasar al siguiente sol':'Lo que puede pasar si no haces nada'}</p></div>${onGo?'':'<button class="close" data-close aria-label="Cerrar">✕</button>'}</div>
-    <div class="mlist">${list.map(x=>`<div class="${x.c?'cur':''}"><span>${x.c?'❗':'•'}</span><span>${x.t}</span></div>`).join('')||'<div><span>✅</span><span>Todo en orden.</span></div>'}</div>
-    ${onGo?'<div class="row"><button class="btn ghost" id="wFix">Revisar primero</button><button class="btn" id="wGo">Pasar el sol igualmente</button></div>':''}`);
-  if(onGo){v.dataset.lock=1;v.querySelector('#wFix').onclick=()=>closeSheet();v.querySelector('#wGo').onclick=()=>{closeSheet();onGo()}}
+const cap1=t=>t.charAt(0).toUpperCase()+t.slice(1);
+function ariaAsk(list,onGo){ // Aria te frena antes de pasar el sol
+  const mood=list.some(x=>x.lv===2)?'alarmada':'preocupada',show=list.slice(0,4);
+  const v=ariaSheet(mood,`<p>Comandante, antes de dormir: ${show.length===1?show[0].t+'.':''}</p>${show.length>1?`<ul>${show.map(x=>`<li>${cap1(x.t)}.</li>`).join('')}</ul>`:''}${list.length>4?`<p>Y ${list.length-4} cosa(s) más.</p>`:''}<p>¿Seguimos igualmente?</p>`,
+    `<div class="row"><button class="btn ghost" id="wFix">Revisar</button><button class="btn" id="wGo">Seguir</button></div>`);
+  v.dataset.lock=1;v.querySelector('#wFix').onclick=()=>closeSheet();v.querySelector('#wGo').onclick=()=>{closeSheet();onGo()};
 }
 let hudOpen=false;try{hudOpen=localStorage.getItem('ares-hud')==='1'}catch(e){}
 function setHud(o){hudOpen=o;try{localStorage.setItem('ares-hud',o?'1':'0')}catch(e){}$('#resMore').hidden=!o;$('#hudTog').textContent=o?'▴ Ver menos':'▾ Ver más datos';$('#hudTog').setAttribute('aria-expanded',o)}
@@ -1247,12 +1348,10 @@ function render(){
   const s=S,f=flows(s);flowsCache=f;
   $('#solLbl').innerHTML=`SOL ${s.sol}<small>${s.name.toUpperCase()} · ${s.pop} EN MARTE</small>`;
   const pills=[];
-  if(s.storm)pills.push(`<span class="pill storm">🌪️ Tormenta ${s.storm}</span>`);
-  if(s.cold)pills.push(`<span class="pill cold">🥶 Frío ${s.cold}</span>`);
-  if(s.dirty)pills.push(`<span class="pill storm">🟫 Polvo</span>`);
-  pills.push(f.nightShort>0?`<span class="pill bad">🌙 Noche: faltan ${f.nightShort}⚡</span>`:`<span class="pill night">🌙 Noche cubierta</span>`);
+  if(s.storm)pills.push(`<span class="pill storm" title="Tormenta de polvo">🌪️${s.storm}</span>`);
+  if(s.cold)pills.push(`<span class="pill cold" title="Ola de frío">🥶${s.cold}</span>`);
+  if(s.dirty)pills.push(`<span class="pill storm" title="Polvo en los paneles">🟫${s.dirty}</span>`);
   const W=warnings(f);S.ack=(S.ack||[]).filter(k=>W.some(x=>x.k===k));lastWarn=W;
-  if(W.length)pills.push(`<button class="pill bad" id="warnPill">⚠️ ${W.length} aviso${W.length>1?'s':''}</button>`);
   pills.push(`<span class="pill${s.salud<40?' bad':''}">❤️ ${s.salud}</span>`);
   $('#statusPills').innerHTML=pills.join('');
   const days=k=>f.d[k]<0?Math.floor(s[k]/-f.d[k]):99;
@@ -1274,13 +1373,10 @@ function render(){
   const col=v=>v>60?'var(--good)':v>30?'var(--warn)':'var(--bad)';
   $('#meters').innerHTML=`<div class="meter">❤️ Salud<span class="track"><i style="width:${s.salud}%;background:${col(s.salud)}"></i></span>${s.salud}</div>
     <div class="meter">😊 Ánimo<span class="track"><i style="width:${s.moral}%;background:${col(s.moral)}"></i></span>${s.moral}</div>`;
-  const m=MISSIONS[Math.min(s.mission,MISSIONS.length-1)];
-  $('#missionBtn').innerHTML=s.mission>=MISSIONS.length?`<span class="num">★</span><span class="txt"><small>Colonia completada</small>¡Sigue haciendo crecer tu ciudad!</span>`:
-    `<span class="num">${s.mission+1}/${MISSIONS.length}</span><span class="txt"><small>Misión</small>${m.t}</span><span>›</span>`;
+  if(talk.msgs.length)placeBubble();refreshAria();
 }
 $('#hudTog').onclick=()=>setHud(!hudOpen);
 let lastWarn=[];
-$('#statusPills').addEventListener('click',e=>{if(e.target.closest('#warnPill'))openWarnings(lastWarn)});
 function floatDeltas(before){
   const r=$('#res').getBoundingClientRect();
   ['o2','agua','comida'].forEach((k,j)=>{
@@ -1292,7 +1388,7 @@ function floatDeltas(before){
 }
 function flashSol(){const el=document.createElement('div');el.className='solflash';el.textContent='SOL '+S.sol;document.body.appendChild(el);setTimeout(()=>el.remove(),1000)}
 let toastT;
-function toast(t){document.querySelectorAll('.toast').forEach(x=>x.remove());const el=document.createElement('div');el.className='toast';el.innerHTML=t;document.body.appendChild(el);clearTimeout(toastT);toastT=setTimeout(()=>el.remove(),2600)}
+function toast(t){const m=/^(⬆️|🔧|🔩|📦|✅|🏆)/.test(t)?'feliz':/^(🧪|🧫)/.test(t)?'pensativa':/Faltan|🔒|Necesita/.test(t)?'preocupada':'normal';say(t,m)}
 function addLog(t){S.log.unshift(t);if(S.log.length>60)S.log.pop()}
 function learn(f){if(f&&!S.facts.includes(f))S.facts.push(f);if(f&&UNIV.includes(f)&&!P.facts.includes(f)){P.facts.push(f);saveP()}}
 
@@ -1302,11 +1398,11 @@ function sheet(html,onClose){
   const v=document.createElement('div');v.className='veil';v.id='veil';
   v.innerHTML=`<div class="sheet gutter" role="dialog" aria-modal="true">${html}</div>`;
   v.addEventListener('click',e=>{if(e.target===v&&!v.dataset.lock){closeSheet();onClose&&onClose()}});
-  document.body.appendChild(v);
+  document.body.appendChild(v);placeBubble();
   v.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{closeSheet();onClose&&onClose()});
   return v;
 }
-function closeSheet(){const v=$('#veil');if(v)v.remove()}
+function closeSheet(){const v=$('#veil');if(v)v.remove();placeBubble()}
 const costTxt=b=>{const p=[];if(b.e>0)p.push(`<span class="up">+${b.e}⚡</span>`);if(b.e<0)p.push(`<span class="down">${b.e}⚡</span>`);
   if(b.p)for(const k in b.p){const ic={o2:'🫁',agua:'💧',comida:'🍞',mat:'🧱'}[k];p.push(`<span class="${b.p[k]>0?'up':'down'}">${b.p[k]>0?'+':''}${b.p[k]}${ic}</span>`)}
   if(b.cap)p.push(`<span class="up">+${b.cap}👥</span>`);if(b.store)p.push(`<span class="up">+${b.store}🔋</span>`);
@@ -1349,7 +1445,7 @@ function openTile(i,j){
   buildMenu(i,j,`<div class="sheetHead"><span class="big">${T.g}</span><div><h2>${T.n}</h2><p>${T.t}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>`);
 }
 function openBuildMenu(){
-  if(placing)return;
+  if(placing)return;hush();setTimeout(()=>tut('build'),50);
   const [wx,wy]=toWorld(VW/2,VH/2),[i,j]=worldToTile(wx,wy);
   buildMenu(clamp(i,0,N-1),clamp(j,0,N-1),`<div class="sheetHead"><span class="big">🏗️</span><div><h2>Construir</h2><p>Elige un edificio y colócalo en el mapa.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>`);
 }
@@ -1364,7 +1460,7 @@ function updatePlaceBar(){
   $('#pbMsg').innerHTML=`<b>${b.n} · ${b.cost} 🧱</b>${v.ok?'Buen sitio. Toca el mapa para moverlo o pulsa Construir.':`<span style="color:var(--bad)">${v.why}</span> Toca otra zona del mapa.`}`;
   $('#pbOk').disabled=!v.ok;
 }
-function stopPlacing(){placing=null;$('#placeBar').hidden=true;$('#actions').style.visibility=''}
+function stopPlacing(){placing=null;$('#placeBar').hidden=true;$('#actions').style.visibility='';placeBubble()}
 $('#pbCancel').onclick=stopPlacing;
 $('#pbOk').onclick=()=>{if(!placing)return;const {t,i,j}=placing;if(!validSpot(t,i,j).ok)return;stopPlacing();build(t,i,j)};
 function build(k,i,j){
@@ -1372,7 +1468,7 @@ function build(k,i,j){
   S.mat-=b.cost;S.blds.push({id:S.nextId++,t:k,i,j,on:true,broken:false});S.stats.built++;if(k==='reactor')S.ach.nuke=1;rebuildOcc();if(k==='shelter')terrainDirty=true;
   learn(b.fact);addLog(`Sol ${S.sol}: construido ${b.n}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
-  toast(`${b.i} ${b.n}<br><small style="font-weight:600">${b.fact}</small>`);
+  say(`${b.i} <b>${b.n}</b> en pie. ¿Sabías que…? ${b.fact}`,'pensativa');if(S.stats.built<=4)tut('nextsol');
   const nm=updateMechs(S);
   S.qBuilt=S.qBuilt||[];if(BUILD_TOPIC[k]&&!S.qBuilt.includes(k)){S.qBuilt.push(k);nm.push(quizEvent(BUILD_TOPIC[k]))}
   checkAch();
@@ -1385,9 +1481,10 @@ function openCrate(ci){
     <div class="fact" style="max-width:none"><b>Contenido</b>${item}</div>
     <p class="info">Solo se envían desde la Tierra los materiales que todavía no se pueden fabricar en Marte.</p>
     <div class="stack" style="width:100%"><button class="btn" id="cOk">Abrir caja (+10 🧱)</button></div>`);
-  v.querySelector('#cOk').onclick=()=>{if(S.crates[ci].init)S.ach.crInit++;S.crates.splice(ci,1);S.mat+=10;learn('Carga desde la Tierra: '+item);beep(700,.08);setTimeout(()=>beep(900,.1),80);closeSheet();render();save();toast('📦 +10 🧱');checkAch()};
+  v.querySelector('#cOk').onclick=()=>{if(S.crates[ci].init)S.ach.crInit++;S.crates.splice(ci,1);S.mat+=10;learn('Carga desde la Tierra: '+item);beep(700,.08);setTimeout(()=>beep(900,.1),80);closeSheet();render();save();say(pick(['¡Caja abierta! +10 🧱. Me encanta abrir regalos.','+10 🧱 de la Tierra. Y ni una nota de «frágil», menos mal.','¡Carga recogida! +10 🧱 para la colonia.']),'feliz');checkAch()};
 }
 function openBuilding(k){
+  setTimeout(()=>tut('ficha'),50);
   const t=S.blds[k],b=B[t.t],f=flows(S),fr=f.frac.get(k)??0,isB=!NOWEAR.has(t.t),linked=f.conn.has(k)||!isB||!mech(S,'conn'),w=Math.round(t.w||0);
   let st='✅ Funcionando';
   if(t.broken)st='🔧 Averiado';else if(!t.on)st='⏸️ Apagado';else if(b.e<0&&fr===0)st='⚡ Sin energía';else if(b.e<0&&fr<1)st='🌙 Sin batería por la noche: rinde a la mitad';
@@ -1412,7 +1509,7 @@ function openBuilding(k){
   const v=sheet(`<div class="sheetHead"><div><h2>${b.n}${NOUP.has(t.t)?'':` · Nv ${t.lv||1}`}</h2><p>${st}${b.inside?' · vista interior':''}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <img class="bimg" src="${pic}" alt="${b.n}">
     <p class="info">${b.desc}</p><button class="btn ghost" id="bWhy" style="font-size:.85rem;padding:8px 12px;align-self:flex-start">¿Por qué?</button>
-    <div class="fact" id="whyTxt" hidden style="max-width:none"><b>¿Por qué?</b>${WHY[t.t]||''}</div><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
+    <div class="ariaSay" id="whyTxt" hidden><img src="${faceSrc('pensativa')}" alt="" style="width:60px;height:80px"><div class="say"><span class="who">ARIA</span><p>${WHY[t.t]||''}</p></div></div><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
     ${lvTxt}${conn}
     ${isB&&mech(S,'wear')?`<div class="meter">🔩 Desgaste<span class="track wear"><i style="width:${w}%;background:${wc}"></i></span>${w}%</div><p class="hint">Cada sol se desgasta un poco. Con más desgaste es más fácil que se averíe: hazle mantenimiento a tiempo.</p>`:''}
     <div class="fact" style="max-width:none"><b>¿Sabías que…?</b>${b.fact}</div>
@@ -1434,85 +1531,92 @@ function openBuilding(k){
     if(!del.dataset.sure){del.dataset.sure=1;del.textContent='¿Seguro? Toca otra vez';return}
     if(t.t==='shelter')terrainDirty=true;S.mat+=Math.floor(b.cost/2);S.blds.splice(k,1);rebuildOcc();save();closeSheet();selB=-1;render();};
 }
+const TP_MOOD={dust:'preocupada',radiation:'alarmada',comms:'alarmada',health:'triste',cold:'preocupada',meteor:'alarmada',travel:'feliz'};
 function showEvent(e,done){
-  learn(e.fact);
+  learn(e.fact);hush();
   if(e.quiz){
     const q=e.quiz,order=q.a.map((a,i)=>i).sort(()=>Math.random()-.5);
-    const v=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2><p>${e.ctx?'Sobre lo que acaba de pasar · ':''}Racha: ${S.streak||0} · 3 seguidas dan premio</p></div></div>
-      <p class="info" style="font-size:1.1rem;font-weight:800">${q.q}</p>
-      <div class="stack" style="width:100%">${order.map(i=>`<button class="opt" data-i="${i}">${q.a[i]}</button>`).join('')}</div><div id="qres"></div>`);
+    const v=ariaSheet('pensativa',`<h2>${e.t}</h2><p>${e.ctx?'Sobre lo que acaba de pasar. ':'El control de misión quiere ponernos a prueba. '}Racha: ${S.streak||0} (3 seguidas dan premio).</p><p style="font-size:1.05rem">${q.q}</p>`,
+      `<div class="stack" style="width:100%">${order.map(i=>`<button class="opt" data-i="${i}">${q.a[i]}</button>`).join('')}</div><div id="qres"></div>`);
     v.dataset.lock=1;
     v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
       if(v.dataset.ans)return;v.dataset.ans=1;const ok=+b.dataset.i===q.c;
       v.querySelectorAll('.opt').forEach(x=>{if(+x.dataset.i===q.c)x.classList.add('right');else if(x===b)x.classList.add('wrong')});
-      let bonus='';
+      let bonus='',mood=ok?'feliz':'pensativa';
       if(ok){const qi=QUIZ.indexOf(q);if(qi>=0&&!P.qOk.includes(qi)){P.qOk.push(qi);saveP()}S.streak=(S.streak||0)+1;S.mat+=12;S.moral+=3;S.stats.quiz++;beep(880,.12);
         if(S.streak%5===0){S.mat+=40;S.moral+=8;bonus=`🏅 ¡Racha de ${S.streak}! Premio extra: +40 🧱 y +8 de ánimo.`}
         else if(S.streak%3===0){S.mat+=20;S.moral+=4;bonus=`🔥 ¡Racha de ${S.streak}! Premio extra: +20 🧱.`}
         else bonus=`Racha: ${S.streak} seguidas. A las 3 seguidas hay premio extra.`}
-      else{bonus=S.streak>=2?`Se ha cortado tu racha de ${S.streak}.`:'';S.streak=0;beep(200,.15)}
+      else{if(S.streak>=3)mood='triste';bonus=S.streak>=2?`Se ha cortado tu racha de ${S.streak}. La próxima será más larga.`:'';S.streak=0;beep(200,.15)}
       learn(q.e);(S.qlog=S.qlog||[]).push({q:q.q,a:q.a[q.c],ok,e:q.e});
-      $('#qres').innerHTML=`<div class="fact" style="max-width:none"><b>${ok?'¡Correcto! +12 🧱':'No es esa'}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
+      v.querySelector('.ariaSay img').src=faceSrc(mood);
+      $('#qres').innerHTML=`<div class="fact" style="max-width:none"><b>${ok?pick(['¡Correcto! +12 🧱','¡Eso es! +12 🧱','¡Bien visto, comandante! +12 🧱']):pick(['No es esa, pero ahora ya lo sabes','Casi. Te lo explico'])}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
         <div class="stack" style="width:100%;margin-top:12px"><button class="btn" id="qok">Continuar</button></div>`;
       $('#qok').onclick=()=>{closeSheet();save();render();checkAch();done()};
     });
     return;
   }
-  const v=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2></div></div>
-    <p class="info">${e.x}</p>${e.forecast?'<p class="hint" style="color:var(--glass)">📡 La previsión ya lo había anunciado.</p>':''}<div class="fact" style="max-width:none"><b>Dato real</b>${e.fact}</div>
+  const mood=e.mood||TP_MOOD[e.tp]||'sorprendida',rm=e.tp==='meteor'?'triste':mood;
+  const v=ariaSheet(mood,`<h2>${e.i} ${e.t}</h2><p>${pick(OPEN[mood])}</p><p>${e.x}</p>${e.forecast?'<p>📡 Ya nos lo había avisado la antena.</p>':''}`,
+    `<div class="fact" style="max-width:none"><b>Dato real</b>${e.fact}</div>
     <div class="sec">¿Qué decides, ${S.name}?</div>
     <div class="stack" style="width:100%">${e.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div>`);
   v.dataset.lock=1;beep(330,.15,'triangle');
   v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
     const r=e.o[+b.dataset.i].fx(S);S.salud=clamp(S.salud,0,100);S.moral=clamp(S.moral,0,100);
     addLog(`Sol ${S.sol}: <b>${e.t}</b> ${r}`);save();render();
-    const v2=sheet(`<div class="sheetHead event"><span class="big">${e.i}</span><div><h2>${e.t}</h2></div></div><p class="info">${r}</p>
-      <div class="stack" style="width:100%"><button class="btn" id="eok">Continuar</button></div>`);v2.dataset.lock=1;
+    const v2=ariaSheet(rm,`<h2>${e.i} ${e.t}</h2><p>${r}</p>`,`<div class="stack" style="width:100%"><button class="btn" id="eok">Continuar</button></div>`);v2.dataset.lock=1;
     $('#eok').onclick=()=>{closeSheet();if(S.salud<=0)return endGame(false);done()};
   });
 }
-function openLog(){
-  const ml=MISSIONS.map((m,i)=>`<div class="${i<S.mission?'done':i===S.mission?'cur':''}"><span>${i<S.mission?'✅':i===S.mission?'🎯':'⬜'}</span><span><b>${m.t}</b>${i===S.mission?`<br><span class="hint">${m.h}</span>`:''}</span></div>`).join('');
-  const crew=S.crew.map(id=>CREW.find(c=>c.id===id)).map(c=>`${c.face} ${c.name}`).join(' · ');
-  sheet(`<div class="sheetHead"><span class="big">📜</span><div><h2>Diario de a bordo</h2><p>${S.name} · ${crew}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
-    <div class="sec">Misiones</div><div class="mlist">${ml}</div>
-    <div class="sec">Datos aprendidos (${S.facts.length})</div><div class="log">${S.facts.map(f=>`<div>🔬 ${f}</div>`).join('')||'<div>Construye y vive aventuras para descubrir datos sobre Marte.</div>'}</div>
-    <div class="sec">Registro</div><div class="log">${S.log.slice(0,25).map(l=>`<div>${l}</div>`).join('')}</div>`);
+// Menú de Aria: se abre al tocar su retrato
+function openAria(){
+  const f=flows(S),W=lastWarn.filter(x=>x.lv>0),mood=restMood(),mi=maintInfo(),done=S.mission>=MISSIONS.length,m=MISSIONS[Math.min(S.mission,MISSIONS.length-1)];
+  const hi={normal:['¿En qué te ayudo, comandante? Tengo objetivos, cuaderno, logros y algún chiste malo.','A tus órdenes, comandante. Todo tranquilo por aquí.'],
+    preocupada:['Comandante, hay un par de cosas que me tienen las orejas tiesas.'],alarmada:['¡Comandante! Hay algo urgente. Mira la lista, por favor.']}[mood];
+  const ml=MISSIONS.map((x,i)=>`<div class="${i<S.mission?'done':i===S.mission?'cur':''}"><span>${i<S.mission?'✅':i===S.mission?'🎯':'⬜'}</span><span><b>${x.t}</b></span></div>`).join('');
+  const v=ariaSheet(mood,`<p>${pick(hi)}</p>${W.length?`<ul>${W.slice(0,5).map(x=>`<li>${cap1(x.t)}.</li>`).join('')}</ul>${W.length>5?`<p>Y ${W.length-5} más.</p>`:''}`:''}`,
+    `<div class="sec">🎯 Objetivo actual${done?'':` · ${S.mission+1}/${MISSIONS.length}`}</div>
+    <div class="fact" style="max-width:none"><b>${done?'Colonia completada':m.t}</b>${done?'¡Sigue haciendo crecer tu ciudad!':m.h}</div>
+    <details><summary class="hint" style="cursor:pointer">Ver todas las misiones</summary><div class="mlist" style="margin-top:6px">${ml}</div></details>
+    <div class="amenu">
+      <button id="aMant" ${mi.worn.length?'':'disabled'}>🔩 Mantenimiento general<small>${mi.worn.length?`${mi.worn.length} edificio(s) · ${mi.cost} 🧱`:'Nada que revisar'}</small></button>
+      <button id="aNote">📖 Cuaderno de ciencia<small>${S.facts.length} datos · ${(S.qlog||[]).length} respuestas</small></button>
+      <button id="aAch">🏆 Logros<small>${ACH_ALL.filter(a=>P.d[a.id]).length}/${ACH_ALL.length} conseguidos</small></button>
+      <button id="aLog">📜 Registro<small>Lo que ha pasado cada sol</small></button>
+      <button id="aTips">💬 Repasar consejos<small>Lo que te he ido explicando</small></button>
+    </div><div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`);
+  v.querySelector('#aMant').onclick=()=>{closeSheet();doMaint()};
+  v.querySelector('#aNote').onclick=openNotebook;v.querySelector('#aAch').onclick=openAch;v.querySelector('#aLog').onclick=openRegistro;v.querySelector('#aTips').onclick=openTips;
 }
+function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filter(x=>x.exp),ok=qs.filter(x=>x.ok).length;
+  const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;
+  ariaSheet('pensativa',`<h2>📖 Cuaderno de ciencia</h2><p>${qs.length} preguntas (${ok} acertadas), ${ex.length} experimentos y ${((S&&S.facts)||[]).length} datos. Lo apunto todo, comandante.</p>`,
+    `<div class="sec">Preguntas que respondiste</div><div class="mlist">${qs.map(item).join('')||'<div><span>•</span><span>Todavía no has respondido ninguna pregunta.</span></div>'}</div>
+    ${ex.length?`<div class="sec">Experimentos (método científico)</div><div class="mlist">${ex.map(item).join('')}</div>`:''}
+    <div class="sec">Datos descubiertos</div><div class="log">${((S&&S.facts)||[]).map(f=>`<div>🔬 ${f}</div>`).join('')||'<div>Construye y vive aventuras para descubrir datos sobre Marte.</div>'}</div>
+    <div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
+function openRegistro(){const crew=S.crew.map(id=>CREW.find(c=>c.id===id)).map(c=>`${c.face} ${c.name}`).join(' · ');
+  ariaSheet('normal',`<h2>📜 Registro</h2><p>Tripulación de ${S.name}: ${crew}.</p>`,`<div class="log">${S.log.slice(0,40).map(l=>`<div>${l}</div>`).join('')}</div><div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
+function openTips(){const seen=(S.tut||[]).filter(id=>TIPS[id]),mm=MECH.filter(m=>mech(S,m.id));
+  ariaSheet('pensativa',`<h2>💬 Mis consejos</h2><p>Lo básico: construye, une los edificios a la base con pasillos, vigila oxígeno, agua, comida y energía, y pulsa Nuevo sol. Lo demás te lo cuento cuando toca.</p>`,
+    `<div class="mlist">${seen.map(id=>`<div><span>💡</span><span>${TIPS[id][1]}</span></div>`).join('')}${mm.map(m=>`<div><span>${m.i}</span><span><b>${m.t}.</b> ${m.x}</span></div>`).join('')}</div>
+    <div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
 function openMenu(){
-  const worn=S.blds.filter(b=>!NOWEAR.has(b.t)&&!b.broken&&(b.w||0)>=20),cost=worn.reduce((a,b)=>a+mcost(b.t),0);
-  const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Menú</h2></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
-    <div class="sec">Mantenimiento</div>
-    <p class="hint">${worn.length?`${worn.length} edificio(s) con más del 20% de desgaste.`:'Ningún edificio necesita mantenimiento ahora.'}</p>
-    <div class="row"><button class="btn" id="mMant" ${worn.length?'':'disabled'}>Mantenimiento general (${cost} 🧱)</button></div>
-    <div class="sec">Cómo jugar</div>
-    <div class="log" style="color:var(--ink)">
-      <div>1. <b>Arrastra</b> el mapa para moverte y <b>pellizca</b> (o usa + y −) para hacer zoom.</div>
-      <div>2. Pulsa <b>Construir</b> o toca el suelo y coloca edificios. Deja <b>una baldosa libre</b> entre edificios distintos y <b>dos alrededor de la base</b>, para que quepan los pasillos.</div>
-      <div>3. <b>Une todo a la base con pasillos</b> hasta las puertas. Un edificio sin conexión 🔌 produce un 40% menos y gasta un 50% más de energía.</div>
-      <div>4. Cada sol tiene <b>día y noche</b>. Los paneles solo funcionan de día: de noche hacen falta <b>baterías 🔋</b> o un reactor. Si falta energía de noche 🌙, los edificios rinden la mitad.</div>
-      <div>5. Los edificios se <b>desgastan</b> cada sol. Con mucho desgaste ⚠️ se averían 🔧: hazles <b>mantenimiento</b>, que es barato.</div>
-      <div>6. Cuantos más colonos, más gasta cada uno y más calefacción hace falta. Los almacenes tienen límite y la comida se estropea poco a poco.</div>
-      <div>7. Con los soles llegan más problemas: tormentas largas y meteoritos que pueden destruir edificios. El escudo magnético los evita.</div>
-      <div>8. <b>Mejora</b> tus edificios hasta el nivel 3 (×1,5 cada nivel) en vez de llenar el mapa de copias.</div>
-      <div>9. La <b>antena</b> anuncia tormentas y frío 1 o 2 soles antes. El <b>bio-laboratorio</b> investiga mejoras.</div>
-      <div>10. Mira los <b>⚠️ avisos</b>: te dicen lo que va a pasar si no haces nada. Cumple las misiones y llega a <b>30 colonos</b> para ganar.</div>
-    </div>
+  const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Ajustes</h2><p>Los objetivos, el mantenimiento y los logros están en el menú de Aria.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
-    <div class="row"><button class="btn ghost" id="mAch">🏆 Logros</button><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
-  v.querySelector('#mMant').onclick=()=>{if(S.mat<cost){toast(`Faltan ${cost-S.mat} 🧱`);return}S.mat-=cost;worn.forEach(b=>b.w=0);beep(700,.1);save();render();closeSheet();toast(`🔩 Mantenimiento hecho en ${worn.length} edificio(s)`)};
+    <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
   v.querySelector('#mSnd').onclick=()=>{sound=!sound;openMenu()};
   const r=v.querySelector('#mRes');r.onclick=()=>{if(!r.dataset.sure){r.dataset.sure=1;r.textContent='¿Seguro? Toca otra vez';return}
     try{localStorage.removeItem(SAVE)}catch(e){}S=null;closeSheet();toTitle();};
   v.querySelector('#mTitle').onclick=()=>{closeSheet();toTitle()};
-  v.querySelector('#mAch').onclick=()=>{closeSheet();openAch()};
 }
 function endGame(win){
-  closeSheet();stopPlacing();show('end');
-  $('#endIcon').textContent=win?'🏙️':'🪦';
+  closeSheet();stopPlacing();hush();show('end');$('#bubble').hidden=true;
+  $('#endIcon').innerHTML=`<img src="${faceSrc(win?'feliz':'triste')}" alt="Aria">`;
   $('#endTitle').textContent=win?'¡Colonia autosuficiente!':'Misión fallida';
-  $('#endText').textContent=win?`¡Enhorabuena, ${S.name}! Gracias a tus decisiones, ${S.pop} personas viven en Marte con oxígeno, agua, comida y energía propios. La humanidad tiene un nuevo hogar.`
-    :`La tripulación no ha podido seguir. Lo último que pasó: ${(S.log[0]||'').replace(/<[^>]+>/g,'').replace(/^Sol \d+: /,'')} En Marte hay que vigilar oxígeno, agua, comida, energía de noche y el desgaste a la vez. ¡Seguro que la próxima vez lo consigues!`;
+  $('#endText').textContent=win?`Aria: «¡Lo conseguimos, ${S.name}! Gracias a tus decisiones, ${S.pop} personas viven en Marte con oxígeno, agua, comida y energía propios. La humanidad tiene un nuevo hogar. Ha sido un honor ser tu asistente.»`
+    :`Aria: «Lo siento mucho, comandante. La tripulación no ha podido seguir. Lo último que pasó: ${(S.log[0]||'').replace(/<[^>]+>/g,'').replace(/^Sol \d+: /,'')} En Marte hay que vigilar oxígeno, agua, comida, energía de noche y el desgaste a la vez. Pero ahora sabemos más que antes: la próxima vez lo conseguimos.»`;
   if(win){S.ach.win=1}checkAch();
   const sc=score(win),rec=sc.total>(P.hi||0);if(rec){P.hi=sc.total;saveP()}
   $('#endStats').innerHTML=`<div class="scoreBox"><div class="sec">Puntuación final</div>
@@ -1560,12 +1664,8 @@ function startGame(){
   S.rs=S.rs||{done:[],cur:null,prog:0};S.wx=S.wx||[];S.ack=S.ack||[];S.ach=Object.assign(newAch(),S.ach||{});if(!S.unl)updateMechs(S,true);
   show('game');selB=-1;stopPlacing();rebuildOcc();terrainDirty=true;setHud(hudOpen);render();
   resizeMap();focusBase();clampCam();
-  if(S.sol===1&&S.log.length<=1)setTimeout(()=>sheet(`<div class="sheetHead"><span class="big">👩‍🚀</span><div><h2>¡Bienvenido a Marte, ${S.name}!</h2><p>Sol 1 · Cráter preparado por los robots</p></div></div>
-    <img class="bimg" src="${imgSrc('base')}" alt="Base central">
-    <p class="info">Este cráter tiene <b>hielo azul</b>, <b>rocas grises con minerales</b>, <b>tubos de lava</b> y cráteres pequeños. La base central y un panel solar ya funcionan, y hay <b>cajas de carga 📦</b> esperando cerca.</p>
-    <p class="info">El oxígeno que trajisteis solo dura unos pocos soles. Y recuerda: <b>de noche los paneles no funcionan</b>, así que hacen falta <b>baterías</b>. Une cada edificio a la base con <b>pasillos</b> para que rinda al máximo.</p>
-    <div class="fact" style="max-width:none"><b>Controles</b>Arrastra para mover la cámara y pellizca para hacer zoom. Pulsa Construir para colocar edificios. Toca ▾ para ver más datos.</div>
-    <div class="stack" style="width:100%"><button class="btn" data-close>¡A trabajar!</button></div>`),400);
+  S.tut=S.tut||(S.sol>1?Object.keys(TIPS):[]);talk.msgs=[];drawBubble();
+  if(S.sol===1&&S.log.length<=1&&!S.tut.includes('hola')){S.tut.push('hola');setTimeout(ariaHello,400)}
 }
 function save(){try{if(S)localStorage.setItem(SAVE,JSON.stringify(S))}catch(e){}}
 function load(){try{const r=localStorage.getItem(SAVE);if(r){const s=JSON.parse(r);if(s&&s.v===5)return s}}catch(e){}return null}
@@ -1575,22 +1675,17 @@ $('#bCont').onclick=()=>{initAudio();if(!S)S=load();if(S)startGame()};
 $('#bStory').onclick=()=>{beep(500,.04);if(storyI<STORY.length-1){storyI++;drawStory()}else startCrew()};
 $('#bLaunch').onclick=()=>startTravel();
 $('#bLand').onclick=()=>startGame();
-$('#bNext').onclick=()=>{if($('#veil')||placing)return;
-  const fresh=lastWarn.filter(x=>x.c&&!S.ack.includes(x.k));          // solo avisos importantes que aún no has visto
-  if(fresh.length)openWarnings(lastWarn,()=>{S.ack=[...new Set([...S.ack,...lastWarn.map(x=>x.k)])];nextSol()});else nextSol()};
+$('#bNext').onclick=()=>{if($('#veil')||placing)return;hush();
+  const fresh=lastWarn.filter(x=>x.c&&!S.ack.includes(x.k));          // solo lo importante que aún no has visto
+  if(fresh.length)ariaAsk(fresh,()=>{S.ack=[...new Set([...S.ack,...lastWarn.map(x=>x.k)])];nextSol()});else nextSol()};
 $('#bBuild').onclick=openBuildMenu;
-$('#bLog').onclick=openLog;
+$('#bAria').onclick=()=>{hush();openAria()};
 $('#bMenu').onclick=openMenu;
-$('#missionBtn').onclick=openLog;
+
 $('#bEndMain').onclick=()=>{S=null;try{localStorage.removeItem(SAVE)}catch(e){}toTitle()};
 $('#bEndKeep').onclick=()=>startGame();
 $('#bEndAch').onclick=openAch;$('#bAch').onclick=openAch;
-$('#bEndFacts').onclick=()=>{const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filter(x=>x.exp),ok=qs.filter(x=>x.ok).length;
-  const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;
-  sheet(`<div class="sheetHead"><span class="big">📚</span><div><h2>Datos aprendidos</h2><p>${qs.length} preguntas · ${ok} acertadas · ${ex.length} experimentos</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
-    <div class="sec">Preguntas que respondiste</div><div class="mlist">${qs.map(item).join('')||'<div><span>•</span><span>Esta vez no respondiste ninguna pregunta.</span></div>'}</div>
-    ${ex.length?`<div class="sec">Experimentos (método científico)</div><div class="mlist">${ex.map(item).join('')}</div>`:''}
-    <div class="sec">Otros datos que descubriste</div><div class="log">${((S&&S.facts)||[]).map(f=>`<div>🔬 ${f}</div>`).join('')}</div>`)};
+$('#bEndFacts').onclick=openNotebook;
 window.addEventListener('resize',()=>{if(!$('#game').hidden){resizeMap();clampCam()}});
 
 /* ================= SONIDO ================= */

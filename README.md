@@ -33,3 +33,9 @@ Videojuego educativo para móviles (niños de 7 a 12 años) sobre cómo fundar l
 - Gana al cumplir las 12 misiones y llegar a 30 colonos.
 
 La partida se guarda automáticamente en el navegador.
+
+## Aria, la asistente
+- Aria acompaña toda la partida con siete expresiones (normal, pensativa, sorprendida, feliz, triste, preocupada y alarmada); si pasan varias cosas a la vez muestra la más importante.
+- Sus globos de diálogo sustituyen a los avisos emergentes; te frena antes de pasar el sol si hay algo importante, anuncia la previsión del clima y da el tutorial por pasos.
+- Al tocar su retrato se abre su menú: objetivo actual, mantenimiento general, cuaderno de ciencia, logros, registro y repaso de consejos.
+- Las imágenes están en `assets/aria_*.png`; la correspondencia emoción → imagen está en `MOOD_IMG`, dentro de `index.html`.
