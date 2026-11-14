@@ -48,6 +48,14 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 
 /* ---------- Pantallas de historia ---------- */
 #title,#story,#crew,#diff,#travel,#end{justify-content:center;align-items:center;text-align:center;gap:16px;padding-block:24px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#title{background:linear-gradient(180deg,transparent 58%,rgba(21,17,31,.9) 72%,#15111f 86%),url("assets/portada.jpg") center top/auto 84% no-repeat,#15111f;justify-content:flex-end;padding-bottom:max(28px, env(safe-area-inset-bottom,0px));gap:12px}
+/* Letras de la portada con el estilo del título: degradado anaranjado, sombra roja oscura y brillo */
+.fire{font-family:var(--display);font-weight:700;margin:0;text-align:center;
+  background:linear-gradient(180deg,#ffd27a 0%,#ff9a3c 45%,#e2541c 70%,#b3301a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 0 #5a1208) drop-shadow(0 0 10px rgba(255,120,40,.45))}
+.fireY{font-size:1.05rem;letter-spacing:.32em}
+.fireTag{font-size:1rem;line-height:1.45;max-width:30ch;letter-spacing:.02em}
 .heroImg{width:min(360px,86vw);filter:drop-shadow(0 16px 20px rgba(0,0,0,.6))}
 .logo{font-family:var(--display);font-weight:700;line-height:.95}
 .logo .y{display:block;font-size:.95rem;letter-spacing:.3em;color:var(--gold);margin-bottom:6px}
@@ -229,9 +237,9 @@ details summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:
 
 <!-- Portada -->
 <section class="screen gutter" id="title">
-  <img class="heroImg" src="assets/base.png" alt="Base central de la colonia">
-  <div class="logo"><span class="y">PROYECTO ARES · 2050</span><span class="n">MISIÓN MARTE</span></div>
-  <p class="tag">Dirige a la primera tripulación y convierte un cráter rojo y helado en el nuevo hogar de la humanidad.</p>
+  <h1 class="sr">Misión Marte</h1>
+  <p class="fire fireY">PROYECTO ARES · 2050</p>
+  <p class="fire fireTag">Dirige a la primera tripulación y convierte un cráter rojo y helado en el nuevo hogar de la humanidad.</p>
   <div class="stack">
     <button class="btn" id="bNew">Nueva misión</button>
     <button class="btn ghost" id="bCont" hidden>Continuar partida</button>
@@ -1979,7 +1987,6 @@ function loop(now){
   cx.fillStyle=g;cx.fillRect(0,0,W,H);
   for(const s of stars){cx.globalAlpha=Math.max(0,(storm?.15:.55)+Math.sin(t*1.5+s.p)*.3);cx.fillStyle='#f5f1e8';cx.fillRect(s.x|0,s.y|0,s.r,s.r)}
   cx.globalAlpha=1;
-  if(skyMode==='title'){const r=Math.min(W,H)*.42;planet(cx,W*.5,H+r*.3,r,'mars',t)}
   if(skyMode==='story')drawStoryArt(t);
   if(skyMode==='travel')drawTravel(t);
   if(skyMode==='game')drawMap(t);
