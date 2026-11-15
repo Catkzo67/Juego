@@ -1,88 +1,88 @@
-# Misión Marte · Proyecto Ares 2050
+# Mission Mars · Project Ares 2050
 
-Videojuego educativo para móviles (niños de 7 a 12 años) sobre cómo fundar la primera colonia humana en Marte.
+Educational mobile game (for kids aged 7 to 12) about founding the first human colony on Mars.
 
-**Historia:** es 2050, la Tierra está en malas condiciones y la humanidad necesita un nuevo hogar. Diriges a la tripulación de astronautas que debe convertir un cráter marciano en una colonia autosuficiente.
+**Story:** it's 2050, Earth is in bad shape and humanity needs a new home. You lead the crew of astronauts who must turn a Martian crater into a self-sufficient colony.
 
-## Cómo jugar
-- Abre `index.html` en el navegador del móvil junto con la carpeta `assets/` (sprites de los edificios). Para que todo funcione bien, sírvelo desde un servidor web (por ejemplo `python3 -m http.server`).
-- Vista isométrica (mapa de 40×40 baldosas de 64×32 px): arrastra para mover la cámara, pellizca o usa + / − para hacer zoom, ⌂ para volver a la base.
-- Pulsa **Construir** (o toca el suelo), elige un edificio y colócalo: la huella se ve verde si el sitio es válido y roja si no.
-- Elige tu nombre y 3 especialistas (ingeniera, botánico, doctora, geólogo, psicóloga).
-- Edificios: base central, pasillos, paneles solares, planta MOXIE (oxígeno del CO₂), extractor de hielo, excavadora minera, batería, bio-laboratorio contra percloratos, invernadero, granja vertical, refugio de regolito (toca un cráter para construirlo ahí), antena, hábitat (doble sobre tubos de lava), comedor, gimnasio, taller de robots, microrreactor nuclear y escudo magnético.
-- Recoge las cajas de carga que llegan desde la Tierra.
-- Los pasillos solo se unen entre sí y con las puertas de los edificios. Un edificio sin conexión con la base produce un 40% menos y gasta un 50% más de energía.
-- Cada sol tiene día y noche: los paneles solo funcionan de día y de noche hacen falta baterías o reactor.
-- Los edificios se desgastan y se averían si no se les hace mantenimiento; con el tiempo llegan tormentas largas y meteoritos que dejan muy averiado todo lo que haya en una zona de 4×4 (el escudo magnético los evita).
-- Las mecánicas se desbloquean poco a poco: noche (misión 1), conexiones (misión 2), desgaste (sol 4), mejoras (misión 4), comida que se estropea (misión 5), investigación (sol 6), almacenes con límite (misión 7) y meteoritos (misión 9 y sol 12).
-- Tripulación de 6: tú y 5 especialistas elegidos entre 10, cada uno con una habilidad propia.
-- Las obras tardan en terminarse: paneles, extractor, excavadora y batería 1 sol; MOXIE, laboratorio, invernadero, gimnasio, antena y comedor 2; refugio, taller, hábitat y granja vertical 3; reactor y escudo 4. Los pasillos son instantáneos.
-- Mejora los edificios hasta nivel 3 (cada nivel ×1,5 de producción o capacidad); el nivel se ve en el mapa.
-- Avisos antes de que pase algo (desgaste alto, energía de la noche, recursos que se acaban, previsión del clima) y confirmación al pasar el sol si hay avisos nuevos.
-- La antena (o la meteoróloga) anuncia tormentas y olas de frío 1 o 2 soles antes.
-- El bio-laboratorio investiga 9 mejoras con el método científico: primero predices qué pasará, el experimento dura unos soles y al final se compara el resultado con tu hipótesis.
-- Cada edificio tiene un botón "¿Por qué?" que explica en dos frases por qué funciona así.
-- Las preguntas tratan de lo que acaba de pasar (tras una tormenta, una sobre tormentas; al construir la MOXIE, una sobre el CO₂).
-- En la pantalla final, "Datos aprendidos" muestra todas las preguntas respondidas, los experimentos y los datos descubiertos.
-- Puntuación final según colonos, edificios en pie (y sus niveles), recursos guardados, rapidez o soles sobrevividos y misiones; con récord guardado.
-- 25 logros en 6 grupos con barra de progreso (por ejemplo "Racha perfecta: 3/5"). Se guardan aparte de la partida y no se pierden al empezar de nuevo o al perder.
+## How to play
+- Open `index.html` in your phone's browser together with the `assets/` folder (building sprites). For everything to work properly, serve it from a web server (for example `python3 -m http.server`).
+- Isometric view (40×40 tile map, 64×32 px tiles): drag to move the camera, pinch or use + / − to zoom, ⌂ to go back to the base.
+- Tap **Build** (or tap the ground), choose a building and place it: the footprint shows green if the spot is valid and red if it isn't.
+- Choose your name and 3 specialists (engineer, botanist, doctor, geologist, psychologist).
+- Buildings: central base, corridors, solar panels, MOXIE plant (oxygen from CO₂), ice extractor, mining excavator, battery, bio-lab against perchlorates, greenhouse, vertical farm, regolith shelter (tap a crater to build it there), antenna, habitat (double capacity on lava tubes), mess hall, gym, robot workshop, nuclear microreactor and magnetic shield.
+- Collect the cargo crates that arrive from Earth.
+- Corridors only connect to each other and to building doors. A building not connected to the base produces 40% less and uses 50% more energy.
+- Every sol has a day and a night: panels only work during the day, and at night you need batteries or a reactor.
+- Buildings wear out and break down if they aren't maintained; over time long storms arrive, along with meteorites that badly damage everything in a 4×4 area (the magnetic shield prevents them).
+- Mechanics unlock little by little: night (mission 1), connections (mission 2), wear (sol 4), upgrades (mission 4), food spoilage (mission 5), research (sol 6), limited storage (mission 7) and meteorites (mission 9 and sol 12).
+- Crew of 6: you and 5 specialists chosen from 10, each with their own skill.
+- Construction takes time: panels, extractor, excavator and battery 1 sol; MOXIE, lab, greenhouse, gym, antenna and mess hall 2; shelter, workshop, habitat and vertical farm 3; reactor and shield 4. Corridors are instant.
+- Upgrade buildings up to level 3 (each level gives ×1.5 production or capacity); the level is shown on the map.
+- Warnings before something happens (high wear, night-time energy, resources running out, weather forecast) and a confirmation when ending the sol if there are new warnings.
+- The antenna (or the meteorologist) forecasts storms and cold snaps 1 or 2 sols in advance.
+- The bio-lab researches 9 upgrades using the scientific method: first you predict what will happen, the experiment lasts a few sols and at the end the result is compared with your hypothesis.
+- Every building has a "Why?" button that explains in two sentences why it works the way it does.
+- Questions are about what just happened (after a storm, one about storms; when you build the MOXIE, one about CO₂).
+- On the final screen, "Facts learned" shows all the questions answered, the experiments and the facts discovered.
+- Final score based on colonists, buildings standing (and their levels), stored resources, speed or sols survived, and missions; with a saved high score.
+- 25 achievements in 6 groups with a progress bar (for example "Perfect streak: 3/5"). They are saved separately from the game and are not lost when you start over or lose.
 
-- Tamaños: base 6×6 (se conecta con pasillos por el extremo de sus 4 brazos); MOXIE 1×3; hábitat, invernadero, granja vertical, extractor, refugio, reactor y escudo 3×3; el resto 2×2; pasillos 1×1. Hay que dejar una baldosa libre entre edificios distintos; los iguales y los pasillos pueden ir pegados.
-- Cada colono consume oxígeno, agua y comida en cada sol; casi todo gasta energía.
-- Afronta tormentas de polvo, tormentas solares, olas de frío, averías, micrometeoritos y decisiones sin ayuda inmediata de la Tierra (retraso de ~20 min).
-- Responde preguntas del control de misión y desbloquea datos reales de la NASA.
-- Gana al cumplir las 12 misiones y llegar a 30 colonos.
+- Sizes: base 6×6 (connects to corridors at the ends of its 4 arms); MOXIE 1×3; habitat, greenhouse, vertical farm, extractor, shelter, reactor and shield 3×3; everything else 2×2; corridors 1×1. You must leave one free tile between different buildings; identical buildings and corridors can go side by side.
+- Each colonist consumes oxygen, water and food every sol; almost everything uses energy.
+- Face dust storms, solar storms, cold snaps, breakdowns, micrometeorites and decisions without immediate help from Earth (~20 min delay).
+- Answer questions from mission control and unlock real NASA facts.
+- Win by completing the 12 missions and reaching 30 colonists.
 
-La partida se guarda automáticamente en el navegador.
+The game saves automatically in the browser.
 
-## Laika, la IA de la base
-- Laika, la inteligencia artificial de la base, acompaña toda la partida con ocho expresiones (normal, explicando, pensativa, sorprendida, feliz, triste, preocupada y alarmada); si pasan varias cosas a la vez muestra la más importante.
-- Sus globos de diálogo sustituyen a los avisos emergentes; te frena antes de pasar el sol si hay algo importante, anuncia la previsión del clima y da el tutorial por pasos.
-- Al tocar su retrato se abre su menú: objetivo actual, mantenimiento general, cuaderno de ciencia, logros, registro y repaso de consejos.
-- Las imágenes están en `assets/laika_*.png`; la correspondencia emoción → imagen está en `MOOD_IMG`, dentro de `index.html`.
-- Su historia la cuenta ella misma: toca la base central y pulsa «¿Quién eres?».
-- Al empezar cualquier partida, su botón brilla con un aro dorado y un cartel «¡Tócame!» hasta que lo tocas por primera vez.
+## Laika, the base AI
+- Laika, the base's artificial intelligence, stays with you the whole game with eight expressions (normal, explaining, thoughtful, surprised, happy, sad, worried and alarmed); if several things happen at once she shows the most important one.
+- Her speech bubbles replace pop-up alerts; she stops you before ending the sol if something important is going on, announces the weather forecast and gives the step-by-step tutorial.
+- Tapping her portrait opens her menu: current goal, general maintenance, science notebook, achievements, log and tip review.
+- The images are in `assets/laika_*.png`; the emotion → image mapping is in `MOOD_IMG`, inside `index.html`.
+- She tells her own story: tap the central base and press «Who are you?».
+- At the start of every game, her button glows with a golden ring and a «Tap me!» sign until you tap it for the first time.
 
-### La voz de Laika
-- **Habla con voz y el texto aparece poco a poco** (unas 40 letras por segundo, un pitido cada 2–3 letras) solo cuando ella es el centro de atención: bienvenida y consejos del tutorial, su historia, victoria o derrota, sucesos importantes (tormentas, meteoritos, naves, nuevas mecánicas), misiones cumplidas, logros y avisos urgentes.
-- **Texto de golpe y sin voz**: mensajes repetidos del globo (obra en marcha, caja abierta, mantenimiento, falta material), listas (objetivo, cuaderno, registro, diccionario), lo que el jugador pide al tocar algo (¿Por qué?, palabras del glosario) y las preguntas del quiz.
-- Para que no canse: si habló hace menos de 8 s el siguiente mensaje sale sin sonido (salvo las páginas siguientes de una misma charla); cada tipo de mensaje tiene voz solo las primeras veces (p. ej. «obra terminada», 2 veces); la voz dura como mucho 2,5 s aunque el texto siga.
-- Primer toque mientras escribe: el texto sale entero y la voz se corta. Segundo toque: siguiente página o cerrar el globo. Las opciones de un suceso aparecen cuando termina el texto (o con el primer toque), y ese toque no pulsa nada de debajo.
-- La voz se apaga aparte en **Ajustes → Voz**, sin quitar música ni efectos. Si el dispositivo tiene activado *reducir movimiento*, el texto sale entero de golpe.
+### Laika's voice
+- **She speaks with a voice and the text appears little by little** (about 40 letters per second, a beep every 2–3 letters) only when she is the center of attention: welcome and tutorial tips, her story, victory or defeat, important events (storms, meteorites, ships, new mechanics), completed missions, achievements and urgent warnings.
+- **Text appears all at once with no voice**: repeated bubble messages (construction underway, crate opened, maintenance, not enough materials), lists (goal, notebook, log, dictionary), things the player asks for by tapping something (Why?, glossary words) and quiz questions.
+- So it doesn't get tiring: if she spoke less than 8 s ago, the next message comes out silently (except for the following pages of the same conversation); each type of message only has a voice the first few times (e.g. «construction finished», 2 times); the voice lasts at most 2.5 s even if the text keeps going.
+- First tap while she's typing: the whole text appears and the voice stops. Second tap: next page or close the bubble. An event's options appear when the text finishes (or on the first tap), and that tap doesn't press anything underneath.
+- The voice can be turned off separately in **Settings → Voice**, without muting music or sound effects. If the device has *reduce motion* turned on, the text appears all at once.
 
-## Dificultad
-Se elige antes de la tripulación, en cada partida nueva (en la pantalla de tripulación, «← Cambiar» vuelve a elegirla; el modo difícil pide confirmación antes de empezar):
-- **Fácil:** el juego base. Meta de 30 colonos; la puntuación vale la mitad.
-- **Normal:** más desastres y meteoritos, un 30% más de desgaste, construir e investigar cuesta un 25% más. Meta de 40 colonos.
-- **Difícil:** aún más desastres, un 70% más de desgaste, costes un 50% mayores, los edificios gastan un 20% más de energía y los colonos consumen un 15% más. Se empieza con más comida (110) para compensar el consumo, Laika casi no da consejos y la meta son 50 colonos; la puntuación vale un 50% más.
+## Difficulty
+It's chosen before the crew, for every new game (on the crew screen, «← Change» lets you choose again; hard mode asks for confirmation before starting):
+- **Easy:** the base game. Goal of 30 colonists; the score is worth half.
+- **Normal:** more disasters and meteorites, 30% more wear, building and research cost 25% more. Goal of 40 colonists.
+- **Hard:** even more disasters, 70% more wear, 50% higher costs, buildings use 20% more energy and colonists consume 15% more. You start with more food (110) to make up for the consumption, Laika barely gives advice and the goal is 50 colonists; the score is worth 50% more.
 
-Las preguntas del control de misión también dependen de la dificultad: 18 en fácil (8-10 años), 18 en normal (11-13) y 25 en difícil (14+). Al agotarse se vuelven a mezclar sin repetir enseguida las últimas.
+Mission control's questions also depend on the difficulty: 18 on easy (ages 8-10), 18 on normal (11-13) and 25 on hard (14+). When they run out they are shuffled again without immediately repeating the most recent ones.
 
-El refugio de regolito no necesita conexión con la base.
+The regolith shelter doesn't need a connection to the base.
 
-## Naves
-- Cuantas más camas libres y mejor antena, más colonos trae cada nave (+2 por nivel de antena y +1 por cada 4 camas libres).
-- Desde la ficha de la antena se puede **llamar a una nave** al momento pagando 40 de material (más en normal y difícil).
-- Desmontar devuelve la mitad de todo lo pagado, mejoras incluidas.
+## Ships
+- The more free beds and the better the antenna, the more colonists each ship brings (+2 per antenna level and +1 for every 4 free beds).
+- From the antenna's info card you can **call a ship** right away by paying 40 materials (more on normal and hard).
+- Dismantling returns half of everything paid, upgrades included.
 
-## Glosario
-- Las palabras difíciles aparecen subrayadas en las fichas, sucesos y preguntas (solo la primera vez en cada texto). Al tocarlas, Laika las explica en su globo.
-- En el menú de Laika está el **Diccionario**, con todas las palabras por grupos y las ya consultadas marcadas. Consultar 40 da el logro *Diccionario andante*.
+## Glossary
+- Difficult words are underlined in info cards, events and questions (only the first time in each text). When you tap them, Laika explains them in her bubble.
+- Laika's menu has the **Dictionary**, with all the words grouped and the ones you've already looked up marked. Looking up 40 earns the *Walking dictionary* achievement.
 
-## Música
-- En los menús (portada, historia, dificultad, tripulación, viaje y pantalla final) suena en bucle la música de menú (`assets/musica_menu.mp3`, provisional).
-- En la partida suena la pista de la dificultad (`assets/musica_facil.mp3`, `musica_normal.mp3`, `musica_dificil.mp3`): empieza en un momento al azar, se apaga poco a poco en sus últimos 25 segundos y vuelve a sonar tras un silencio de 1 a 3 minutos.
-- Se puede silenciar con el botón 🎵 de la portada o desde Ajustes.
+## Music
+- In the menus (title screen, story, difficulty, crew, journey and final screen) the menu music loops (`assets/musica_menu.mp3`, placeholder).
+- During the game the difficulty's track plays (`assets/musica_facil.mp3`, `musica_normal.mp3`, `musica_dificil.mp3`): it starts at a random moment, fades out during its last 25 seconds and plays again after a 1 to 3 minute silence.
+- It can be muted with the 🎵 button on the title screen or from Settings.
 
-## Clima espacial real (NASA DONKI)
-- Las tormentas solares usan erupciones reales del catálogo DONKI de la NASA (CCMC, Goddard): fecha, clase GOES (A, B, C, M, X) y región activa. Cuanto más fuerte la clase, más daño hacen sin refugio.
-- La antena anuncia la clase de la erupción antes de que llegue; el cuaderno de ciencia guarda las erupciones vividas y hay un logro, *Cazador de erupciones*.
-- Para añadir más erupciones, pega la respuesta JSON de DONKI en `DONKI_RAW` dentro de `index.html`.
+## Real space weather (NASA DONKI)
+- Solar storms use real flares from NASA's DONKI catalog (CCMC, Goddard): date, GOES class (A, B, C, M, X) and active region. The stronger the class, the more damage they do without a shelter.
+- The antenna announces the flare's class before it arrives; the science notebook keeps the flares you've lived through and there's an achievement, *Flare hunter*.
+- To add more flares, paste the DONKI JSON response into `DONKI_RAW` inside `index.html`.
 
-## ¿Ciencia real o ficción?
-Cada edificio, investigación y dato curioso lleva una etiqueta: ✅ **Real hoy** (existe y ya se usa), 🧪 **En pruebas** (probado en pequeño o en la Tierra) o 🔮 **Idea para el futuro** (todavía no existe). Laika lo explica la primera vez que construyes algo de cada tipo.
+## Real science or fiction?
+Every building, research project and fun fact has a label: ✅ **Real today** (it exists and is already in use), 🧪 **Being tested** (tested on a small scale or on Earth) or 🔮 **Idea for the future** (it doesn't exist yet). Laika explains it the first time you build something of each kind.
 
-Cada refugio de regolito protege a 12 personas: en una tormenta solar, los colonos que no caben sufren daño.
+Each regolith shelter protects 12 people: during a solar storm, colonists who don't fit inside take damage.
 
-## Fuentes
-Todos los datos científicos tienen su fuente oficial (prioridad NASA / JPL / ESA) en [`FUENTES.md`](FUENTES.md). En el juego se consultan en **Ajustes → 📚 Fuentes**, con enlaces a cada página.
+## Sources
+All the scientific data has its official source (priority NASA / JPL / ESA) in [`FUENTES.md`](FUENTES.md). In the game they can be viewed in **Settings → 📚 Sources**, with links to each page.
