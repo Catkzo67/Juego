@@ -492,6 +492,19 @@ QUIZ_DIFICIL.push(
   {q:'Marte está unas 1,5 veces más lejos del Sol que la Tierra. ¿Cuánta luz solar le llega?',a:['Menos de la mitad','Dos tercios','La misma cantidad','Una décima parte'],c:0,e:'La luz se reparte al alejarse: 1 ÷ (1,5 × 1,5) ≈ 0,44. Por eso los paneles rinden menos que en la Tierra.'}
 );
 QT_DIFICIL.push('co2','energy');
+QUIZ_DIFICIL.push(
+  {q:'Además de hielo de agua, ¿de qué están hechos en parte los casquetes polares de Marte?',a:['Dióxido de carbono congelado','Nitrógeno congelado','Metano congelado','Oxígeno congelado'],c:0,e:'En invierno parte del CO₂ del aire se congela en los polos: es "hielo seco".'},
+  {q:'Un sol dura 39 minutos más que un día terrestre. En 100 soles, ¿cuánto tiempo extra suma?',a:['Unas 65 horas','Unas 39 horas','Unas 6 horas','Unas 100 horas'],c:0,e:'39 × 100 = 3.900 minutos, y 3.900 ÷ 60 = 65 horas: casi 3 días terrestres.'},
+  {q:'Las naves salen hacia Marte cuando los planetas están bien alineados. ¿Cada cuánto pasa?',a:['Cada unos 26 meses','Cada mes','Cada 10 años','Cada 6 meses'],c:0,e:'Es la "ventana de lanzamiento": salir en otro momento costaría mucho más combustible.'},
+  {q:'¿Qué velocidad necesita un cohete para escapar de Marte, comparada con la Tierra?',a:['Menos de la mitad','El doble','La misma','Una décima parte'],c:0,e:'Unos 5 km/s en Marte frente a 11,2 km/s en la Tierra: despegar de Marte cuesta mucho menos.'},
+  {q:'Si 20 colonos gastan 26 de oxígeno por sol y cada MOXIE da 6, ¿cuántas MOXIE hacen falta como mínimo?',a:['5','4','3','6'],c:0,e:'26 ÷ 6 ≈ 4,3. Con 4 faltaría oxígeno, así que hacen falta 5.'},
+  {q:'¿Por qué es tan difícil volar un helicóptero en Marte?',a:['El aire es tan fino que las hélices casi no empujan','La gravedad es mucho más fuerte','Hay demasiado viento siempre','El frío congela el motor'],c:0,e:'El helicóptero Ingenuity lo logró en 2021 con hélices enormes que giraban muy rápido.'},
+  {q:'¿Qué usan los rovers Curiosity y Perseverance para tener energía día y noche?',a:['El calor del plutonio-238','Paneles solares gigantes','Baterías que traen de la Tierra','Pequeños molinos de viento'],c:0,e:'Un generador convierte en electricidad el calor que desprende el plutonio-238 al desintegrarse.'},
+  {q:'Durante una gran tormenta de polvo, ¿qué le pasa al aire de Marte?',a:['Se calienta porque el polvo absorbe la luz','Se congela por completo','Se vuelve respirable','Desaparece hacia el espacio'],c:0,e:'El polvo absorbe la luz del Sol y calienta el aire alto, mientras el suelo se enfría.'},
+  {q:'¿De dónde sacaría la colonia el hidrógeno para la reacción de Sabatier?',a:['Del agua, separándola con electricidad','Del suelo rojo de Marte','De las lunas Fobos y Deimos','Del viento solar directamente'],c:0,e:'Es la electrólisis: la electricidad separa el agua (H₂O) en hidrógeno y oxígeno.'},
+  {q:'¿Por qué Marte tiene estaciones parecidas a las de la Tierra?',a:['Su eje está inclinado casi igual','Tiene dos lunas','Gira más rápido','Está más cerca del Sol'],c:0,e:'Marte está inclinado unos 25° y la Tierra unos 23°. Sus estaciones duran casi el doble porque su año es más largo.'}
+);
+QT_DIFICIL.push('cold','night','travel','gravity','co2','travel','energy','dust','water','cold');
 const QUIZ=[];
 [[QUIZ_FACIL,QT_FACIL],[QUIZ_NORMAL,QT_NORMAL],[QUIZ_DIFICIL,QT_DIFICIL]].forEach(([L,T],lv)=>L.forEach((q,i)=>QUIZ.push(Object.assign(q,{lv,tp:T[i]||'travel'}))));
 const BUILD_TOPIC={moxie:'co2',ice:'water',solar:'energy',battery:'night',farm:'food',vfarm:'food',bio:'bio',shelter:'radiation',antenna:'comms',habitat:'home',gym:'gravity',reactor:'energy',shield:'radiation',miner:'soil',mess:'health'};
@@ -997,7 +1010,9 @@ const EVENTS=[
 ];
 function quizEvent(tp){ // pregunta del tema que toca (o cualquiera que no se haya hecho)
   const lvl=QUIZ.map((q,i)=>i).filter(i=>QUIZ[i].lv===(S.diff||0));   // solo las preguntas de la dificultad elegida
-  let pool=lvl.filter(i=>!S.quizUsed.includes(i));if(!pool.length){S.quizUsed=S.quizUsed.filter(i=>!lvl.includes(i));pool=lvl}
+  let pool=lvl.filter(i=>!S.quizUsed.includes(i));
+  if(!pool.length){const last=S.quizUsed.filter(i=>lvl.includes(i)).slice(-Math.floor(lvl.length/2));   // las más recientes esperan
+    S.quizUsed=S.quizUsed.filter(i=>!lvl.includes(i)).concat(last);pool=lvl.filter(i=>!last.includes(i))}
   const on=tp?pool.filter(i=>QUIZ[i].tp===tp):[];const qi=pick(on.length?on:pool);S.quizUsed.push(qi);
   return {quiz:QUIZ[qi],i:'🛰️',t:'Pregunta del control de misión',x:QUIZ[qi].q,ctx:!!(tp&&on.length)};
 }
@@ -1355,15 +1370,15 @@ const GLOSARIO=[
 const GL_ALIAS=[];GLOSARIO.forEach((g,k)=>{if(!g.nu)g.al.forEach(a=>GL_ALIAS.push([a,k]))});
 GL_ALIAS.sort((a,b)=>b[0].length-a[0].length);
 const GL_MAP=new Map(GL_ALIAS.map(([a,k])=>[a.toLowerCase(),[a,k]]));
-const GL_RE=new RegExp(`(?<![\\p{L}\\p{N}])(${GL_ALIAS.map(([a])=>a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')})(?![\\p{L}\\p{N}])`,'giu');
+const GL_RE=new RegExp(`(^|[^\\p{L}\\p{N}])(${GL_ALIAS.map(([a])=>a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')})(?![\\p{L}\\p{N}])`,'giu');
 const isAcr=a=>a.length<=6&&a===a.toUpperCase()&&/[A-Z]/.test(a);
 function gloss(html){ // subraya solo la primera vez que sale cada palabra; nunca dentro de botones
   const used=new Set();let inBtn=0;
   return html.split(/(<[^>]+>)/).map(seg=>{
     if(seg.startsWith('<')){if(/^<button\b/i.test(seg))inBtn++;else if(/^<\/button/i.test(seg))inBtn=Math.max(0,inBtn-1);return seg}
     if(inBtn||!seg.trim())return seg;
-    return seg.replace(GL_RE,(m)=>{const hit=GL_MAP.get(m.toLowerCase());if(!hit)return m;const [a,k]=hit;
-      if(isAcr(a)&&m!==a)return m;if(used.has(k))return m;used.add(k);return `<span class="gl" data-g="${k}" role="button" tabindex="0">${m}</span>`});
+    return seg.replace(GL_RE,(all,pre,m)=>{const hit=GL_MAP.get(m.toLowerCase());if(!hit)return all;const [a,k]=hit;
+      if(isAcr(a)&&m!==a)return all;if(used.has(k))return all;used.add(k);return `${pre}<span class="gl" data-g="${k}" role="button" tabindex="0">${m}</span>`});
   }).join('');
 }
 function explainWord(k){const g=GLOSARIO[k];if(!g)return;
@@ -1975,11 +1990,17 @@ const VOL={menu:.4,game:.35},FADE_END=25;   // segundos finales en los que baja 
 let musicOn=true;try{musicOn=localStorage.getItem('ares-music')!=='0'}catch(e){}
 const mus={el:new Audio(),mode:null,timer:0,ramp:0,base:0};
 mus.el.preload='auto';
-function rampTo(v,ms,cb){clearInterval(mus.ramp);const a=mus.el.volume,t0=performance.now();
-  mus.ramp=setInterval(()=>{const p=Math.min(1,(performance.now()-t0)/ms);mus.el.volume=Math.max(0,Math.min(1,a+(v-a)*p));if(p>=1){clearInterval(mus.ramp);cb&&cb()}},50)}
+function musGraph(){ // conecta la música a un control de volumen de Web Audio (funciona también en iPhone)
+  if(mus.g)return;initAudio();if(!AC)return;
+  try{const src=AC.createMediaElementSource(mus.el);mus.g=AC.createGain();mus.g.gain.value=getV();src.connect(mus.g);mus.g.connect(AC.destination);mus.el.volume=1}catch(e){}
+}
+function getV(){return mus.g?mus.g.gain.value:mus.el.volume}
+function setV(v){v=Math.max(0,Math.min(1,v));if(mus.g)mus.g.gain.value=v;else mus.el.volume=v}
+function rampTo(v,ms,cb){clearInterval(mus.ramp);const a=getV(),t0=performance.now();
+  mus.ramp=setInterval(()=>{const p=Math.min(1,(performance.now()-t0)/ms);setV(a+(v-a)*p);if(p>=1){clearInterval(mus.ramp);cb&&cb()}},50)}
 function playNow(src,loop,vol){clearTimeout(mus.timer);mus.base=vol;
   if(!mus.el.src.endsWith(src)){mus.el.src=src}else if(!loop)mus.el.currentTime=0;
-  mus.el.loop=loop;mus.el.volume=0;
+  mus.el.loop=loop;setV(0);
   if(!musicOn)return;const pr=mus.el.play();if(pr)pr.catch(()=>{});rampTo(vol,2500);
 }
 function nextGameTrack(first){clearTimeout(mus.timer);if(mus.mode!=='game')return;
@@ -1992,10 +2013,10 @@ function musicSet(mode){
 }
 // al final de la canción el volumen baja poco a poco hasta apagarse
 mus.el.addEventListener('timeupdate',()=>{if(mus.el.loop||!mus.el.duration)return;const left=mus.el.duration-mus.el.currentTime;
-  if(left<FADE_END){clearInterval(mus.ramp);mus.el.volume=Math.max(0,mus.base*left/FADE_END)}});
+  if(left<FADE_END){clearInterval(mus.ramp);setV(mus.base*left/FADE_END)}});
 mus.el.addEventListener('ended',()=>{if(mus.mode==='game')nextGameTrack(false)});
 // los navegadores solo dejan sonar música después de un toque
-document.addEventListener('pointerdown',()=>{if(musicOn&&mus.mode==='menu'&&mus.el.paused){const pr=mus.el.play();if(pr)pr.catch(()=>{});rampTo(VOL.menu,2500)}},true);
+document.addEventListener('pointerdown',()=>{musGraph();if(AC&&AC.state==='suspended')AC.resume();if(musicOn&&mus.mode==='menu'&&mus.el.paused){const pr=mus.el.play();if(pr)pr.catch(()=>{});rampTo(VOL.menu,2500)}},true);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)mus.el.pause();else if(musicOn&&(mus.mode==='menu'||(mus.mode==='game'&&mus.el.currentTime>0&&!mus.el.ended))){const pr=mus.el.play();if(pr)pr.catch(()=>{})}});
 function setMusic(on){musicOn=on;try{localStorage.setItem('ares-music',on?'1':'0')}catch(e){}
   if(!on){clearInterval(mus.ramp);mus.el.pause()}else{const m=mus.mode;mus.mode=null;musicSet(m)}
