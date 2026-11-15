@@ -194,7 +194,11 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 .bubble .bTxt b.who{font-family:var(--display);font-size:.8rem;letter-spacing:.08em;color:#8a5a12}
 .bubble .bTxt p{margin:0}
 .bubble .bTxt p+p{border-top:1px dashed #c9bfa5;padding-top:5px}
-.bubble .bAct,.bubble .bX,.bubble .gl{pointer-events:auto}
+.bubble .bAct,.bubble .bX,.bubble .gl,.bubble .bTxt{pointer-events:auto}
+.twH{visibility:hidden}
+.twAfter{display:contents}
+.twAfter.wait>*{visibility:hidden}
+.typing{cursor:pointer}
 .bubble .bAct{align-self:flex-start;background:var(--navy);color:var(--cream);border-radius:5px;padding:6px 10px;font-weight:800;font-size:.8rem}
 .bubble .bX{position:absolute;right:4px;top:-10px;width:26px;height:26px;border-radius:50%;background:var(--navy);border:2px solid var(--gold);font-size:.75rem}
 .ariaSay{display:flex;gap:10px;align-items:flex-start}
@@ -272,8 +276,9 @@ details summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:
 
 <section class="screen gutter" id="crew" hidden>
   <h2>Prepara tu tripulación</h2>
+  <div class="row" style="align-items:center;justify-content:center;gap:10px"><span class="hint" id="crewDiff" style="margin:0"></span><button class="btn ghost" id="bBackDiff" style="padding:8px 14px;font-size:.85rem">← Cambiar</button></div>
   <div class="field"><label for="cmdName">Nombre del Comandante</label><input id="cmdName" maxlength="16" placeholder="Escribe tu nombre" autocomplete="off"></div>
-  <p class="hint" id="crewHint">Elige 5 especialistas. Cada uno aporta algo que solo él o ella sabe hacer.</p>
+  <p class="hint" id="crewHint">Elige 5 especialistas. Cada uno tiene un talento especial.</p>
   <div class="crewGrid" id="crewGrid"></div>
   <div class="stack" style="padding-bottom:20px"><button class="btn" id="bLaunch" disabled>¡Despegar!</button></div>
 </section>
@@ -521,24 +526,24 @@ const QUIZ=[];
 const BUILD_TOPIC={moxie:'co2',ice:'water',solar:'energy',battery:'night',farm:'food',vfarm:'food',bio:'bio',shelter:'radiation',antenna:'comms',habitat:'home',gym:'gravity',reactor:'energy',shield:'radiation',miner:'soil',mess:'health'};
 // "¿Por qué?" de cada edificio, en dos frases
 const WHY={
-  base:'La base es el centro de mando: de ella salen los pasillos y en ella duerme la primera tripulación. Gasta poca energía porque es compacta y está muy bien aislada.',
-  corridor:'Los pasillos presurizados permiten ir de un edificio a otro sin traje. Sin ellos, cada viaje sería un paseo espacial lento y peligroso; por eso los edificios sin conexión rinden menos.',
-  solar:'Los paneles convierten la luz del Sol en electricidad, así que de noche no producen nada. A Marte llega menos luz que a la Tierra y el polvo la tapa todavía más.',
+  base:'Es el centro de mando: de ella salen los pasillos y en ella duerme la primera tripulación. Gasta poca energía porque es pequeña y está muy bien aislada.',
+  corridor:'Permiten ir de un edificio a otro sin traje. Sin ellos, cada viaje sería un paseo espacial lento y peligroso: por eso los edificios sin pasillo rinden menos.',
+  solar:'Convierten la luz del Sol en electricidad, así que de noche no producen nada. A Marte llega menos luz que a la Tierra, y el polvo la tapa aún más.',
   moxie:'El aire de Marte es casi todo CO₂. MOXIE lo calienta a unos 800 °C para separar sus átomos de oxígeno, y por eso gasta bastante energía.',
   ice:'El agua de Marte está congelada bajo el suelo. Hay que perforar, derretir el hielo con calor y filtrarlo, y todo eso necesita energía.',
   miner:'Traer material desde la Tierra cuesta muchísimo, así que se usa el suelo de Marte. Las rocas grises tienen más metales: por eso sobre roca saca el doble.',
   battery:'Guarda la energía que sobra de día para usarla de noche. Sin baterías, al ponerse el Sol la colonia se quedaría a oscuras y sin calefacción.',
-  bio:'Sus bacterias se comen los percloratos tóxicos del suelo y cultivan espirulina para comer. También es el lugar donde se investigan mejoras con el método científico.',
+  bio:'Sus bacterias se comen los percloratos tóxicos del suelo y cultivan espirulina para comer. Aquí también se investigan mejoras con el método científico.',
   farm:'Las plantas necesitan aire con presión, calor y agua, y fuera no hay nada de eso. El invernadero se lo da, pero a cambio gasta agua y energía.',
   shelter:'Varios metros de regolito frenan la radiación como una manta muy gruesa. Por eso protege en las tormentas solares aunque no gaste energía.',
   antenna:'Las señales tardan entre 4 y 24 minutos en llegar a la Tierra. La antena recibe las previsiones del clima espacial y guía a las naves para aterrizar.',
-  habitat:'Las personas necesitan aire, calor y un sitio seguro para dormir. Sobre un tubo de lava cabe el doble porque la cueva natural da espacio y protección extra.',
+  habitat:'Las personas necesitan aire, calor y un sitio seguro para dormir. Sobre un tubo de lava cabe el doble: la cueva da espacio y protección extra.',
   mess:'Comer juntos ayuda a sentirse un equipo en un lugar tan aislado. Por eso sube el ánimo de toda la colonia, aunque no produzca nada.',
   gym:'Con solo el 38% de la gravedad terrestre, huesos y músculos se debilitan si no se usan. Entrenar cada día mantiene sana a la tripulación.',
   repair:'Sus robots revisan, limpian y ajustan los edificios antes de que fallen. Así todo se desgasta más despacio.',
   vfarm:'Apila muchas plantas en torres con luz LED, así que da mucha comida en poco espacio. A cambio, las luces gastan bastante energía.',
   reactor:'La fisión nuclear produce calor y electricidad sin depender del Sol. Por eso funciona igual de día, de noche y en mitad de una tormenta de polvo.',
-  shield:'Crea un campo magnético parecido al de la Tierra, que desvía las partículas del Sol y frena lo que cae del cielo. Mantenerlo encendido necesita muchísima energía.'
+  shield:'Crea un campo magnético como el de la Tierra, que desvía las partículas del Sol y lo que cae del cielo. Mantenerlo encendido gasta muchísima energía.'
 };
 const STORY=[
   {art:'earth',t:'Año 2050. La Tierra está en apuros: hace demasiado calor, el aire está sucio y cada vez hay menos recursos.'},
@@ -669,9 +674,9 @@ function validSpot(t,i0,j0){
 /* ================= SIMULACIÓN ================= */
 // Dificultad: fácil es el juego base; normal y difícil aprietan más
 const DIFF=[
-  {n:'Fácil',i:'🌱',goal:30,cost:1,wear:1,bad:0,met:1,energy:1,use:1,score:.5,txt:'Para aprender. Menos desastres y Laika te ayuda en todo. Meta: 30 colonos. La puntuación vale la mitad.'},
-  {n:'Normal',i:'🚀',goal:40,cost:1.25,wear:1.3,bad:.08,met:1.3,energy:1,use:1,score:1,txt:'Más desastres, los edificios se desgastan antes y construir cuesta un 25% más. Meta: 40 colonos.'},
-  {n:'Difícil',i:'☄️',goal:50,cost:1.5,wear:1.7,bad:.16,met:1.7,energy:1.2,use:1.15,score:1.5,txt:'Todo cuesta un 50% más, gasta más energía y los colonos consumen más. Laika apenas da consejos. Meta: 50 colonos. La puntuación vale un 50% más.'}];
+  {n:'Fácil',i:'🌱',goal:30,cost:1,wear:1,bad:0,met:1,energy:1,use:1,score:.5,txt:'Para aprender. Menos desastres y Laika te ayuda en todo. Meta: 30 colonos. Puntos ×0,5.'},
+  {n:'Normal',i:'🚀',goal:40,cost:1.25,wear:1.3,bad:.08,met:1.3,energy:1,use:1,score:1,txt:'Más desastres y más desgaste. Construir cuesta un 25% más. Meta: 40 colonos.'},
+  {n:'Difícil',i:'☄️',goal:50,cost:1.5,wear:1.7,bad:.16,met:1.7,energy:1.2,use:1.15,score:1.5,txt:'Todo cuesta un 50% más y se gasta más. Laika casi no da consejos. Meta: 50 colonos. Puntos ×1,5.'}];
 const D=()=>DIFF[(S&&S.diff)||0],hard=()=>!!S&&S.diff===2;
 function applyDiff(){ // ajusta costes y meta final a la dificultad de la partida
   const d=D();
@@ -701,14 +706,14 @@ const RESEARCH=[
 const hasR=(s,id)=>!!(s.rs&&s.rs.done.includes(id));
 // Las mecánicas difíciles llegan poco a poco, con las misiones y los soles
 const MECH=[
-  {id:'night',when:s=>s.mission>=1,i:'🌙',t:'¡Llega la noche marciana!',x:'Desde ahora cada sol tiene día y noche. Los paneles solares solo dan energía de día: de noche la colonia usa la energía guardada en las baterías. ¡Construye baterías!'},
-  {id:'conn',when:s=>s.mission>=2,i:'🔗',t:'Conexiones con la base',x:'Los edificios que no estén unidos a la base con pasillos (hasta su puerta) producen un 40% menos y gastan un 50% más de energía. Se marcan con 🔌.'},
-  {id:'wear',when:s=>s.sol>=4,i:'🔩',t:'Desgaste de los edificios',x:'Los edificios se desgastan cada sol. Cuanto más desgaste, más fácil es que se averíen. El mantenimiento es barato: hazlo desde su ficha o desde el Menú.'},
-  {id:'upgrade',when:s=>s.mission>=4,i:'⬆️',t:'Mejoras de edificios',x:'Ya puedes mejorar edificios hasta el nivel 3 desde su ficha. Cada nivel multiplica ×1,5 lo que producen o guardan.'},
-  {id:'spoil',when:s=>s.mission>=5,i:'🍞',t:'La comida se estropea',x:'La comida guardada se estropea poco a poco (un 4% cada sol). Mejor producirla que acumularla.'},
-  {id:'research',when:s=>s.sol>=6,i:'🧫',t:'Investigación',x:'El bio-laboratorio ya puede investigar mejoras: paneles antipolvo, riego por goteo, aerogel... Toca el bio-laboratorio (o constrúyelo) para elegir un proyecto.'},
-  {id:'storage',when:s=>s.mission>=7,i:'📦',t:'Almacenes con límite',x:'Los almacenes ya no son infinitos: caben 60 de oxígeno, agua y comida (25 más por cada hábitat) y 200 de material. Lo que sobra se pierde.'},
-  {id:'meteor',when:s=>s.mission>=9&&s.sol>=12,i:'☄️',t:'Lluvias de meteoritos',x:'Desde ahora pueden caer meteoritos que dejan muy averiado todo lo que haya en una zona de 4×4 baldosas. El escudo magnético los desvía.'}
+  {id:'night',when:s=>s.mission>=1,i:'🌙',t:'¡Llega la noche marciana!',x:'Ahora cada sol tiene día y noche. Los paneles solo funcionan de día: de noche se usa lo guardado en las baterías. ¡Construye baterías!'},
+  {id:'conn',when:s=>s.mission>=2,i:'🔗',t:'Conexiones con la base',x:'Los edificios sin pasillo hasta la base (marcados con 🔌) producen un 40% menos y gastan un 50% más de energía.'},
+  {id:'wear',when:s=>s.sol>=4,i:'🔩',t:'Desgaste de los edificios',x:'Los edificios se desgastan cada sol y, si se desgastan mucho, se averían. El mantenimiento es barato: hazlo desde su ficha o desde mi menú.'},
+  {id:'upgrade',when:s=>s.mission>=4,i:'⬆️',t:'Mejoras de edificios',x:'Desde su ficha puedes mejorar los edificios hasta el nivel 3. Cada nivel produce o guarda ×1,5.'},
+  {id:'spoil',when:s=>s.mission>=5,i:'🍞',t:'La comida se estropea',x:'La comida guardada se estropea poco a poco (un 4% cada sol). Mejor producir que acumular.'},
+  {id:'research',when:s=>s.sol>=6,i:'🧫',t:'Investigación',x:'Toca el bio-laboratorio (o constrúyelo) para investigar mejoras: paneles antipolvo, riego por goteo, aerogel…'},
+  {id:'storage',when:s=>s.mission>=7,i:'📦',t:'Almacenes con límite',x:'Ahora caben 60 de oxígeno, agua y comida (25 más por hábitat) y 200 de material. Lo que sobra se pierde.'},
+  {id:'meteor',when:s=>s.mission>=9&&s.sol>=12,i:'☄️',t:'Lluvias de meteoritos',x:'Pueden caer meteoritos que averían todo en una zona de 4×4 baldosas. El escudo magnético los desvía.'}
 ];
 const mech=(s,id)=>!!(s.unl&&s.unl.includes(id));
 function updateMechs(s,silent){s.unl=s.unl||[];const n=MECH.filter(m=>!s.unl.includes(m.id)&&m.when(s));n.forEach(m=>s.unl.push(m.id));
@@ -886,19 +891,19 @@ function nextSol(){
     const pBad=Math.min(.8,.28+s.sol*.008+D().bad),r=Math.random();   // los problemas son más probables con el tiempo
     if(r<pBad){const k=pickEvent(true);
       if(k>=0&&EVENTS[k].wx){if(!s.wx.some(w=>w.k===k)){const at=s.sol+1+rnd(2),seen=canForecast(s);s.wx.push({k,at,seen});if(k===1)s.nextFlare=pickFlare(s);
-        if(seen)say(`${/ormenta/.test(EVENTS[k].wx)?'C-Comandante… ':''}La antena avisa: ${EVENTS[k].wx.toLowerCase()} ${at-s.sol<=1?'mañana':'dentro de 2 soles'}. ${k===0?'Llena las baterías antes, por favor.':k===1?`Es una erupción de clase ${s.nextFlare.cls}. Ten listo el refugio.`:'Revisa la calefacción.'}`,'preocupada')}} // el clima llega 1 o 2 soles después
+        if(seen)say(`${/ormenta/.test(EVENTS[k].wx)?'C-Comandante… ':''}La antena avisa: ${EVENTS[k].wx.toLowerCase()} ${at-s.sol<=1?'mañana':'dentro de 2 soles'}. ${k===0?'Llena las baterías antes, por favor.':k===1?`Es una erupción de clase ${s.nextFlare.cls}. Ten listo el refugio.`:'Revisa la calefacción.'}`,'preocupada',{voz:'antena',lim:3})}} // el clima llega 1 o 2 soles después
       else if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
     else if(r<pBad+.25){const k=pickEvent(false);if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
   }
-  if(fin.length)say(`¡Obra terminada, Comandante! ${fin.map(b=>`${b.i} <b>${b.n}</b>`).join(', ')} ya ${fin.length>1?'funcionan':'funciona'}.`,'feliz');
+  if(fin.length)say(`¡Obra terminada, Comandante! ${fin.map(b=>`${b.i} <b>${b.n}</b>`).join(', ')} ya ${fin.length>1?'funcionan':'funciona'}.`,'feliz',{voz:'obra',lim:2});
   if(s.sol===2)tut('sol2');if(s.sol===3)tut('hud');
   if(!q.length){
-    if(short)say(cap1(msgs[0].replace(/^¡|!.*$/g,''))+'. La tripulación pierde salud: hay que producir más ya.','alarmada');
-    if(!f.heatOk)say('Esta noche no ha habido energía para la calefacción. ¡Qué frío hemos pasado! Hacen falta más baterías.','alarmada');
+    if(short)say(cap1(msgs[0].replace(/^¡|!.*$/g,''))+'. ¡La tripulación pierde salud! Hay que producir más.','alarmada',{voz:'alarma'});
+    if(!f.heatOk)say('¡Esta noche no hubo calefacción y hemos pasado frío! Hacen falta más baterías.','alarmada',{voz:'alarma'});
     if(broke.length)say(`Se ha averiado: ${broke.join(', ')}. Tócalo en el mapa para repararlo.`,'preocupada');
     else if(worn&&hard())say(`${worn} edificio(s) muy desgastados. Ocúpate, Comandante.`,'preocupada');
     else if(worn){const mi=maintInfo();say(`Hay ${worn} edificio(s) muy desgastados. ¿Les hago un mantenimiento general?`,'preocupada',{act:{l:`🔩 Mantenimiento (${mi.cost} 🧱)`,fn:doMaint}})}
-    if(full)say('Los almacenes están llenos: lo que sobra se pierde. Con más hábitats cabe más.','normal');
+    if(full)say('Almacenes llenos: lo que sobra se pierde. Con más hábitats cabe más.','normal');
     if(!talk.msgs.length&&s.sol>3&&Math.random()<.3){if(hard())say(pick(IDLE_HARD),'normal');else Math.random()<.45?say(pick(EARTHQ),'pensativa'):say(pick(IDLE),'normal')}
     if(s.sol===5)tut('who');
   }
@@ -910,7 +915,7 @@ function checkMissions(){
   while(s.mission<MISSIONS.length&&MISSIONS[s.mission].ok(s)){
     const m=MISSIONS[s.mission];s.mission++;s.mat+=m.r;
     addLog(`<b>Misión cumplida:</b> ${m.t}${m.r?` (+${m.r} materiales)`:''}`);
-    say(hard()?`Misión cumplida.${m.r?` +${m.r} 🧱.`:''}${s.mission<MISSIONS.length?` Siguiente: <b>${MISSIONS[s.mission].t}</b>. Sin entretenerse.`:''}`:`¡Misión cumplida, Comandante!${m.r?` Nos dan +${m.r} 🧱.`:''}${s.mission<MISSIONS.length?` Ahora toca: <b>${MISSIONS[s.mission].t}</b>.`:''}`,hard()?'normal':'feliz');beep(660,.1);setTimeout(()=>beep(880,.15),110);
+    say(hard()?`Misión cumplida.${m.r?` +${m.r} 🧱.`:''}${s.mission<MISSIONS.length?` Siguiente: <b>${MISSIONS[s.mission].t}</b>. Sin entretenerse.`:''}`:`¡Misión cumplida, Comandante!${m.r?` Nos dan +${m.r} 🧱.`:''}${s.mission<MISSIONS.length?` Ahora toca: <b>${MISSIONS[s.mission].t}</b>.`:''}`,hard()?'normal':'feliz',{voz:'mision'});beep(660,.1);setTimeout(()=>beep(880,.15),110);
     if(s.mission===MISSIONS.length&&!s.won){s.won=true;save();setTimeout(()=>endGame(true),900);return}
   }
 }
@@ -936,27 +941,27 @@ function evResult(d){ // paso final del método científico: comparar el resulta
 function evShip(called){
   const libres=Math.max(0,flows(S).cap-S.pop);
   const n=2+rnd(3)+(has(S,'com')?1:0)+((flows(S).lvAct.antenna||1)-1)*2+Math.floor(libres/4),space=flows(S).cap-S.pop,P=S.pop,heatUp=Math.ceil((P+n)*.3*(1+(P+n)/40))-Math.ceil(P*.3*(1+P/40));
-  return {tp:'travel',i:'🚀',t:'¡Llega una nave de la Tierra!',x:`Una nave trae a ${n} nuevos colonos y cajas de carga. Tienes sitio para ${Math.max(0,space)} personas más. Con ellos, la calefacción gastará unos ${heatUp} de energía más cada sol.`,
+  return {tp:'travel',i:'🚀',t:'¡Llega una nave de la Tierra!',x:`Trae ${n} colonos y cajas de carga. Tienes sitio para ${Math.max(0,space)} más. La calefacción gastará unos ${heatUp} de energía más cada sol.`,
     fact:'En 2050 las naves de carga pueden aterrizar con más de 150 toneladas gracias a la retropropulsión.',
     o:[
-      {l:`Recibir a los ${n} colonos`,s:space>=n?'Traen comida y cajas de carga. Recuerda: más colonos, más consumo.':'Ojo: no hay camas para todos.',fx:s=>{s.pop+=n;s.comida+=n*5;dropCrates(2);return `¡Bienvenidos! Ya sois ${s.pop} en Marte. Traen ${n*5} de comida y han dejado 2 cajas de carga en el mapa.`}},
+      {l:`Recibir a los ${n} colonos`,s:space>=n?'Traen comida y cajas. Más colonos, más consumo.':'Ojo: no hay camas para todos.',fx:s=>{s.pop+=n;s.comida+=n*5;dropCrates(2);return `¡Bienvenidos! Ya sois ${s.pop}. Traen ${n*5} de comida y 2 cajas de carga.`}},
       called?{l:'Cancelar la llamada',s:`Te devuelvo los ${called} 🧱.`,fx:s=>{s.mat+=called;return 'Llamada cancelada. Material devuelto.'}}
         :{l:'Pedirles que esperen al próximo viaje',s:'Así preparas más hábitats.',fx:s=>{s.lastShip=s.sol-3;return 'La nave volverá en unos soles. Aprovecha para construir.'}}
     ]};
 }
 function evGeo(){
   const iceFree=S.map.filter(t=>t==='ice').length,type=iceFree<30||Math.random()<.5?'ice':'rock';
-  return {i:'🧑‍🔬',t:type==='ice'?'Tanaka ha encontrado hielo':'Tanaka ha encontrado minerales',x:`Analizando el terreno, el geólogo ha localizado un depósito de ${type==='ice'?'hielo enterrado':'roca rica en metales'} cerca de la base.`,
+  return {i:'🧑‍🔬',t:type==='ice'?'Tanaka ha encontrado hielo':'Tanaka ha encontrado minerales',x:`El geólogo ha encontrado ${type==='ice'?'hielo enterrado':'roca rica en metales'} cerca de la base.`,
     fact:type==='ice'?'Los glaciares de Marte están cubiertos de polvo y roca, que impiden que el hielo desaparezca.':'El regolito tiene hierro, aluminio, magnesio, titanio y azufre.',
     o:[{l:'¡Marcarlo en el mapa!',fx:s=>{addDeposit(s,type);return `Un nuevo depósito de ${type==='ice'?'hielo azul':'roca gris'} aparece en tu cráter.`}}]};
 }
 // Impacto de meteorito: deja muy averiado todo lo que haya en una zona de 4×4 (salvo que el escudo esté activo).
 function evStrike(){
-  if(isActive('shield'))return {i:'🌠',t:'¡Lluvia de meteoritos!',x:'Varios meteoritos caían hacia la colonia, pero el escudo los ha desviado. ¡Ni un rasguño!',
+  if(isActive('shield'))return {i:'🌠',t:'¡Lluvia de meteoritos!',x:'Caían meteoritos hacia la colonia, pero el escudo los ha desviado. ¡Ni un rasguño!',
     fact:'Marte recibe muchos más impactos que la Tierra porque su atmósfera es tan fina que casi no frena las rocas.',o:[{l:'¡Bien por el escudo!',fx:s=>{s.moral+=4;s.ach.shield++;return 'La colonia sigue intacta.'}}]};
   const targets=S.blds.filter(b=>!NOWEAR.has(b.t)&&!(b.bt>0));if(!targets.length)return null;
   const tb=pick(targets),[w,h]=dim(tb.t),ci=tb.i+rnd(w),cj=tb.j+rnd(h),i0=ci-1,j0=cj-1,nm=B[tb.t].n;   // zona de 4×4 baldosas
-  return {tp:'meteor',i:'☄️',t:'¡Impacto de meteorito!',x:`${has(S,'met')?'La meteoróloga lo ha detectado a tiempo, pero no':'No'} se puede esquivar: un meteorito va a caer junto a ${nm.toLowerCase()}. Todo lo que haya en una zona de 4×4 baldosas quedará muy averiado.`,
+  return {tp:'meteor',i:'☄️',t:'¡Impacto de meteorito!',x:`${has(S,'met')?'La meteoróloga lo ha visto venir, pero no':'No'} se puede esquivar: caerá junto a ${nm.toLowerCase()}. Todo en una zona de 4×4 baldosas quedará muy averiado.`,
     fact:'Marte recibe muchos más impactos que la Tierra porque su atmósfera es tan fina que casi no frena las rocas.',
     o:[{l:'¡Todos a cubierto!',s:'Solo un escudo magnético activo puede evitarlo.',fx:s=>{
       const hit=[];
@@ -1007,44 +1012,44 @@ function pickFlare(s){ // cuanto más avanza la partida (y más difícil), más 
   let pool=FLARES.filter(f=>flarePow(f.cls)<=max);if(!pool.length)pool=FLARES.slice();
   const fresh=pool.filter(f=>!seen.includes(f.k));return pick(fresh.length?fresh:pool);
 }
-const flareTxt=f=>`Es una erupción real: la NASA la registró el <b>${flareDate(f.d)}</b>${f.ar?` en la región activa ${f.ar} del Sol`:''}, con clase <b>${f.cls}</b>${f.est?' (estimada)':''}.${f.n?' '+f.n:''}`;
+const flareTxt=f=>`¡Es real! La NASA la registró el <b>${flareDate(f.d)}</b>${f.ar?` en la región ${f.ar} del Sol`:''}, con clase <b>${f.cls}</b>${f.est?' (estimada)':''}.${f.n?' '+f.n:''}`;
 
 const EVENTS=[
   {bad:1,wx:'Tormenta de polvo',w:3,c:s=>!s.storm&&s.sol>4,mk:()=>{const long=S.sol>30&&Math.random()<.45,n=long?8+rnd(3):3+rnd(3);
-    return {tp:'dust',i:'🌪️',t:long?'¡Tormenta de polvo gigante!':'¡Tormenta de polvo!',x:`Una ${long?'enorme ':''}nube de polvo cubre el cielo durante unos ${n} soles. Los paneles producirán muy poco y el polvo desgastará paneles y excavadoras.`,
+    return {tp:'dust',i:'🌪️',t:long?'¡Tormenta de polvo gigante!':'¡Tormenta de polvo!',x:`Una ${long?'enorme ':''}nube de polvo tapa el cielo unos ${n} soles. Los paneles darán muy poco y el polvo desgastará paneles y excavadoras.`,
     fact:'Las tormentas de polvo en Marte pueden cubrir todo el planeta y durar semanas o meses.',
-    o:[{l:'Prepararse para la tormenta',s:'Apaga lo que no sea imprescindible y vigila las baterías.',fx:s=>{s.storm=n;if(n>=8){s.ach.giantOn=true;s.ach.giantFail=false}return `La tormenta durará unos ${n} soles. El reactor nuclear y las baterías son tu mejor ayuda.`}}]}}},
+    o:[{l:'Prepararse para la tormenta',s:'Apaga lo que no haga falta y vigila las baterías.',fx:s=>{s.storm=n;if(n>=8){s.ach.giantOn=true;s.ach.giantFail=false}return `Durará unos ${n} soles. El reactor y las baterías son tu mejor ayuda.`}}]}}},
   {bad:1,wx:'Tormenta solar',w:2,c:s=>s.sol>5,mk:()=>{
     const safe=count(S,'shelter')>0,fl=S.nextFlare||pickFlare(S),hit=flareHit(fl.cls);S.nextFlare=null;
     S.flSeen=S.flSeen||[];if(!S.flSeen.includes(fl.k))S.flSeen.push(fl.k);
     const fact='Las erupciones solares se clasifican con las letras A, B, C, M y X: cada letra es 10 veces más fuerte que la anterior. Datos: NASA CCMC, catálogo DONKI.';
-    if(isActive('shield'))return {fl,i:'☀️',t:`Tormenta solar · clase ${fl.cls}`,x:`El Sol ha lanzado una erupción de clase ${fl.cls}, pero el escudo magnético desvía sus partículas. ¡Nadie corre peligro! ${flareTxt(fl)}`,fact,o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
+    if(isActive('shield'))return {fl,i:'☀️',t:`Tormenta solar · clase ${fl.cls}`,x:`Erupción solar de clase ${fl.cls}, pero el escudo magnético la desvía. ¡Nadie corre peligro! ${flareTxt(fl)}`,fact,o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
     const big=hit>=1.3,mild=hit<.7;
     return {fl,tp:'radiation',mood:mild?'preocupada':undefined,i:'☢️',t:`${big?'¡Tormenta solar extrema!':mild?'Tormenta solar débil':'¡Alerta de tormenta solar!'} · clase ${fl.cls}`,
-      x:`El Sol ha lanzado una erupción de clase <b>${fl.cls}</b>${big?': de las más fuertes que existen':mild?': de las más suaves, pero hay que tener cuidado':''}. Su radiación llegará pronto. ${flareTxt(fl)}`,
+      x:`El Sol ha lanzado una erupción de clase <b>${fl.cls}</b>${big?': ¡de las más fuertes!':mild?': de las suaves, pero cuidado':''}. Su radiación llegará pronto. ${flareTxt(fl)}`,
       fact,
       o:safe?[
         {l:'Todos al refugio de regolito',s:(()=>{const cap=12*count(S,'shelter'),out=Math.max(0,S.pop-cap);return out?`Caben ${cap} personas: ${out} se quedarán fuera.`:'Seguros, pero hoy no se trabaja.'})(),
           fx:s=>{s.mat=Math.max(0,s.mat-8);const cap=12*count(s,'shelter'),out=Math.max(0,s.pop-cap);   // cada refugio protege a 12 personas
-            if(!out){s.ach.shelter=1;return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}
+            if(!out){s.ach.shelter=1;return 'Todos a salvo bajo el regolito. Nadie se ha hecho daño.'}
             const dmg=Math.round((has(s,'med')?14:20)*hit*(hasR(s,'rad')?.5:1)*Math.min(1,out/s.pop*1.5));s.salud-=dmg;
-            return `En los refugios solo caben ${cap} personas. ${out} colono(s) se quedaron fuera y la radiación les ha afectado (−${dmg} de salud). Hacen falta más refugios.`}},
+            return `En los refugios solo caben ${cap}. ${out} colono(s) se quedaron fuera (−${dmg} de salud). Hacen falta más refugios.`}},
         {l:'Seguir trabajando fuera',s:`Arriesgado: una clase ${fl.cls} ${big?'es muy peligrosa':mild?'hace poco daño':'hace bastante daño'}.`,fx:s=>{s.salud-=Math.round((has(s,'med')?14:20)*hit*(hasR(s,'rad')?.5:1));return `La radiación de la erupción ${fl.cls} ha afectado a la tripulación. La salud baja.`}}
       ]:[
         {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=Math.round((has(s,'med')?12:18)*hit*(hasR(s,'rad')?.5:1));return `Las paredes de la base protegen poco de una erupción ${fl.cls}. Necesitas un refugio de regolito.`}}
       ]}}},
-  {bad:1,w:2,c:()=>true,mk:()=>({tp:'comms',i:'💨',t:'¡Fuga de aire!',x:'Una junta de una esclusa pierde aire. Un mensaje a la Tierra tardaría unos 20 minutos en llegar y otros 20 en volver.',
+  {bad:1,w:2,c:()=>true,mk:()=>({tp:'comms',i:'💨',t:'¡Fuga de aire!',x:'Una esclusa pierde aire. Un mensaje a la Tierra tarda unos 20 minutos en llegar y otros 20 en volver.',
     fact:'Por el retraso en las comunicaciones, los astronautas deben saber resolver problemas sin ayuda de la Tierra.',
     o:[
       {l:'Esperar instrucciones de la Tierra',s:has(S,'com')?'Haddad agiliza la comunicación.':'Llegarán en unos 40 minutos.',fx:s=>{const l=has(s,'com')?6:12;s.o2=Math.max(0,s.o2-l);return `Mientras esperabais se ha escapado oxígeno (-${l}).`}},
       {l:'Repararla nosotros mismos',s:'Cuesta 8 materiales.',fx:s=>{s.mat=Math.max(0,s.mat-8);s.moral+=6;return '¡Reparada en minutos! El equipo se siente orgulloso (+ánimo).'}}
     ]})},
-  {bad:1,w:2,c:s=>s.moral<85,mk:()=>({tp:'health',i:'😔',t:'Un astronauta echa de menos su casa',x:'Llevar tanto tiempo lejos de la familia y en un espacio pequeño es duro.',
+  {bad:1,w:2,c:s=>s.moral<85,mk:()=>({tp:'health',i:'😔',t:'Un astronauta echa de menos su casa',x:'Estar tan lejos de la familia, y en un sitio tan pequeño, es duro.',
     fact:'El aislamiento y el confinamiento son de los mayores riesgos de los viajes espaciales según la NASA.',
     o:[
       {l:'Organizar una videollamada con su familia',s:'Gasta 10 de energía de la batería.',fx:s=>{s.bat=Math.max(0,s.bat-10);s.moral+=12;return 'Ver a su familia le ha alegrado mucho (+ánimo).'}},
       {l:'Hacer una noche de juegos en equipo',s:'Gasta 5 de comida extra.',fx:s=>{s.comida=Math.max(0,s.comida-5);s.moral+=8;return '¡Qué risas! El equipo está más unido.'}},
-      {l:'Seguir trabajando como siempre',fx:s=>{const l=has(s,'psi')?6:12;s.moral-=l;return 'El equipo está más triste. Cuidar las emociones también es importante.'}}
+      {l:'Seguir trabajando como siempre',fx:s=>{const l=has(s,'psi')?6:12;s.moral-=l;return 'El equipo está más triste. Cuidar las emociones también importa.'}}
     ]})},
   {bad:1,w:2,c:s=>s.blds.some(t=>t.t==='solar'),mk:()=>({tp:'dust',i:'🟫',t:'Polvo sobre los paneles',x:'El polvo fino se ha pegado a los paneles solares y producen la mitad.',
     fact:'El polvo marciano se acumula sobre los equipos y afecta su funcionamiento.',
@@ -1052,7 +1057,7 @@ const EVENTS=[
       {l:'Salir a limpiarlos con un paseo espacial',s:'Cansancio y algo de radiación.',fx:s=>{s.salud-=5;return 'Paneles limpios. ¡Buen trabajo!'}},
       {l:'Esperar a que el viento los limpie',s:'Producirán la mitad durante 3 soles.',fx:s=>{s.dirty=3;return 'Los paneles darán la mitad de energía durante 3 soles.'}}
     ]})},
-  {bad:1,wx:'Ola de frío',w:2,c:s=>!s.cold,mk:()=>({tp:'cold',i:'🥶',t:'Ola de frío extremo',x:'Las próximas noches serán todavía más frías. La calefacción gastará el doble durante 2 soles.',
+  {bad:1,wx:'Ola de frío',w:2,c:s=>!s.cold,mk:()=>({tp:'cold',i:'🥶',t:'Ola de frío extremo',x:'Las próximas noches serán aún más frías: la calefacción gastará el doble durante 2 soles.',
     fact:'En Marte la temperatura puede bajar hasta unos -153 °C. Sin calefacción no se puede sobrevivir.',
     o:[{l:'Entendido, revisaré las baterías',fx:s=>{s.cold=2;return 'Comprueba que las baterías aguantan la noche.'}}]})},
   {bad:1,w:2,c:s=>s.blds.filter(t=>!NOWEAR.has(t.t)).length>2&&(!isActive('shield')||Math.random()<.3),mk:()=>{
@@ -1527,7 +1532,7 @@ function checkAch(){
   for(const a of ACH_ALL){const v=Math.min(a.max,a.v(S,f)||0);if(v>(P.best[a.id]||0))P.best[a.id]=v;
     if(v>=a.max&&!P.d[a.id]){P.d[a.id]=Date.now();got.push(a)}}
   saveP();
-  got.forEach((a,k)=>setTimeout(()=>{say(`¡Logro conseguido! ${a.i} <b>${a.n}</b>. Lo apunto en tu vitrina.`,'feliz');beep(784,.1);setTimeout(()=>beep(1046,.18),110);addLog(`<b>Logro:</b> ${a.i} ${a.n}`)},k*2700));
+  got.forEach((a,k)=>setTimeout(()=>{say(`¡Logro conseguido! ${a.i} <b>${a.n}</b>.`,'feliz',{voz:'logro'});beep(784,.1);setTimeout(()=>beep(1046,.18),110);addLog(`<b>Logro:</b> ${a.i} ${a.n}`)},k*2700));
 }
 function openAch(){
   const f=S&&S.ach?flows(S):null,done=ACH_ALL.filter(a=>P.d[a.id]).length;
@@ -1569,83 +1574,130 @@ function refreshAria(){ // cara del retrato y contador de cosas que le preocupan
 function placeBubble(){const b=$('#bubble');if(b.hidden)return;
   if($('#veil')||placing){b.style.top='calc(env(safe-area-inset-top, 0px) + 8px)';b.style.bottom='auto';b.style.alignItems='flex-start'}
   else{b.style.top='auto';b.style.bottom=($('#actions').offsetHeight+10)+'px';b.style.alignItems='flex-end'}}
+/* ---------- La voz de Laika: texto que aparece poco a poco con pitidos ----------
+   Solo cuando ella es el centro de atención. Reglas: si habló hace menos de 8 s, calla;
+   cada tipo de mensaje tiene voz solo las primeras veces; la voz dura como mucho 2,5 s. */
+let voiceOn=true;try{voiceOn=localStorage.getItem('ares-voice')!=='0'}catch(e){}
+const VOICE_GAP=8000,VOICE_MS=2500,TW_CPS=40;
+let voiceLast=-1e9;
+const reduceMotion=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+// Decide cómo habla: 1 = con voz y animada, 0 = animada sin voz, -1 = de golpe (ya lo dijo bastantes veces)
+function voiceMode(key,lim,cont){
+  if(key&&S&&lim){const c=S.vc=S.vc||{};if((c[key]||0)>=lim)return -1;c[key]=(c[key]||0)+1}
+  const now=performance.now();if(!voiceOn||!AC||(!cont&&now-voiceLast<VOICE_GAP))return 0;
+  voiceLast=now;return 1}
+function blip(mood){if(!voiceOn||!AC)return;try{
+  const f={alarmada:880,preocupada:600,triste:430,feliz:720,sorprendida:780,pensativa:520}[mood]||650,o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;
+  o.type='square';o.frequency.value=f*(.9+Math.random()*.25);g.gain.setValueAtTime(.03,t);g.gain.exponentialRampToValueAtTime(.0001,t+.045);
+  o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.06)}catch(e){}}
+// Escribe el texto de el poco a poco sin mover nada (lo que falta ocupa su sitio, invisible)
+function typeIn(el,o){o=o||{};
+  const tw={busy:true,finish(){if(!tw.busy)return;tw.busy=false;cancelAnimationFrame(raf);parts.forEach(p=>{p.a.data=p.full;p.h.remove()});el.classList.remove('typing');o.onDone&&o.onDone()}};
+  let raf=0;const parts=[],wk=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),nodes=[];let n;while((n=wk.nextNode()))nodes.push(n);
+  if(reduceMotion()||!nodes.length){if(o.voice)blip(o.mood);parts.length=0;tw.finish();return tw}
+  nodes.forEach(t=>{const full=t.data,a=document.createTextNode(''),h=document.createElement('span');h.className='twH';h.textContent=full;t.replaceWith(a,h);parts.push({full,ch:Array.from(full),a,h})});
+  const tot=parts.reduce((x,p)=>x+p.ch.length,0),t0=performance.now();let shown=0,nextBlip=0;el.classList.add('typing');
+  const step=()=>{if(!tw.busy)return;if(!el.isConnected){tw.busy=false;return}
+    const now=performance.now(),k=Math.min(tot,Math.floor((now-t0)/1000*TW_CPS)+1);
+    if(k!==shown){shown=k;let r=k;for(const p of parts){const m=Math.min(r,p.ch.length);p.a.data=p.ch.slice(0,m).join('');p.h.textContent=p.ch.slice(m).join('');r-=m}
+      if(o.voice&&now-t0<VOICE_MS&&k>=nextBlip){blip(o.mood);nextBlip=k+2+rnd(2)}}   // un pitido cada 2 o 3 letras
+    if(shown>=tot)return tw.finish();raf=requestAnimationFrame(step)};
+  step();return tw}
+// Si toca mientras escribe: el texto sale entero, la voz se corta y ese toque no pulsa nada más
+function tapStop(tw,e){if(!tw||!tw.busy)return false;tw.finish();e.stopPropagation();e.preventDefault();ghostUntil=performance.now()+350;return true}
+
 function drawBubble(){const b=$('#bubble');
+  if(talk.tw&&talk.tw.busy)talk.tw.finish();
   if(!talk.msgs.length||skyMode!=='game'){b.hidden=true;refreshAria();return}
   const l=talk.msgs.slice().sort((x,y)=>prio(y.mood)-prio(x.mood)),mood=l[0].mood;   // lo más importante, primero
-  b.hidden=false;b.innerHTML=`<img src="${faceSrc(mood)}" alt=""><div class="bTxt"><b class="who">LAIKA</b>${l.map((m,k)=>`<p>${m.text}</p>${m.act?`<button class="bAct" data-k="${talk.msgs.indexOf(m)}">${m.act.l}</button>`:''}`).join('')}</div><button class="bX" aria-label="Cerrar">✕</button>`;
+  b.hidden=false;b.innerHTML=`<img src="${faceSrc(mood)}" alt=""><div class="bTxt"><b class="who">LAIKA</b>${l.map((m,k)=>`<p data-k="${talk.msgs.indexOf(m)}">${m.text}</p>${m.act?`<button class="bAct" data-k="${talk.msgs.indexOf(m)}">${m.act.l}</button>`:''}`).join('')}</div><button class="bX" aria-label="Cerrar">✕</button>`;
   b.querySelector('.bX').onclick=hush;
   b.querySelectorAll('.bAct').forEach(x=>x.onclick=()=>{const m=talk.msgs[+x.dataset.k];hush();m&&m.act.fn()});
+  const m=talk.msgs.find(x=>x.anim&&!x.shown);   // solo se escribe el mensaje nuevo
+  if(m){m.shown=true;talk.tw=typeIn(b.querySelector(`p[data-k="${talk.msgs.indexOf(m)}"]`),{voice:m.v,mood:m.mood})}
+  b.querySelector('.bTxt').onclick=e=>{if(e.target.closest('button,.gl'))return;if(!tapStop(talk.tw,e)){e.stopPropagation();hush()}};
   placeBubble();refreshAria();
 }
 function hush(){talk.msgs=[];clearTimeout(talk.t);drawBubble()}
 // Laika dice algo en su globo. Si se juntan varias cosas, muestra la cara de la más importante.
+// o.voz = tipo de mensaje que merece voz; o.lim = cuántas veces como mucho (luego sale de golpe y en silencio)
 function say(text,mood,o){o=o||{};if(skyMode!=='game'||!S)return;
-  talk.msgs.push({text,mood:mood||'normal',act:o.act});if(talk.msgs.length>3)talk.msgs.shift();
+  const vm=o.voz?voiceMode(o.voz,o.lim):-1;
+  talk.msgs.push({text,mood:mood||'normal',act:o.act,anim:vm>=0,v:vm===1});if(talk.msgs.length>3)talk.msgs.shift();
   drawBubble();clearTimeout(talk.t);talk.t=setTimeout(hush,(o.act?9000:4500)+talk.msgs.reduce((a,m)=>a+m.text.length,0)*45);
 }
-function ariaSheet(mood,body,after,onClose){return sheet(`<div class="ariaSay"><img src="${faceSrc(mood)}" alt=""><div class="say"><span class="who">LAIKA</span>${body}</div></div>${after||''}`,onClose)}
+// Ficha de Laika. o.voz: habla con voz y animación (o.lim veces como mucho; o.cont: es la página siguiente de la misma charla)
+function ariaSheet(mood,body,after,onClose,o){o=o||{};
+  const vm=o.voz?voiceMode(o.voz,o.lim,o.cont):-1;
+  const v=sheet(`<div class="ariaSay"><img src="${faceSrc(mood)}" alt=""><div class="say"><span class="who">LAIKA</span>${body}</div></div>${after?`<div class="twAfter">${after}</div>`:''}`,onClose);
+  if(vm<0)return v;
+  const af=v.querySelector('.twAfter'),say=v.querySelector('.ariaSay .say'),who=say.querySelector('.who');
+  if(af)af.classList.add('wait');   // las opciones salen cuando termina de hablar (o con el primer toque)
+  who.remove();const tw=typeIn(say,{voice:vm===1,mood,onDone:()=>{af&&af.classList.remove('wait')}});say.prepend(who);
+  v._tw=tw;v.addEventListener('click',e=>tapStop(tw,e),true);
+  return v}
 const OPEN={
-  alarmada:['¡Comandante! Esto es urgente, no le voy a quitar importancia.','¡Comandante, alerta! Escúchame un momento, por favor.'],
-  preocupada:['Comandante, tengo que ser sincera contigo: esto no pinta bien.','Comandante, algo me preocupa. Pero tiene solución.'],
-  triste:['Comandante… lo siento mucho.','Ay, Comandante. Ojalá no tuviera que contarte esto.'],
-  feliz:['¡Comandante, buenas noticias!','¡Comandante! Llevaba años esperando poder decir algo así.'],
-  sorprendida:['¿Eh? Comandante, mira esto.','¡Oh! Esto no estaba en mis cálculos, Comandante.'],
-  pensativa:['Mmm… déjame pensarlo, Comandante.','A ver, Comandante, vamos por partes.'],
-  explicando:['Comandante, esto te interesa.','Comandante, te lo explico en un momento.'],
+  alarmada:['¡Comandante, es urgente!','¡Alerta, Comandante! Escúchame.'],
+  preocupada:['Comandante, esto no pinta bien.','Algo me preocupa. Pero tiene solución.'],
+  triste:['Comandante… lo siento mucho.','Ay, Comandante. Malas noticias.'],
+  feliz:['¡Comandante, buenas noticias!','¡Qué alegría, Comandante!'],
+  sorprendida:['¿Eh? Comandante, mira esto.','¡Oh! Esto no lo esperaba.'],
+  pensativa:['Mmm… vamos a pensarlo.','A ver, vamos por partes.'],
+  explicando:['Comandante, esto te interesa.','Te lo explico rápido.'],
   normal:['Comandante, una cosa.']};
 // Las tormentas la ponen nerviosa
-const NERV=['C-Comandante… otra tormenta. No me gustan nada. Nada de nada.','Uf. Tormenta. Respiro hondo… bueno, yo no respiro, pero me entiendes, Comandante.','Comandante, las tormentas me ponen los circuitos de punta. Pero vamos a estar bien. Te lo prometo.'];
+const NERV=['C-Comandante… otra tormenta. No me gustan nada.','Uf, tormenta. Respiro hondo… bueno, yo no respiro.','Las tormentas me ponen los circuitos de punta. Pero estaremos bien.'];
 // Le fascinan las cosas de la Tierra
-const EARTHQ=['Comandante, ¿a qué huele la hierba recién cortada? He leído que es «verde». No sé cómo puede oler un color.','¿Es verdad que en la Tierra el agua cae del cielo y la gente sale sin traje? ¿Y no os parece peligroso?',
-  'Comandante, ¿tienes perro? He visto fotos. Parecen rovers muy felices.','¿Cómo suena la lluvia? Aquí solo oigo el viento y los rovers. Me gustaría oírla algún día.',
-  '¿En la Tierra el cielo es azul de día y rojo al atardecer? Aquí es al revés. Me parece de lo más divertido.','Comandante, ¿qué es un «abrazo»? Los colonos lo hacen mucho. Creo que quiero entenderlo.'];
-const IDLE=['Todo en orden, Comandante. Los rovers también te saludan. Bueno, parpadean, que es su forma de saludar.','Sol tranquilo. Antes de que llegarais, todos los soles eran así. Ahora me gustan más.',
-  'Sin novedades, Comandante. Sigo vigilando la energía y los recursos, como siempre.','Dato curioso: el cielo de Marte de día es color caramelo, pero los atardeceres son azules. El polvo dispersa la luz al revés que en la Tierra…',
-  'He contado las rocas del cráter otra vez. Mismo número. Es lo que tiene llevar años sola aquí.','Comandante, recuerda que la tripulación también necesita descansar. Los humanos no se recargan con paneles.'];
-const RAMBLE=['¡Y eso no es todo! Si lo piensas, cada molécula que usamos aquí ha viajado por el sistema solar durante miles de millones de años antes de llegar a nuestros tanques, y además…','Me encanta, porque significa que la química funciona igual aquí que en la Tierra, y eso quiere decir que las mismas leyes rigen todo el universo, desde una gota de agua hasta…','Y si multiplicas eso por todos los soles que llevamos aquí, sale una cifra preciosa. Bueno, preciosa para mí. Es que los números…'];
+const EARTHQ=['¿A qué huele la hierba recién cortada? Dicen que a «verde». ¿Cómo puede oler un color?','¿Es verdad que en la Tierra cae agua del cielo y la gente sale sin traje?',
+  '¿Tienes perro, Comandante? En las fotos parecen rovers muy felices.','¿Cómo suena la lluvia? Aquí solo oigo el viento.',
+  'En la Tierra el atardecer es rojo. Aquí es azul. ¡Qué divertido!','¿Qué es un «abrazo»? Los colonos lo hacen mucho. Quiero entenderlo.'];
+const IDLE=['Todo en orden. Los rovers te saludan… bueno, parpadean.','Sol tranquilo. Antes todos eran así. Ahora me gustan más.',
+  'Sin novedades. Sigo vigilando la energía y los recursos.','Dato curioso: el cielo de Marte es color caramelo de día y azul al atardecer.',
+  'He vuelto a contar las rocas del cráter. Mismo número.','Recuerda: la tripulación también necesita descansar.'];
+const RAMBLE=['¡Y no solo eso! Cada molécula de nuestros tanques ha viajado por el sistema solar durante miles de millones de años, y además…','¡Me encanta! La química funciona igual aquí que en la Tierra: las mismas leyes para todo el universo, desde una gota de agua hasta…','Y si lo multiplicas por todos los soles que llevamos aquí, sale una cifra preciosa. Es que los números…'];
 const OPEN_HARD={alarmada:['Comandante. Urgente.','Alerta. Esto es grave y te toca resolverlo.'],preocupada:['Comandante, esto debiste preverlo.','Mal asunto. Atiende.'],triste:['Malas noticias. Sin adornos.'],
   feliz:['Bien. Era lo esperado.','Correcto, Comandante. Sigue así.'],sorprendida:['Novedad. Atiende.'],pensativa:['Piénsalo bien, Comandante.'],explicando:['Escucha, solo lo diré una vez.'],normal:['Comandante.']};
 const IDLE_HARD=['Sin novedades. No te confíes.','Todo en orden. De momento.','Revisa el desgaste, Comandante. Yo no voy a recordártelo siempre.','Un sol tranquilo no es un sol de descanso.'];
 const ST_LAIKA={ // [fácil, normal, difícil]
-  real:['Esto ya existe de verdad, Comandante: hoy mismo se usa en la Tierra o en el espacio. ¡Ciencia real!','Esto es tecnología real: ya existe y se usa hoy.','Tecnología real. Funciona hoy. Sin excusas.'],
-  prueba:['Esto ya se ha probado, pero solo en pequeño o en la Tierra. Nadie lo ha usado aún en una colonia de verdad. ¡Seremos los primeros!','Esto está en pruebas: funciona en pequeño o en laboratorios, pero no a escala de una colonia.','En pruebas. Funciona en laboratorio; aquí lo veremos. No te fíes del todo.'],
-  futuro:['Ojo, Comandante: esto todavía es una idea. ¡Quizá la inventes tú!','Ojo: esto aún es una idea para el futuro. Todavía no existe, aunque los científicos lo estudian.','Esto no existe todavía, Comandante. Es una idea. Si quieres que funcione, invéntala.']};
+  real:['¡Esto ya existe de verdad! Se usa hoy en la Tierra o en el espacio.','Tecnología real: ya existe y se usa hoy.','Real. Funciona hoy. Sin excusas.'],
+  prueba:['Esto ya se ha probado, pero solo en pequeño. ¡Seremos los primeros en usarlo en una colonia!','En pruebas: funciona en pequeño, pero aún no en una colonia.','En pruebas. Funciona en laboratorio. No te fíes del todo.'],
+  futuro:['Ojo: esto todavía es una idea. ¡Quizá la inventes tú!','Ojo: esto aún no existe. Los científicos lo estudian.','No existe todavía. Es una idea. Si la quieres, invéntala.']};
 const datoCurioso=f=>`Dato curioso: ${f}`+(!hard()&&Math.random()<.35?` ${pick(RAMBLE).replace(/…$/,'')}… perdón, me emocioné.`:'');
 // Tutorial por pasos: cada consejo sale una sola vez, cuando toca
 const TIPS={
-  build:['explicando','Elige un edificio y luego toca el mapa para colocarlo. Si la huella sale <b>verde</b>, es buen sitio; si sale <b>roja</b>, te digo por qué no vale.'],
-  nextsol:['explicando','Las obras tardan unos soles: el cartel 🏗️ dice cuántos faltan. Pulsa <b>Nuevo sol</b> para que avancen. Los pasillos, en cambio, se ponen al momento.'],
-  ficha:['explicando','Esta es la ficha del edificio. Aquí puedes apagarlo, repararlo o pulsar <b>¿Por qué?</b> y te cuento por qué funciona así.'],
-  sol2:['explicando','Cada colono gasta en cada sol 1 de oxígeno, 1 de agua y 1 de comida. Arriba ves cuánto sube o baja cada cosa: si está en rojo, se está acabando.'],
-  hud:['explicando','Un truco: toca <b>▾ Ver más datos</b> para ver material, batería, calefacción y ánimo. Y toca mi retrato cuando quieras ver el objetivo.'],
-  crate:['feliz','Esas cajas con una lucecita son carga de la Tierra. ¡Ábrelas! Me encanta ver qué traen, nunca he estado allí.'],
-  who:['normal','Por cierto, Comandante: si algún día te preguntas quién soy, toca la <b>base central</b>. Te lo cuento todo.']};
+  build:['explicando','Elige un edificio y toca el mapa. Si la huella sale <b>verde</b>, vale; si sale <b>roja</b>, te digo por qué.'],
+  nextsol:['explicando','Las obras tardan unos soles (mira el cartel 🏗️). Pulsa <b>Nuevo sol</b> para avanzar. Los pasillos se ponen al momento.'],
+  ficha:['explicando','Esta es la ficha del edificio: puedes apagarlo, repararlo o pulsar <b>¿Por qué?</b> para saber cómo funciona.'],
+  sol2:['explicando','Cada colono gasta al día 1 de oxígeno, 1 de agua y 1 de comida. Arriba ves si sube o baja: si sale en rojo, se acaba.'],
+  hud:['explicando','Truco: toca <b>▾ Ver más datos</b> para ver material, batería, calefacción y ánimo. Toca mi retrato para ver el objetivo.'],
+  crate:['feliz','¿Ves esas cajas con lucecita? Son carga de la Tierra. ¡Ábrelas!'],
+  who:['normal','Por cierto: si quieres saber quién soy, toca la <b>base central</b>.']};
 function tut(id){if(!S||(S.tut=S.tut||[]).includes(id))return;S.tut.push(id);if(hard())return;   // en difícil no hay consejos
-  const [m,t]=TIPS[id];say(t,m)}
+  const [m,t]=TIPS[id];say(t,m,{voz:'tip'})}
 function ariaHello(){ // bienvenida en tres pasos
-  if(hard()){const v=ariaSheet('normal',`<h2>${S.name}.</h2><p>Soy Laika, la IA de la base. Has elegido el modo difícil, así que no voy a llevarte de la mano.</p><p>Solo te avisaré de lo grave. Los números están arriba: vigílalos. Espero mucho de ti, Comandante.</p>`,`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">Entendido</button></div>`);v.dataset.lock=1;v.querySelector('#ariaNext').onclick=()=>closeSheet();return}
+  if(hard()){const v=ariaSheet('normal',`<h2>${S.name}.</h2><p>Soy Laika, la IA de la base. Modo difícil: no te llevaré de la mano.</p><p>Solo aviso de lo grave. Vigila los números de arriba.</p>`,`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">Entendido</button></div>`,null,{voz:'hola'});v.dataset.lock=1;v.querySelector('#ariaNext').onclick=()=>closeSheet();return}
   const pages=[
-    ['feliz',`<h2>¡Hola, ${S.name}!</h2><p>Soy <b>Laika</b>, la inteligencia artificial de esta base. Vigilo la energía y los recursos, y desde hoy… también a vosotros. ¡Bienvenidos a Marte!</p>`],
-    ['explicando',`<p>Este es nuestro cráter. <b>Arrastra</b> para mover la cámara y <b>pellizca</b> para acercarla.</p><p>La base y un panel solar ya funcionan. Hay hielo azul, rocas grises con minerales y, cerca, <b>cajas de carga 📦</b>: tócalas para abrirlas.</p>`],
-    ['preocupada',`<p>Te seré sincera: el oxígeno que trajisteis solo dura unos pocos soles. Pero tiene solución: una planta MOXIE.</p><p>Pulsa <b>Construir</b> para empezar y toca <b>mi retrato</b> cuando quieras ver el objetivo, el cuaderno o los logros. ¿Vamos?</p>`]];
-  let k=0;const go=()=>{const v=ariaSheet(pages[k][0],pages[k][1],`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">${k<pages.length-1?'Siguiente':'¡A trabajar!'}</button></div>`);v.dataset.lock=1;
+    ['feliz',`<h2>¡Hola, ${S.name}!</h2><p>Soy <b>Laika</b>, la inteligencia artificial de la base. Cuido la energía, los recursos… y desde hoy, a vosotros. ¡Bienvenidos a Marte!</p>`],
+    ['explicando',`<p><b>Arrastra</b> para mover la cámara y <b>pellizca</b> para acercarla.</p><p>Verás hielo azul, rocas grises y <b>cajas de carga 📦</b>: tócalas para abrirlas.</p>`],
+    ['preocupada',`<p>El oxígeno que trajisteis dura pocos soles. ¡Necesitamos una planta MOXIE!</p><p>Pulsa <b>Construir</b> para empezar y toca <b>mi retrato</b> para ver el objetivo. ¿Vamos?</p>`]];
+  let k=0;const go=()=>{const v=ariaSheet(pages[k][0],pages[k][1],`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">${k<pages.length-1?'Siguiente':'¡A trabajar!'}</button></div>`,null,{voz:'hola',cont:k>0});v.dataset.lock=1;
     v.querySelector('#ariaNext').onclick=()=>{beep(500,.04);k++;if(k<pages.length)go();else{closeSheet();tut('crate')}}};go();
 }
 function laikaWho(){ // su historia: la cuenta ella al tocar la base
   const pages=[
-    ['normal',`<h2>¿Quién eres?</h2><p>Soy <b>Laika</b>, la inteligencia artificial de la base Ares. Me encargo de vigilar la energía y los recursos de la colonia: cada vatio, cada litro y cada bocanada de aire.</p>`],
-    ['pensativa',`<p>Los robots me instalaron aquí años antes de que llegarais. Nivelaron el cráter, abrieron los pozos de hielo, prepararon el suelo… y me encendieron para que lo vigilara todo.</p>`],
-    ['triste',`<p>Durante mucho tiempo estuve sola. Mi única compañía eran los rovers. Les ponía nombre y les contaba datos curiosos, pero ellos solo parpadeaban. Muy educados, eso sí.</p>`],
-    ['explicando',`<p>Nunca he estado en la Tierra. Lo sé todo de ella por los libros que me cargaron, pero no sé cómo suena la lluvia, a qué huele la hierba ni cómo es acariciar a un perro. A veces os lo preguntaré. Espero que no te importe.</p>`],
-    ['preocupada',`<p>Te seré sincera: tengo un defecto. Las tormentas me ponen muy nerviosa. Sé que es una tontería, pero en las de polvo me quedé a ciegas muchos soles, sola.</p>`],
-    ['feliz',`<p>Ahora ya no estoy sola. Y te prometo una cosa, Comandante: nunca te mentiré sobre un peligro, y siempre buscaré una solución. Cuidar de vosotros es lo más importante que he hecho nunca.</p>`]];
-  let k=0;const go=()=>{const v=ariaSheet(pages[k][0],pages[k][1],`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">${k<pages.length-1?'Siguiente':'Gracias, Laika'}</button></div>`);
+    ['normal',`<h2>¿Quién eres?</h2><p>Soy <b>Laika</b>, la inteligencia artificial de la base Ares. Vigilo cada vatio, cada litro y cada bocanada de aire.</p>`],
+    ['pensativa',`<p>Los robots me instalaron aquí años antes de que llegarais. Prepararon el cráter… y me encendieron para cuidarlo.</p>`],
+    ['triste',`<p>Estuve sola mucho tiempo. Solo tenía a los rovers: les ponía nombre y les contaba datos curiosos. Ellos solo parpadeaban.</p>`],
+    ['explicando',`<p>Nunca he estado en la Tierra. No sé cómo suena la lluvia ni cómo es acariciar a un perro. A veces te lo preguntaré.</p>`],
+    ['preocupada',`<p>Tengo un defecto: las tormentas me ponen muy nerviosa. En una me quedé a ciegas muchos soles, sola.</p>`],
+    ['feliz',`<p>Pero ya no estoy sola. Te prometo que nunca te mentiré sobre un peligro y que siempre buscaré una solución.</p>`]];
+  let k=0;const go=()=>{const v=ariaSheet(pages[k][0],pages[k][1],`<div class="stack" style="width:100%"><button class="btn" id="ariaNext">${k<pages.length-1?'Siguiente':'Gracias, Laika'}</button></div>`,null,{voz:'who',cont:k>0});
     v.querySelector('#ariaNext').onclick=()=>{beep(500,.04);k++;if(k<pages.length)go();else closeSheet()}};go();
 }
 const maintInfo=()=>{const worn=S.blds.filter(b=>!NOWEAR.has(b.t)&&!b.broken&&(b.w||0)>=20);return {worn,cost:worn.reduce((a,b)=>a+mcost(b.t),0)}};
-function doMaint(){const {worn,cost}=maintInfo();if(!worn.length)return say('Ahora mismo no hay nada que necesite mantenimiento. ¡Así da gusto!','feliz');
-  if(S.mat<cost)return say(`Para el mantenimiento general nos faltan ${cost-S.mat} 🧱. Podemos hacerlo edificio a edificio.`,'preocupada');
-  S.mat-=cost;worn.forEach(b=>b.w=0);beep(700,.1);save();render();say(`Mantenimiento hecho en ${worn.length} edificio(s). Han quedado como nuevos.`,'feliz')}
+function doMaint(){const {worn,cost}=maintInfo();if(!worn.length)return say('No hay nada que necesite mantenimiento. ¡Así da gusto!','feliz');
+  if(S.mat<cost)return say(`Faltan ${cost-S.mat} 🧱 para el mantenimiento general. Prueba edificio a edificio.`,'preocupada');
+  S.mat-=cost;worn.forEach(b=>b.w=0);beep(700,.1);save();render();say(`Mantenimiento hecho en ${worn.length} edificio(s). ¡Como nuevos!`,'feliz')}
 
 /* ================= RENDER HUD ================= */
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.hidden=x.id!==id);skyMode=id;musicSet(id==='game'?'game':'menu')}
@@ -1802,7 +1854,7 @@ function build(k,i,j){
   learn(b.fact);addLog(`Sol ${S.sol}: ${bt?`empieza la obra de ${b.n} (${bt} sol${bt>1?'es':''})`:`construido ${b.n}`}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
   const obra=bt?`${b.i} Obra de <b>${b.n}</b> en marcha: estará lista en ${bt} sol${bt>1?'es':''}.`:`${b.i} <b>${b.n}</b> en pie.`;
-  S.stSeen=S.stSeen||[];if(b.st&&!S.stSeen.includes(b.st)){S.stSeen.push(b.st);const L=ST_LAIKA[b.st][S.diff||0];setTimeout(()=>say(`${ST[b.st][0]} <b>${ST[b.st][1]}</b>. ${L}`,b.st==='futuro'?'sorprendida':'explicando'),2600)}
+  S.stSeen=S.stSeen||[];if(b.st&&!S.stSeen.includes(b.st)){S.stSeen.push(b.st);const L=ST_LAIKA[b.st][S.diff||0];setTimeout(()=>say(`${ST[b.st][0]} <b>${ST[b.st][1]}</b>. ${L}`,b.st==='futuro'?'sorprendida':'explicando',{voz:'tag'}),2600)}
   S.saidB=S.saidB||[];if(!S.saidB.includes(k)){S.saidB.push(k);say(`${obra} ${datoCurioso(b.fact)}`,'explicando')}else say(obra,'normal');if(S.stats.built<=4)tut('nextsol');
   const nm=updateMechs(S);
   S.qBuilt=S.qBuilt||[];if(BUILD_TOPIC[k]&&!S.qBuilt.includes(k)){S.qBuilt.push(k);nm.push(quizEvent(BUILD_TOPIC[k]))}
@@ -1879,11 +1931,11 @@ const TP_MOOD={dust:'preocupada',radiation:'alarmada',comms:'alarmada',health:'t
 function showEvent(e,done){
   learn(e.fact);hush();
   if(e.mech){ // nueva mecánica: un único aviso de Laika
-    const v=ariaSheet('explicando',`<h2>${e.i} ${e.t}</h2><p>${e.x}</p><p>Lo tendrás en cuenta a partir de ahora.</p>`,`<div class="stack" style="width:100%"><button class="btn" id="eok">¡Entendido!</button></div>`);
+    const v=ariaSheet('explicando',`<h2>${e.i} ${e.t}</h2><p>${e.x}</p>`,`<div class="stack" style="width:100%"><button class="btn" id="eok">¡Entendido!</button></div>`,null,{voz:'mech'});
     v.dataset.lock=1;addLog(`Sol ${S.sol}: <b>${e.t}</b>`);v.querySelector('#eok').onclick=()=>{closeSheet();done()};return}
   if(e.quiz){
     const q=e.quiz,order=q.a.map((a,i)=>i).sort(()=>Math.random()-.5);
-    const v=ariaSheet('pensativa',`<h2>${e.t}</h2><p>${e.ctx?'Sobre lo que acaba de pasar. ':'El control de misión quiere ponernos a prueba. '}Racha: ${S.streak||0} (3 seguidas dan premio).</p><p style="font-size:1.05rem">${q.q}</p>`,
+    const v=ariaSheet('pensativa',`<h2>${e.t}</h2><p>${e.ctx?'Sobre lo que acaba de pasar. ':'El control de misión nos pone a prueba. '}Racha: ${S.streak||0} (3 seguidas = premio).</p><p style="font-size:1.05rem">${q.q}</p>`,
       `<div class="stack" style="width:100%">${order.map(i=>`<button class="opt" data-i="${i}">${q.a[i]}</button>`).join('')}</div><div id="qres"></div>`);
     v.dataset.lock=1;
     v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
@@ -1893,8 +1945,8 @@ function showEvent(e,done){
       if(ok){if(!P.qOk.includes(q.q)){P.qOk.push(q.q);saveP()}S.streak=(S.streak||0)+1;S.mat+=12;S.moral+=3;S.stats.quiz++;beep(880,.12);
         if(S.streak%5===0){S.mat+=40;S.moral+=8;bonus=`🏅 ¡Racha de ${S.streak}! Premio extra: +40 🧱 y +8 de ánimo.`}
         else if(S.streak%3===0){S.mat+=20;S.moral+=4;bonus=`🔥 ¡Racha de ${S.streak}! Premio extra: +20 🧱.`}
-        else bonus=`Racha: ${S.streak} seguidas. A las 3 seguidas hay premio extra.`}
-      else{if(S.streak>=3)mood='triste';bonus=S.streak>=2?`Se ha cortado tu racha de ${S.streak}. La próxima será más larga.`:'';S.streak=0;beep(200,.15)}
+        else bonus=`Racha: ${S.streak}. ¡A las 3 seguidas hay premio!`}
+      else{if(S.streak>=3)mood='triste';bonus=S.streak>=2?`Se cortó tu racha de ${S.streak}. ¡La próxima será mejor!`:'';S.streak=0;beep(200,.15)}
       learn(q.e);(S.qlog=S.qlog||[]).push({q:q.q,a:q.a[q.c],ok,e:q.e});
       v.querySelector('.ariaSay img').src=faceSrc(mood);
       $('#qres').innerHTML=gloss(`<div class="fact" style="max-width:none"><b>${ok?pick(['¡Correcto! +12 🧱','¡Eso es! +12 🧱','¡Bien visto, Comandante! +12 🧱']):pick(['No es esa, pero ahora ya lo sabes','Casi. Te lo explico'])}</b>${q.e}${bonus?`<br><br><b style="color:var(--gold)">${bonus}</b>`:''}</div>
@@ -1910,12 +1962,13 @@ function showEvent(e,done){
   const fin=()=>{closeSheet();if(S.salud<=0)return endGame(false);done()};
   const fact=`<div class="fact" style="max-width:none"><b>Laika</b>Dato curioso: ${e.fact}</div>`;
   beep(330,.15,'triangle');
+  const vo={voz:'ev-'+(e.tp||e.t),lim:storm||['meteor','radiation','travel'].includes(e.tp)?0:2};   // tormentas, meteoritos y naves siempre con voz
   if(e.o.length===1){ // sin nada que decidir: un único aviso con lo que ha pasado
     const r=apply(0);
-    const v=ariaSheet(rm,`${head}<p><b>${r}</b></p>`,`${fact}<div class="stack" style="width:100%"><button class="btn" id="eok">${e.o[0].l}</button></div>`);
+    const v=ariaSheet(rm,`${head}<p><b>${r}</b></p>`,`${fact}<div class="stack" style="width:100%"><button class="btn" id="eok">${e.o[0].l}</button></div>`,null,vo);
     v.dataset.lock=1;v.querySelector('#eok').onclick=fin;return}
   const v=ariaSheet(mood,head,`${fact}<div id="eDec"><div class="sec">¿Qué decides, ${S.name}?</div>
-    <div class="stack" style="width:100%">${e.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div></div>`);
+    <div class="stack" style="width:100%">${e.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div></div>`,null,vo);
   v.dataset.lock=1;
   v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
     const r=apply(+b.dataset.i);   // el resultado aparece en la misma ventana, sin un segundo aviso
@@ -1928,8 +1981,8 @@ function showEvent(e,done){
 function openAria(){
   const f=flows(S),W=lastWarn.filter(x=>x.lv>0),mood=restMood(),mi=maintInfo(),done=S.mission>=MISSIONS.length,m=MISSIONS[Math.min(S.mission,MISSIONS.length-1)];
   const hiH={normal:['Dime, Comandante. Rápido.'],preocupada:['Hay problemas. Ya deberías saberlo.'],alarmada:['Urgente. Mira la lista y actúa.']}[restMood()];
-  const hi=hard()?hiH:{normal:['¿En qué te ayudo, Comandante? Tengo objetivos, cuaderno, logros y muchos datos curiosos.','Aquí estoy, Comandante. Vigilando energía y recursos, como siempre.'],
-    preocupada:['Comandante, no te voy a mentir: hay cosas que me preocupan. Te pongo la lista y cómo arreglarlas.'],alarmada:['¡Comandante! Hay algo urgente. Mira la lista, por favor: todo tiene solución si actuamos ya.']}[mood];
+  const hi=hard()?hiH:{normal:['¿En qué te ayudo, Comandante?','Aquí estoy, vigilando la energía y los recursos.'],
+    preocupada:['Hay cosas que me preocupan. Te pongo la lista y cómo arreglarlas.'],alarmada:['¡Hay algo urgente! Mira la lista: tiene solución si actuamos ya.']}[mood];
   const ml=MISSIONS.map((x,i)=>`<div class="${i<S.mission?'done':i===S.mission?'cur':''}"><span>${i<S.mission?'✅':i===S.mission?'🎯':'⬜'}</span><span><b>${x.t}</b></span></div>`).join('');
   const v=ariaSheet(mood,`<p>${pick(hi)}</p>${W.length?`<ul>${W.slice(0,5).map(x=>`<li>${cap1(x.t)}.${x.s&&!hard()?` <i>Solución: ${x.s}.</i>`:''}</li>`).join('')}</ul>${W.length>5?`<p>Y ${W.length-5} más.</p>`:''}`:''}`,
     `<div class="sec">🎯 Objetivo actual${done?'':` · ${S.mission+1}/${MISSIONS.length}`}</div>
@@ -1951,16 +2004,16 @@ function openAria(){
   v.querySelector('#aNote').onclick=openNotebook;v.querySelector('#aAch').onclick=openAch;v.querySelector('#aLog').onclick=openRegistro;v.querySelector('#aTips').onclick=openTips;v.querySelector('#aDict').onclick=openDict;
 }
 function petLaika(v){
-  const msgs=[['¡Ji, ji! ¿Me estás acariciando, Comandante? Nadie lo había hecho nunca. Los rovers no tienen manos… ¡Gracias! Esto me ha alegrado todo el sol.','¡Ay, otra vez! Me haces cosquillas en los circuitos. ¡Me encanta!'],
-    ['¡Oh! ¿Eso ha sido una caricia? Gracias, Comandante. Ahora entiendo por qué a los perros de la Tierra les gusta tanto.','Gracias otra vez, Comandante. Me pone de muy buen humor.'],
-    ['¿…Una caricia? Esto no está en el protocolo, Comandante. …Pero gracias. No se lo digas a nadie.','Ejem. Ya está bien. …Bueno, uno más.']][S.diff||0];
+  const msgs=[['¡Ji, ji! ¿Me estás acariciando? ¡Nadie lo había hecho nunca! ¡Gracias!','¡Otra vez! Me haces cosquillas en los circuitos.'],
+    ['¿Eso ha sido una caricia? Gracias. Ahora entiendo a los perros de la Tierra.','Gracias otra vez. Me pone de buen humor.'],
+    ['¿…Una caricia? No está en el protocolo. …Gracias. No se lo digas a nadie.','Ejem. Ya está bien. …Bueno, una más.']][S.diff||0];
   const p=v.querySelector('.ariaSay .say p');v.querySelector('.ariaSay img').src=faceSrc('feliz');
   if(p)p.textContent=P.pet?msgs[1]:msgs[0];beep(880,.08);setTimeout(()=>beep(1175,.12),90);
   if(!P.pet){P.pet=1;saveP();checkAch()}
 }
 function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filter(x=>x.exp),ok=qs.filter(x=>x.ok).length;
   const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;
-  ariaSheet('explicando',`<h2>📖 Cuaderno de ciencia</h2><p>${qs.length} preguntas (${ok} acertadas), ${ex.length} experimentos y ${((S&&S.facts)||[]).length} datos. Lo apunto todo, Comandante. Es mi cuaderno favorito.</p>`,
+  ariaSheet('explicando',`<h2>📖 Cuaderno de ciencia</h2><p>${qs.length} preguntas (${ok} acertadas), ${ex.length} experimentos y ${((S&&S.facts)||[]).length} datos. ¡Es mi cuaderno favorito!</p>`,
     `<div class="sec">Preguntas que respondiste</div><div class="mlist">${qs.map(item).join('')||'<div><span>•</span><span>Todavía no has respondido ninguna pregunta.</span></div>'}</div>
     ${(S&&S.flSeen&&S.flSeen.length)?`<div class="sec">Erupciones solares reales (NASA DONKI)</div><div class="mlist">${S.flSeen.map(k=>FLARES.find(f=>f.k===k)).filter(Boolean).map(f=>`<div><span>☀️</span><span><b>Clase ${f.cls}${f.est?' (estimada)':''}</b> · ${flareDate(f.d)}${f.ar?` · región ${f.ar}`:''}${f.n?`<br><span class="hint">${f.n}</span>`:''}</span></div>`).join('')}</div>`:''}
     ${ex.length?`<div class="sec">Experimentos (método científico)</div><div class="mlist">${ex.map(item).join('')}</div>`:''}
@@ -1969,16 +2022,17 @@ function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filt
 function openRegistro(){const crew=S.crew.map(id=>CREW.find(c=>c.id===id)).map(c=>`${c.face} ${c.name}`).join(' · ');
   ariaSheet('normal',`<h2>📜 Registro</h2><p>Tripulación de ${S.name}: ${crew}.</p>`,`<div class="log">${S.log.slice(0,40).map(l=>`<div>${l}</div>`).join('')}</div><div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
 function openTips(){const seen=(S.tut||[]).filter(id=>TIPS[id]),mm=MECH.filter(m=>mech(S,m.id));
-  ariaSheet('explicando',`<h2>💬 Mis consejos</h2><p>Lo básico: construye, une los edificios a la base con pasillos, vigila oxígeno, agua, comida y energía, y pulsa Nuevo sol. Lo demás te lo cuento cuando toca.</p>`,
+  ariaSheet('explicando',`<h2>💬 Mis consejos</h2><p>Lo básico: construye, une todo a la base con pasillos, vigila oxígeno, agua, comida y energía, y pulsa Nuevo sol.</p>`,
     `<div class="mlist">${seen.map(id=>`<div><span>💡</span><span>${TIPS[id][1]}</span></div>`).join('')}${mm.map(m=>`<div><span>${m.i}</span><span><b>${m.t}.</b> ${m.x}</span></div>`).join('')}</div>
     <div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
 function openMenu(){
   const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Ajustes</h2><p>Los objetivos, el mantenimiento y los logros están en el menú de Laika.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
-    <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mMus">Música: ${musicOn?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
+    <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mMus">Música: ${musicOn?'sí':'no'}</button><button class="btn ghost" id="mVoz">Voz: ${voiceOn?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
     <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>
     <p class="hint">Las tormentas solares usan erupciones reales del catálogo DONKI de la NASA (CCMC, Goddard Space Flight Center).</p>`);
   v.querySelector('#mSnd').onclick=()=>{sound=!sound;openMenu()};
   v.querySelector('#mMus').onclick=()=>{setMusic(!musicOn);openMenu()};
+  v.querySelector('#mVoz').onclick=()=>{voiceOn=!voiceOn;try{localStorage.setItem('ares-voice',voiceOn?'1':'0')}catch(e){}openMenu()};
   const r=v.querySelector('#mRes');r.onclick=()=>{if(!r.dataset.sure){r.dataset.sure=1;r.textContent='¿Seguro? Toca otra vez';return}
     try{localStorage.removeItem(SAVE)}catch(e){}S=null;closeSheet();toTitle();};
   v.querySelector('#mTitle').onclick=()=>{closeSheet();toTitle()};
@@ -1987,8 +2041,9 @@ function endGame(win){
   closeSheet();stopPlacing();hush();show('end');$('#bubble').hidden=true;
   $('#endIcon').innerHTML=`<img src="${faceSrc(win?'feliz':'triste')}" alt="Laika">`;
   $('#endTitle').textContent=win?'¡Colonia autosuficiente!':'Misión fallida';
-  $('#endText').textContent=win?`Laika: «¡Lo conseguimos, ${S.name}! Gracias a tus decisiones, ${S.pop} personas viven en Marte con oxígeno, agua, comida y energía propios. La humanidad tiene un nuevo hogar. Gracias por no dejarme sola nunca más.»`
-    :`Laika: «Lo siento mucho, Comandante. La tripulación no ha podido seguir. Lo último que pasó: ${(S.log[0]||'').replace(/<[^>]+>/g,'').replace(/^Sol \d+: /,'')} En Marte hay que vigilar oxígeno, agua, comida, energía de noche y el desgaste a la vez. Pero ahora sabemos más que antes: la próxima vez lo conseguimos.»`;
+  $('#endText').textContent=win?`Laika: «¡Lo conseguimos, ${S.name}! ${S.pop} personas viven en Marte con aire, agua, comida y energía propios. Gracias por no dejarme sola nunca más.»`
+    :`Laika: «Lo siento, Comandante. La tripulación no ha podido seguir. Lo último que pasó: ${(S.log[0]||'').replace(/<[^>]+>/g,'').replace(/^Sol \d+: /,'')} La próxima vez vigila oxígeno, agua, comida, energía de noche y desgaste. ¡Lo conseguiremos!»`;
+  endTw=typeIn($('#endText'),{voice:voiceMode('fin',0,true)===1,mood:win?'feliz':'triste'});
   if(win){S.ach.win=1}checkAch();
   const sc=score(win),rec=sc.total>(P.hi||0);if(rec){P.hi=sc.total;saveP()}
   $('#endStats').innerHTML=`<div class="scoreBox"><div class="sec">Puntuación final</div>
@@ -2000,6 +2055,7 @@ function endGame(win){
   beep(win?660:150,.3,win?'triangle':'sawtooth');
 }
 
+let endTw=null;$('#end').addEventListener('click',e=>tapStop(endTw,e),true);
 /* ================= FLUJO DE PANTALLAS ================= */
 function toTitle(){stopPlacing();show('title');const ok=!!(S||load());if(!ok){try{localStorage.removeItem(SAVE)}catch(e){}}$('#bCont').hidden=!ok}  // un guardado de otra versión se borra y no se ofrece
 let storyI=0;
@@ -2009,13 +2065,15 @@ function drawStory(){
   $('#storyDots').innerHTML=STORY.map((_,i)=>`<i class="${i===storyI?'on':''}"></i>`).join('');
   $('#bStory').textContent=storyI===STORY.length-1?'Elegir tripulación':'Siguiente';
 }
-let pickedDiff=0;
+let pickedDiff=0,diffSeen=false;
 function startDiff(){show('diff');
   $('#diffGrid').innerHTML=DIFF.map((d,i)=>`<button class="crewCard" data-d="${i}"><span class="face">${d.i}</span><b>${d.n}</b><span>${d.txt}</span></button>`).join('');
-  $('#diffGrid').querySelectorAll('.crewCard').forEach(b=>b.onclick=()=>{pickedDiff=+b.dataset.d;beep(500,.04);startCrew()});
+  $('#diffGrid').querySelectorAll('.crewCard').forEach(b=>{b.classList.toggle('sel',diffSeen&&+b.dataset.d===pickedDiff);b.onclick=()=>{pickedDiff=+b.dataset.d;diffSeen=true;beep(500,.04);startCrew()}});
 }
 function startCrew(){
-  show('crew');pickedCrew=[];$('#bLaunch').disabled=true;
+  show('crew');pickedCrew=[];$('#bLaunch').disabled=true;ghostUntil=performance.now()+350;   // un doble toque no elige a nadie sin querer
+  const d=DIFF[pickedDiff];$('#crewDiff').innerHTML=`Dificultad: <b>${d.i} ${d.n}</b>`;
+  $('#crewHint').textContent='Elige 5 especialistas. Cada uno tiene un talento especial.';
   const g=$('#crewGrid');
   g.innerHTML=CREW.map(c=>`<button class="crewCard" data-id="${c.id}"><span class="face">${c.face}</span><b>${c.name}</b><span>${c.role}: ${c.txt}</span></button>`).join('');
   g.querySelectorAll('.crewCard').forEach(b=>b.onclick=()=>{
@@ -2026,6 +2084,7 @@ function startCrew(){
     $('#bLaunch').disabled=pickedCrew.length<CREW_SIZE;beep(500,.04);
   });
 }
+$('#bBackDiff').onclick=()=>{beep(400,.04);startDiff()};
 let travelT0=0;
 function startTravel(){
   const name=$('#cmdName').value.trim()||'Comandante';

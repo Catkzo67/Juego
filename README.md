@@ -42,8 +42,15 @@ La partida se guarda automáticamente en el navegador.
 - Las imágenes están en `assets/laika_*.png`; la correspondencia emoción → imagen está en `MOOD_IMG`, dentro de `index.html`.
 - Su historia la cuenta ella misma: toca la base central y pulsa «¿Quién eres?».
 
+### La voz de Laika
+- **Habla con voz y el texto aparece poco a poco** (unas 40 letras por segundo, un pitido cada 2–3 letras) solo cuando ella es el centro de atención: bienvenida y consejos del tutorial, su historia, victoria o derrota, sucesos importantes (tormentas, meteoritos, naves, nuevas mecánicas), misiones cumplidas, logros y avisos urgentes.
+- **Texto de golpe y sin voz**: mensajes repetidos del globo (obra en marcha, caja abierta, mantenimiento, falta material), listas (objetivo, cuaderno, registro, diccionario), lo que el jugador pide al tocar algo (¿Por qué?, palabras del glosario) y las preguntas del quiz.
+- Para que no canse: si habló hace menos de 8 s el siguiente mensaje sale sin sonido (salvo las páginas siguientes de una misma charla); cada tipo de mensaje tiene voz solo las primeras veces (p. ej. «obra terminada», 2 veces); la voz dura como mucho 2,5 s aunque el texto siga.
+- Primer toque mientras escribe: el texto sale entero y la voz se corta. Segundo toque: siguiente página o cerrar el globo. Las opciones de un suceso aparecen cuando termina el texto (o con el primer toque), y ese toque no pulsa nada de debajo.
+- La voz se apaga aparte en **Ajustes → Voz**, sin quitar música ni efectos. Si el dispositivo tiene activado *reducir movimiento*, el texto sale entero de golpe.
+
 ## Dificultad
-Se elige antes de la tripulación, en cada partida nueva:
+Se elige antes de la tripulación, en cada partida nueva (en la pantalla de tripulación, «← Cambiar» vuelve a elegirla):
 - **Fácil:** el juego base. Meta de 30 colonos; la puntuación vale la mitad.
 - **Normal:** más desastres y meteoritos, un 30% más de desgaste, construir e investigar cuesta un 25% más. Meta de 40 colonos.
 - **Difícil:** aún más desastres, un 70% más de desgaste, costes un 50% mayores, los edificios gastan un 20% más de energía y los colonos consumen un 15% más. Se empieza con más comida (110) para compensar el consumo, Laika casi no da consejos y la meta son 50 colonos; la puntuación vale un 50% más.
