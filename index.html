@@ -1818,16 +1818,23 @@ function showEvent(e,done){
   }
   const mood=e.mood||TP_MOOD[e.tp]||'sorprendida',rm=e.tp==='meteor'?'triste':mood;
   const storm=/ormenta/.test(e.t)&&!/escudo/.test(e.x);
-  const v=ariaSheet(mood,`<h2>${e.i} ${e.t}</h2><p>${storm?pick(NERV):pick((hard()?OPEN_HARD:OPEN)[mood])}</p><p>${e.x}</p>${e.forecast?'<p>📡 Ya nos lo había avisado la antena.</p>':''}`,
-    `<div class="fact" style="max-width:none"><b>Laika</b>Dato curioso: ${e.fact}</div>
-    <div class="sec">¿Qué decides, ${S.name}?</div>
-    <div class="stack" style="width:100%">${e.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div>`);
-  v.dataset.lock=1;beep(330,.15,'triangle');
+  const head=`<h2>${e.i} ${e.t}</h2><p>${storm?pick(NERV):pick((hard()?OPEN_HARD:OPEN)[mood])}</p><p>${e.x}</p>${e.forecast?'<p>📡 Ya nos lo había avisado la antena.</p>':''}`;
+  const apply=i=>{const r=e.o[i].fx(S);S.salud=clamp(S.salud,0,100);S.moral=clamp(S.moral,0,100);addLog(`Sol ${S.sol}: <b>${e.t}</b> ${r}`);save();render();return r};
+  const fin=()=>{closeSheet();if(S.salud<=0)return endGame(false);done()};
+  const fact=`<div class="fact" style="max-width:none"><b>Laika</b>Dato curioso: ${e.fact}</div>`;
+  beep(330,.15,'triangle');
+  if(e.o.length===1){ // sin nada que decidir: un único aviso con lo que ha pasado
+    const r=apply(0);
+    const v=ariaSheet(rm,`${head}<p><b>${r}</b></p>`,`${fact}<div class="stack" style="width:100%"><button class="btn" id="eok">${e.o[0].l}</button></div>`);
+    v.dataset.lock=1;v.querySelector('#eok').onclick=fin;return}
+  const v=ariaSheet(mood,head,`${fact}<div id="eDec"><div class="sec">¿Qué decides, ${S.name}?</div>
+    <div class="stack" style="width:100%">${e.o.map((o,i)=>`<button class="opt" data-i="${i}">${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')}</div></div>`);
+  v.dataset.lock=1;
   v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
-    const r=e.o[+b.dataset.i].fx(S);S.salud=clamp(S.salud,0,100);S.moral=clamp(S.moral,0,100);
-    addLog(`Sol ${S.sol}: <b>${e.t}</b> ${r}`);save();render();
-    const v2=ariaSheet(rm,`<h2>${e.i} ${e.t}</h2><p>${r}</p>`,`<div class="stack" style="width:100%"><button class="btn" id="eok">Continuar</button></div>`);v2.dataset.lock=1;
-    $('#eok').onclick=()=>{closeSheet();if(S.salud<=0)return endGame(false);done()};
+    const r=apply(+b.dataset.i);   // el resultado aparece en la misma ventana, sin un segundo aviso
+    v.querySelector('.ariaSay img').src=faceSrc(rm);
+    v.querySelector('#eDec').innerHTML=gloss(`<div class="fact" style="max-width:none"><b>Resultado</b>${r}</div><div class="stack" style="width:100%;margin-top:10px"><button class="btn" id="eok">Continuar</button></div>`);
+    v.querySelector('#eok').onclick=fin;
   });
 }
 // Menú de Laika: se abre al tocar su retrato
