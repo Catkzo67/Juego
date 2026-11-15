@@ -11,6 +11,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Nunito:wght@600;700;800&display=swap">
 <style>
+/* «2» redibujado: en Pixelify Sans se confundía con el 8. Solo cambia ese carácter. */
+@font-face{font-family:'Pix2';font-weight:500;src:url(data:font/ttf;base64,AAEAAAAOAIAAAwBgR1BPU0R2THUAAATIAAAAIEdTVUK4+rj0AAAE6AAAACpPUy8yYH5bfAAAAWgAAABgU1RBVHmRaoEAAAUUAAAAKmNtYXAADACFAAAB0AAAADRnYXNwAAAAEAAABMAAAAAIZ2x5ZtFbMosAAAIMAAAAfmhlYWQp9ALKAAAA7AAAADZoaGVhBjgB7gAAASQAAAAkaG10eAUWAKAAAAHIAAAACGxvY2EAPwAVAAACBAAAAAZtYXhwAAkAGQAAAUgAAAAgbmFtZS7tVGYAAAKMAAACFHBvc3T/uAAyAAAEoAAAACAAAQAAAAEAAEIMduhfDzz1AAMD6AAAAADhH3IwAAAAAOcfTaYAPP9xAmICoAAAAAYAAgAAAAAAAAABAAADmP7oAAACxgA8AD0CYgABAAAAAAAAAAAAAAAAAAAAAgABAAAAAgAYAAYAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAQCPwH0AAUAAAK8AooAAACMArwCigAAAd0AMgD6AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAE5PTkUAwAAyADIDmP7oAAADmgEhAAAAAQAAAAAByAK8AAAAIAADAsYAZAJQADwAAAACAAAAAwAAABQAAwABAAAAFAAEACAAAAAEAAQAAQAAADL//wAAADL////PAAEAAAAAAAAAFQA/AAAAAgBk/3ECYgKgAAMABwAAFxEhESUhESFkAf7+cAEi/t6PAy/80W4CUwAABgA8//QCEwJ5AAMABwALAA8AEwAXAAATNSEVBTUzFRc1MxUHNTMVBTUzFQU1IRWSASr+gHzefe2W/vyW/u4B1wIkVVWIiIhU3NxVh4d4hoaHh4cAAAAAAAwAlgADAAEECQAAALQAAAADAAEECQABAAgAtAADAAEECQACAA4AvAADAAEECQADADwAygADAAEECQAEAAgAtAADAAEECQAFABoBBgADAAEECQAGABABIAADAAEECQAOADYBMAADAAEECQAQAAgAtAADAAEECQARAAwBZgADAAEECQEAAAwBcgADAAEECQECAAwBZgBDAG8AcAB5AHIAaQBnAGgAdAAgADIAMAAyADEAIABUAGgAZQAgAFAAaQB4AGUAbABpAGYAeQAgAFMAYQBuAHMAIABQAHIAbwBqAGUAYwB0ACAAQQB1AHQAaABvAHIAcwAgACgAaAB0AHQAcABzADoALwAvAGcAaQB0AGgAdQBiAC4AYwBvAG0ALwBlAGkAZgBlAHQAeAAvAFAAaQB4AGUAbABpAGYAeQAtAFMAYQBuAHMAKQBQAGkAeAAyAFIAZQBnAHUAbABhAHIAMQAuADAAMAAwADsATgBPAE4ARQA7AFAAaQB4AGUAbABpAGYAeQBTAGEAbgBzAC0ATQBlAGQAaQB1AG0AVgBlAHIAcwBpAG8AbgAgADEALgAwADAAMABQAGkAeAAyAC0ANQAwADAAaAB0AHQAcABzADoALwAvAHMAYwByAGkAcAB0AHMALgBzAGkAbAAuAG8AcgBnAC8ATwBGAEwATQBlAGQAaQB1AG0AVwBlAGkAZwBoAHQAAwAAAAAAAP+1ADIAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAH//wAPAAEAAAAKABwAHgABREZMVAAIAAQAAAAA//8AAAAAAAAAAQAAAAoAJgAoAAJERkxUAA5sYXRuABgABAAAAAD//wAAAAAAAAAAAAAAAAABAAEACAABAAAAFAABAAAAHAACd2dodAEAAAAAAgABAAAAAAECAfQAAAAA) format('truetype');unicode-range:U+0032}
+@font-face{font-family:'Pix2';font-weight:700;src:url(data:font/ttf;base64,AAEAAAAOAIAAAwBgR1BPU0R2THUAAAScAAAAIEdTVUK4+rj0AAAEvAAAACpPUy8yYUZbcwAAAWgAAABgU1RBVHmTa0kAAAToAAAAKmNtYXAADACFAAAB0AAAADRnYXNwAAAAEAAABJQAAAAIZ2x5ZtBpU68AAAIMAAAAfmhlYWQqBwLRAAAA7AAAADZoaGVhBkoB/wAAASQAAAAkaG10eAUyAKEAAAHIAAAACGxvY2EAPwAVAAACBAAAAAZtYXhwAAkAGQAAAUgAAAAgbmFtZSrNSIMAAAKMAAAB5nBvc3T/uAAyAAAEdAAAACAAAQAAAAEAAEoaS8BfDzz1AAMD6AAAAADhH3IwAAAAAOcfTaYAPf9yAnMCpgABAAYAAgAAAAAAAAABAAADmP7oAAAC1wA9AD0CcwABAAAAAAAAAAAAAAAAAAAAAgABAAAAAgAYAAYAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAQCSwK8AAUAAAK8AooAAACMArwCigAAAd0AMgD6AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAE5PTkUAoAAyADIDmP7oAAADmgEhAAAAAQAAAAAB0wK8AAAAIAADAtcAZAJbAD0AAAACAAAAAwAAABQAAwABAAAAFAAEACAAAAAEAAQAAQAAADL//wAAADL////PAAEAAAAAAAAAFQA/AAAAAgBk/3ICcwKmAAMABwAAFxEhESUhESFkAg/+cAER/u+OAzT8zH8CNgAABgA9//UCHgJ+AAMABwALAA8AEwAXAAATNSEVBTUzFRc1MxUHNTMVBTUzFQU1IRWVATD+eH/igPKZ/veZ/ugB4QIoVlaIiIhV3d1Vh4d5h4eIiIgAAAAAAAoAfgADAAEECQAAALQAAAADAAEECQABAAgAtAADAAEECQACAAgAvAADAAEECQADADgAxAADAAEECQAEAAgAtAADAAEECQAFABoA/AADAAEECQAGABABFgADAAEECQAOADYBJgADAAEECQEAAAwBXAADAAEECQEEAAgAvABDAG8AcAB5AHIAaQBnAGgAdAAgADIAMAAyADEAIABUAGgAZQAgAFAAaQB4AGUAbABpAGYAeQAgAFMAYQBuAHMAIABQAHIAbwBqAGUAYwB0ACAAQQB1AHQAaABvAHIAcwAgACgAaAB0AHQAcABzADoALwAvAGcAaQB0AGgAdQBiAC4AYwBvAG0ALwBlAGkAZgBlAHQAeAAvAFAAaQB4AGUAbABpAGYAeQAtAFMAYQBuAHMAKQBQAGkAeAAyAEIAbwBsAGQAMQAuADAAMAAwADsATgBPAE4ARQA7AFAAaQB4AGUAbABpAGYAeQBTAGEAbgBzAC0AQgBvAGwAZABWAGUAcgBzAGkAbwBuACAAMQAuADAAMAAwAFAAaQB4ADIALQA3ADAAMABoAHQAdABwAHMAOgAvAC8AcwBjAHIAaQBwAHQAcwAuAHMAaQBsAC4AbwByAGcALwBPAEYATABXAGUAaQBnAGgAdAAAAAMAAAAAAAD/tQAyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAB//8ADwABAAAACgAcAB4AAURGTFQACAAEAAAAAP//AAAAAAAAAAEAAAAKACYAKAACREZMVAAObGF0bgAYAAQAAAAA//8AAAAAAAAAAAAAAAAAAQABAAgAAQAAABQAAQAAABwAAndnaHQBAAAAAAIAAQAAAAABBAK8AAAAAA==) format('truetype');unicode-range:U+0032}
 /* Layout: one-screen mobile console. Isometric crater map fills the screen; navy/cream module-style HUD floats on top, action bar at the bottom, dialogs rise as bottom sheets. */
 :root{
   --night:#120d16;      /* cielo marciano */
@@ -24,7 +27,7 @@
   --rust:#c8552b;       /* suelo marciano */
   --glass:#8fd8ec;      /* cúpulas y oxígeno */
   --good:#86d98f; --warn:#f2c14e; --bad:#ff6b5a;
-  --display:"Pixelify Sans", "Courier New", monospace;
+  --display:"Pix2","Pixelify Sans", "Courier New", monospace;
   --body:"Nunito", "Segoe UI", system-ui, sans-serif;
   --bevel: inset 0 2px 0 rgba(255,255,255,.12), inset 0 -3px 0 rgba(0,0,0,.35);
   color-scheme: dark;
@@ -485,6 +488,8 @@ QUIZ_NORMAL.push(
   {q:'¿Qué protege mejor de una tormenta solar?',a:['Varios metros de regolito encima','Una tienda de campaña','Las ventanas de la base','La sombra de un panel solar'],c:0,e:'El suelo grueso frena las partículas, por eso los refugios van medio enterrados.'}
 );
 QT_NORMAL.push('water','travel','radiation');
+QUIZ_NORMAL.push({q:'Las erupciones solares se clasifican por letras. ¿Cuántas veces más fuerte es una de clase X que una de clase M?',a:['10 veces','2 veces','100 veces','Igual de fuerte'],c:0,e:'Cada letra (A, B, C, M, X) es 10 veces más fuerte que la anterior. La NASA registra todas en su catálogo DONKI.'});
+QT_NORMAL.push('radiation');
 
 // ---- Difícil: 2 más ----
 QUIZ_DIFICIL.push(
@@ -874,8 +879,8 @@ function nextSol(){
   if(!q.length&&s.sol>=3){
     const pBad=Math.min(.8,.28+s.sol*.008+D().bad),r=Math.random();   // los problemas son más probables con el tiempo
     if(r<pBad){const k=pickEvent(true);
-      if(k>=0&&EVENTS[k].wx){if(!s.wx.some(w=>w.k===k)){const at=s.sol+1+rnd(2),seen=canForecast(s);s.wx.push({k,at,seen});
-        if(seen)say(`${/ormenta/.test(EVENTS[k].wx)?'C-Comandante… ':''}La antena avisa: ${EVENTS[k].wx.toLowerCase()} ${at-s.sol<=1?'mañana':'dentro de 2 soles'}. ${k===0?'Llena las baterías antes, por favor.':k===1?'Ten listo el refugio.':'Revisa la calefacción.'}`,'preocupada')}} // el clima llega 1 o 2 soles después
+      if(k>=0&&EVENTS[k].wx){if(!s.wx.some(w=>w.k===k)){const at=s.sol+1+rnd(2),seen=canForecast(s);s.wx.push({k,at,seen});if(k===1)s.nextFlare=pickFlare(s);
+        if(seen)say(`${/ormenta/.test(EVENTS[k].wx)?'C-Comandante… ':''}La antena avisa: ${EVENTS[k].wx.toLowerCase()} ${at-s.sol<=1?'mañana':'dentro de 2 soles'}. ${k===0?'Llena las baterías antes, por favor.':k===1?`Es una erupción de clase ${s.nextFlare.cls}. Ten listo el refugio.`:'Revisa la calefacción.'}`,'preocupada')}} // el clima llega 1 o 2 soles después
       else if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
     else if(r<pBad+.25){const k=pickEvent(false);if(k>=0){const e=EVENTS[k].mk();if(e)q.push(e)}}
   }
@@ -957,21 +962,66 @@ function evStrike(){
       s.stats.lost+=hit.length;focusTile(ci,cj);
       return hit.length?`El impacto ha dejado muy averiado: ${hit.join(', ')}. Hay que repararlos.`:'El meteorito cayó cerca, pero no dañó nada.';}}]};
 }
+/* ================= CLIMA ESPACIAL REAL (NASA DONKI) ================= */
+// Erupciones solares reales del catálogo DONKI de la NASA (CCMC, Goddard): fecha del pico (UTC), clase GOES y región activa.
+// Para añadir más: descarga en el navegador
+//   https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get/FLR?startDate=2024-01-01&endDate=2024-12-31
+// y pega el contenido (la lista entre [ ]) en DONKI_RAW. El juego lo convierte solo.
+const DONKI_FLR=[
+  {d:'2017-09-04',cls:'M5.5',ar:2673},
+  {d:'2017-09-06',cls:'X2.2',ar:2673},
+  {d:'2017-09-06',cls:'X9.3',ar:2673,n:'Fue la erupción más fuerte de todo el ciclo solar 24.'},
+  {d:'2017-09-07',cls:'M7.3',ar:2673},
+  {d:'2017-09-07',cls:'X1.3',ar:2673},
+  {d:'2017-09-08',cls:'M8.1',ar:2673},
+  {d:'2017-09-10',cls:'X8.2',ar:2673},
+  {d:'2024-05-06',cls:'X4.5',ar:3663},
+  {d:'2024-05-14',cls:'X8.7',ar:3664},
+  {d:'2024-05-20',cls:'X12',ar:3664,est:1,mars:1,n:'Salió por la cara del Sol que no vemos desde la Tierra y alcanzó Marte: el rover Curiosity midió la mayor radiación desde que llegó, como 30 radiografías de tórax.'},
+  {d:'2024-10-01',cls:'X7.1',ar:3842},
+  {d:'2024-10-03',cls:'X9.0',ar:3842,n:'Es la erupción más fuerte del ciclo solar 25, el actual.'},
+  {d:'2024-10-07',cls:'X2.1',ar:3842},
+  {d:'2024-10-08',cls:'X1.0',ar:3844},
+  {d:'2025-11-04',cls:'X1.8',ar:4274},
+  {d:'2025-11-09',cls:'X1.7',ar:4274},
+  {d:'2025-11-10',cls:'X1.2',ar:4274,n:'Lanzó una eyección de masa coronal a unos 1.300 km/s.'},
+  {d:'2025-11-10',cls:'M1.5',ar:4274},
+  {d:'2025-11-11',cls:'M1.4',ar:4274},
+  {d:'2025-11-11',cls:'X5.1',ar:4274,n:'Fue la erupción más fuerte de 2025.'}
+];
+const DONKI_RAW=[];   // ← aquí puedes pegar la respuesta JSON de DONKI (campos flrID, peakTime, classType, activeRegionNum)
+function fromDonki(raw){return (raw||[]).filter(f=>f&&f.classType&&/^[CMX]/.test(f.classType)).map(f=>({d:(f.peakTime||f.beginTime||'').slice(0,10),cls:f.classType,ar:f.activeRegionNum||null,id:f.flrID}))}
+const FLARES=[...DONKI_FLR,...fromDonki(DONKI_RAW)].filter((f,i,a)=>f.d&&a.findIndex(g=>g.d===f.d&&g.cls===f.cls)===i).map((f,i)=>Object.assign(f,{k:f.id||`${f.d}-${f.cls}`}));
+// Escala GOES: cada letra es 10 veces más fuerte que la anterior (C=1, M=10, X=100) y el número multiplica
+const flarePow=c=>({A:.01,B:.1,C:1,M:10,X:100}[c[0]]||1)*(parseFloat(c.slice(1))||1);
+const flareHit=c=>{const p=flarePow(c);return p<10?.4:p<50?.7:p<100?.85:p<500?1:p<1000?1.3:1.6};
+const flareDate=d=>new Date(d+'T12:00:00Z').toLocaleDateString('es',{day:'numeric',month:'long',year:'numeric'});
+function pickFlare(s){ // cuanto más avanza la partida (y más difícil), más fuertes pueden ser
+  const max=100*(2+s.sol/8+(s.diff||0)*2),seen=s.flSeen||[];
+  let pool=FLARES.filter(f=>flarePow(f.cls)<=max);if(!pool.length)pool=FLARES.slice();
+  const fresh=pool.filter(f=>!seen.includes(f.k));return pick(fresh.length?fresh:pool);
+}
+const flareTxt=f=>`Es una erupción real: la NASA la registró el <b>${flareDate(f.d)}</b>${f.ar?` en la región activa ${f.ar} del Sol`:''}, con clase <b>${f.cls}</b>${f.est?' (estimada)':''}.${f.n?' '+f.n:''}`;
+
 const EVENTS=[
   {bad:1,wx:'Tormenta de polvo',w:3,c:s=>!s.storm&&s.sol>4,mk:()=>{const long=S.sol>30&&Math.random()<.45,n=long?8+rnd(3):3+rnd(3);
     return {tp:'dust',i:'🌪️',t:long?'¡Tormenta de polvo gigante!':'¡Tormenta de polvo!',x:`Una ${long?'enorme ':''}nube de polvo cubre el cielo durante unos ${n} soles. Los paneles producirán muy poco y el polvo desgastará paneles y excavadoras.`,
     fact:'Las tormentas de polvo en Marte pueden cubrir todo el planeta y durar semanas o meses.',
     o:[{l:'Prepararse para la tormenta',s:'Apaga lo que no sea imprescindible y vigila las baterías.',fx:s=>{s.storm=n;if(n>=8){s.ach.giantOn=true;s.ach.giantFail=false}return `La tormenta durará unos ${n} soles. El reactor nuclear y las baterías son tu mejor ayuda.`}}]}}},
   {bad:1,wx:'Tormenta solar',w:2,c:s=>s.sol>5,mk:()=>{
-    const safe=count(S,'shelter')>0;
-    if(isActive('shield'))return {i:'☀️',t:'Tormenta solar',x:'El Sol ha lanzado una ola de partículas, pero el escudo magnético la desvía. ¡Nadie corre peligro!',fact:'Un escudo magnético crea un “paraguas” que desvía las partículas cargadas del viento solar.',o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
-    return {tp:'radiation',i:'☢️',t:'¡Alerta de tormenta solar!',x:'El Sol ha lanzado una ola de radiación peligrosa que llegará pronto.',
-      fact:'Marte no tiene un campo magnético global, así que la radiación del Sol llega hasta el suelo.',
+    const safe=count(S,'shelter')>0,fl=S.nextFlare||pickFlare(S),hit=flareHit(fl.cls);S.nextFlare=null;
+    S.flSeen=S.flSeen||[];if(!S.flSeen.includes(fl.k))S.flSeen.push(fl.k);
+    const fact='Las erupciones solares se clasifican con las letras A, B, C, M y X: cada letra es 10 veces más fuerte que la anterior. Datos: NASA CCMC, catálogo DONKI.';
+    if(isActive('shield'))return {fl,i:'☀️',t:`Tormenta solar · clase ${fl.cls}`,x:`El Sol ha lanzado una erupción de clase ${fl.cls}, pero el escudo magnético desvía sus partículas. ¡Nadie corre peligro! ${flareTxt(fl)}`,fact,o:[{l:'¡Genial!',fx:s=>{s.moral+=5;return 'La colonia está protegida.'}}]};
+    const big=hit>=1.3,mild=hit<.7;
+    return {fl,tp:'radiation',mood:mild?'preocupada':undefined,i:'☢️',t:`${big?'¡Tormenta solar extrema!':mild?'Tormenta solar débil':'¡Alerta de tormenta solar!'} · clase ${fl.cls}`,
+      x:`El Sol ha lanzado una erupción de clase <b>${fl.cls}</b>${big?': de las más fuertes que existen':mild?': de las más suaves, pero hay que tener cuidado':''}. Su radiación llegará pronto. ${flareTxt(fl)}`,
+      fact,
       o:safe?[
         {l:'Todos al refugio de regolito',s:'Seguros, pero hoy no se trabaja.',fx:s=>{s.mat=Math.max(0,s.mat-8);s.ach.shelter=1;return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}},
-        {l:'Seguir trabajando fuera',s:'Arriesgado...',fx:s=>{s.salud-=(has(s,'med')?14:20)*(hasR(s,'rad')?.5:1);return 'La radiación ha afectado a la tripulación. La salud baja.'}}
+        {l:'Seguir trabajando fuera',s:`Arriesgado: una clase ${fl.cls} ${big?'es muy peligrosa':mild?'hace poco daño':'hace bastante daño'}.`,fx:s=>{s.salud-=Math.round((has(s,'med')?14:20)*hit*(hasR(s,'rad')?.5:1));return `La radiación de la erupción ${fl.cls} ha afectado a la tripulación. La salud baja.`}}
       ]:[
-        {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=(has(s,'med')?12:18)*(hasR(s,'rad')?.5:1);return 'Las paredes de la base protegen poco. Necesitas un refugio de regolito.'}}
+        {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=Math.round((has(s,'med')?12:18)*hit*(hasR(s,'rad')?.5:1));return `Las paredes de la base protegen poco de una erupción ${fl.cls}. Necesitas un refugio de regolito.`}}
       ]}}},
   {bad:1,w:2,c:()=>true,mk:()=>({tp:'comms',i:'💨',t:'¡Fuga de aire!',x:'Una junta de una esclusa pierde aire. Un mensaje a la Tierra tardaría unos 20 minutos en llegar y otros 20 en volver.',
     fact:'Por el retraso en las comunicaciones, los astronautas deben saber resolver problemas sin ayuda de la Tierra.',
@@ -1213,20 +1263,20 @@ function drawMap(t){
     x.globalAlpha=1;
     if(wip){const fx=r.x+r.w/2,fy=r.y+r.h*.55;   // cartel de obra con los soles que faltan
       x.fillStyle='#d8ab4c';x.strokeStyle='#222a4c';x.lineWidth=2;x.beginPath();x.roundRect?x.roundRect(fx-24,fy-12,48,24,5):x.rect(fx-24,fy-12,48,24);x.fill();x.stroke();
-      x.fillStyle='#222a4c';x.font='700 13px "Pixelify Sans", monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(`🏗️ ${b.bt}`,fx,fy+1)}
+      x.fillStyle='#222a4c';x.font='700 13px "Pix2","Pixelify Sans", monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(`🏗️ ${b.bt}`,fx,fy+1)}
     if(!it.ghost&&!wip){
       let flag='';const isB=!NOWEAR.has(b.t);
       if(b.broken)flag='🔧';else if(!b.on)flag='⏸️';else if(B[b.t].e<0&&fr===0)flag='⚡';else if(B[b.t].e<0&&fr<1)flag='🌙';
       else if(isB&&!f.conn.has(it.k)&&mech(S,'conn'))flag='🔌';else if(isB&&(b.w||0)>=60)flag='⚠️';
       if((b.lv||1)>1){const lx=r.x+r.w*.18,ly=r.y+r.h*.78;x.fillStyle='#d8ab4c';x.strokeStyle='#222a4c';x.lineWidth=2;x.beginPath();x.arc(lx,ly,8,0,7);x.fill();x.stroke();
-        x.fillStyle='#222a4c';x.font='700 11px "Pixelify Sans", monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(b.lv,lx,ly+1)}
+        x.fillStyle='#222a4c';x.font='700 11px "Pix2","Pixelify Sans", monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(b.lv,lx,ly+1)}
       if(flag){const fx=r.x+r.w/2,fy=r.y+4;x.fillStyle='#120d16';x.strokeStyle='#e9e4d6';x.lineWidth=2;x.beginPath();x.arc(fx,fy,11,0,7);x.fill();x.stroke();
         x.font='13px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(flag,fx,fy+1)}
     }
   }
   x.restore();
   if(nightT){const p=(performance.now()-nightT)/1700;if(p>=1)nightT=0;else{const a=Math.sin(p*Math.PI);x.fillStyle=`rgba(10,14,46,${a*.62})`;x.fillRect(0,0,VW,VH);
-    x.fillStyle=`rgba(200,210,255,${a*.9})`;x.font='700 18px "Pixelify Sans", monospace';x.textAlign='center';x.fillText(p<.5?'🌙 Noche marciana':'☀️ Amanece',VW/2,40)}}
+    x.fillStyle=`rgba(200,210,255,${a*.9})`;x.font='700 18px "Pix2","Pixelify Sans", monospace';x.textAlign='center';x.fillText(p<.5?'🌙 Noche marciana':'☀️ Amanece',VW/2,40)}}
   if(S.storm>0){x.fillStyle='rgba(200,120,60,.22)';x.fillRect(0,0,VW,VH);x.fillStyle='rgba(240,178,122,.45)';
     for(const d of dust){d.x+=d.v*.004;if(d.x>1.05)d.x=-.05;x.fillRect(d.x*VW,d.y*VH+Math.sin(t+d.y*9)*8,d.r*1.6,d.r)}}
 }
@@ -1365,6 +1415,11 @@ const GLOSARIO=[
   {g:'Ciencia y colonia',t:'Hipótesis',al:['hipótesis'],d:'Lo que crees que va a pasar en un experimento, antes de hacerlo.'},
   {g:'Ciencia y colonia',t:'Colono',nu:1,al:['colono','colonos'],d:'Una persona que va a vivir a un lugar nuevo para fundar una colonia.'},
   {g:'Ciencia y colonia',t:'Autosuficiente',al:['autosuficiente'],d:'Que puede conseguir todo lo que necesita por sí mismo, sin ayuda de fuera.'},
+  {g:'Radiación y protección',t:'Erupción solar',al:['erupción solar','erupciones solares','erupción','erupciones'],d:'Un destello enorme de luz y radiación en el Sol, causado por sus campos magnéticos. Las más fuertes son de clase X.'},
+  {g:'Radiación y protección',t:'Clase de una erupción (A, B, C, M, X)',al:['clase'],d:'Cómo se mide la fuerza de una erupción solar. Cada letra es 10 veces más fuerte que la anterior: una X es 10 veces más fuerte que una M.'},
+  {g:'Radiación y protección',t:'Eyección de masa coronal',al:['eyección de masa coronal','eyección'],d:'Una gigantesca nube de gas cargado que el Sol lanza al espacio. Puede viajar a más de 1.000 km por segundo.'},
+  {g:'Radiación y protección',t:'Región activa',al:['región activa'],d:'Una zona del Sol con campos magnéticos muy fuertes, donde suelen nacer las erupciones. Cada una tiene un número.'},
+  {g:'Tecnología y misiones',t:'DONKI',al:['DONKI'],d:'La base de datos de la NASA que registra el clima espacial: erupciones solares, eyecciones y tormentas.'},
   {g:'Ciencia y colonia',t:'Dispersión de la luz',al:['dispersa','dispersión'],d:'Cuando la luz rebota en partículas y se reparte por colores. Por eso el cielo tiene color.'}
 ];
 const GL_ALIAS=[];GLOSARIO.forEach((g,k)=>{if(!g.nu)g.al.forEach(a=>GL_ALIAS.push([a,k]))});
@@ -1414,6 +1469,7 @@ const ACH=[
   {id:'crates',i:'📦',n:'Abrir el regalo',d:'Recoge las 5 cajas de carga del principio.',max:5,v:s=>s.ach.crInit},
   {id:'night',i:'🌙',n:'Sobrevivir a la noche',d:'Pasa 5 soles seguidos sin que falte energía de noche.',max:5,v:s=>s.ach.nightRun}]},
  {g:'🔬 Ciencia y aprendizaje',items:[
+  {id:'flares',i:'☀️',n:'Cazador de erupciones',d:'Vive 5 erupciones solares reales del catálogo DONKI de la NASA en una partida.',max:5,v:s=>(s.flSeen||[]).length},
   {id:'facts',i:'📖',n:'Mente curiosa',d:'Ten 15 datos en el cuaderno en una partida.',max:15,v:s=>s.facts.length},
   {id:'encyc',i:'🎓',n:'Enciclopedia marciana',d:'Descubre todos los datos del juego (entre todas tus partidas).',max:UNIV.length,v:()=>P.facts.length},
   {id:'streak',i:'🔥',n:'Racha perfecta',d:'Acierta 5 preguntas seguidas.',max:5,v:s=>s.streak||0},
@@ -1878,6 +1934,7 @@ function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filt
   const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;
   ariaSheet('explicando',`<h2>📖 Cuaderno de ciencia</h2><p>${qs.length} preguntas (${ok} acertadas), ${ex.length} experimentos y ${((S&&S.facts)||[]).length} datos. Lo apunto todo, Comandante. Es mi cuaderno favorito.</p>`,
     `<div class="sec">Preguntas que respondiste</div><div class="mlist">${qs.map(item).join('')||'<div><span>•</span><span>Todavía no has respondido ninguna pregunta.</span></div>'}</div>
+    ${(S&&S.flSeen&&S.flSeen.length)?`<div class="sec">Erupciones solares reales (NASA DONKI)</div><div class="mlist">${S.flSeen.map(k=>FLARES.find(f=>f.k===k)).filter(Boolean).map(f=>`<div><span>☀️</span><span><b>Clase ${f.cls}${f.est?' (estimada)':''}</b> · ${flareDate(f.d)}${f.ar?` · región ${f.ar}`:''}${f.n?`<br><span class="hint">${f.n}</span>`:''}</span></div>`).join('')}</div>`:''}
     ${ex.length?`<div class="sec">Experimentos (método científico)</div><div class="mlist">${ex.map(item).join('')}</div>`:''}
     <div class="sec">Datos descubiertos</div><div class="log">${((S&&S.facts)||[]).map(f=>`<div>🔬 ${f}</div>`).join('')||'<div>Construye y vive aventuras para descubrir datos sobre Marte.</div>'}</div>
     <div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
@@ -1890,7 +1947,8 @@ function openTips(){const seen=(S.tut||[]).filter(id=>TIPS[id]),mm=MECH.filter(m
 function openMenu(){
   const v=sheet(`<div class="sheetHead"><span class="big">⚙️</span><div><h2>Ajustes</h2><p>Los objetivos, el mantenimiento y los logros están en el menú de Laika.</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <div class="row"><button class="btn ghost" id="mSnd">Sonido: ${sound?'sí':'no'}</button><button class="btn ghost" id="mMus">Música: ${musicOn?'sí':'no'}</button><button class="btn ghost" id="mRes">Reiniciar partida</button></div>
-    <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>`);
+    <div class="row"><button class="btn ghost" id="mTitle">Volver a la portada</button></div>
+    <p class="hint">Las tormentas solares usan erupciones reales del catálogo DONKI de la NASA (CCMC, Goddard Space Flight Center).</p>`);
   v.querySelector('#mSnd').onclick=()=>{sound=!sound;openMenu()};
   v.querySelector('#mMus').onclick=()=>{setMusic(!musicOn);openMenu()};
   const r=v.querySelector('#mRes');r.onclick=()=>{if(!r.dataset.sure){r.dataset.sure=1;r.textContent='¿Seguro? Toca otra vez';return}

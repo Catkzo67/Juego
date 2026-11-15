@@ -65,3 +65,8 @@ El refugio de regolito no necesita conexión con la base.
 - En los menús (portada, historia, dificultad, tripulación, viaje y pantalla final) suena en bucle la música de menú (`assets/musica_menu.mp3`, provisional).
 - En la partida suena la pista de la dificultad (`assets/musica_facil.mp3`, `musica_normal.mp3`, `musica_dificil.mp3`): empieza en un momento al azar, se apaga poco a poco en sus últimos 25 segundos y vuelve a sonar tras un silencio de 1 a 3 minutos.
 - Se puede silenciar con el botón 🎵 de la portada o desde Ajustes.
+
+## Clima espacial real (NASA DONKI)
+- Las tormentas solares usan erupciones reales del catálogo DONKI de la NASA (CCMC, Goddard): fecha, clase GOES (A, B, C, M, X) y región activa. Cuanto más fuerte la clase, más daño hacen sin refugio.
+- La antena anuncia la clase de la erupción antes de que llegue; el cuaderno de ciencia guarda las erupciones vividas y hay un logro, *Cazador de erupciones*.
+- Para añadir más erupciones, pega la respuesta JSON de DONKI en `DONKI_RAW` dentro de `index.html`.
