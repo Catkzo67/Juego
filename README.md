@@ -41,6 +41,7 @@ La partida se guarda automáticamente en el navegador.
 - Al tocar su retrato se abre su menú: objetivo actual, mantenimiento general, cuaderno de ciencia, logros, registro y repaso de consejos.
 - Las imágenes están en `assets/laika_*.png`; la correspondencia emoción → imagen está en `MOOD_IMG`, dentro de `index.html`.
 - Su historia la cuenta ella misma: toca la base central y pulsa «¿Quién eres?».
+- Al empezar cualquier partida, su botón brilla con un aro dorado y un cartel «¡Tócame!» hasta que lo tocas por primera vez.
 
 ### La voz de Laika
 - **Habla con voz y el texto aparece poco a poco** (unas 40 letras por segundo, un pitido cada 2–3 letras) solo cuando ella es el centro de atención: bienvenida y consejos del tutorial, su historia, victoria o derrota, sucesos importantes (tormentas, meteoritos, naves, nuevas mecánicas), misiones cumplidas, logros y avisos urgentes.
@@ -50,7 +51,7 @@ La partida se guarda automáticamente en el navegador.
 - La voz se apaga aparte en **Ajustes → Voz**, sin quitar música ni efectos. Si el dispositivo tiene activado *reducir movimiento*, el texto sale entero de golpe.
 
 ## Dificultad
-Se elige antes de la tripulación, en cada partida nueva (en la pantalla de tripulación, «← Cambiar» vuelve a elegirla):
+Se elige antes de la tripulación, en cada partida nueva (en la pantalla de tripulación, «← Cambiar» vuelve a elegirla; el modo difícil pide confirmación antes de empezar):
 - **Fácil:** el juego base. Meta de 30 colonos; la puntuación vale la mitad.
 - **Normal:** más desastres y meteoritos, un 30% más de desgaste, construir e investigar cuesta un 25% más. Meta de 40 colonos.
 - **Difícil:** aún más desastres, un 70% más de desgaste, costes un 50% mayores, los edificios gastan un 20% más de energía y los colonos consumen un 15% más. Se empieza con más comida (110) para compensar el consumo, Laika casi no da consejos y la meta son 50 colonos; la puntuación vale un 50% más.

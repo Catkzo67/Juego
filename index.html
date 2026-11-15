@@ -188,6 +188,12 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 .ariaBtn img{width:46px;height:44px;object-fit:cover;object-position:50% 16%;border-radius:4px;background:var(--navy-2)}
 .ariaBtn .badge{position:absolute;right:-5px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--bad);color:#fff;font:800 .72rem var(--body);display:grid;place-items:center;font-style:normal;border:2px solid var(--night)}
 .ariaBtn .badge.soft{background:var(--warn);color:var(--navy)}
+/* aro dorado y flecha para que se descubra el menú de Laika al empezar */
+.ariaBtn.hint{animation:ring 1.4s ease-in-out infinite;box-shadow:0 0 0 3px var(--gold),0 0 14px 4px rgba(216,171,76,.7)}
+.ariaBtn.hint::before{content:'¡Tócame!';position:absolute;bottom:calc(100% + 14px);left:-4px;white-space:nowrap;background:var(--gold);color:var(--navy);font:800 .78rem var(--body);padding:5px 9px;border-radius:6px;box-shadow:0 3px 0 #0d1022;animation:bob 1s ease-in-out infinite;pointer-events:none}
+.ariaBtn.hint::after{content:'';position:absolute;bottom:calc(100% + 4px);left:22px;border:6px solid transparent;border-top:9px solid var(--gold);border-bottom:0;animation:bob 1s ease-in-out infinite;pointer-events:none}
+@keyframes ring{50%{box-shadow:0 0 0 5px var(--gold),0 0 22px 8px rgba(216,171,76,.9)}}
+@keyframes bob{50%{transform:translateY(-5px)}}
 .bubble{pointer-events:none;position:fixed;left:max(10px, env(safe-area-inset-left,0px));right:max(10px, env(safe-area-inset-right,0px));z-index:30;display:flex;gap:10px;align-items:flex-end;margin:0 auto;max-width:540px;animation:fade .2s}
 .bubble>img{width:66px;height:84px;object-fit:cover;object-position:50% 0;flex:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.4))}
 .bubble .bTxt{flex:1;min-width:0;background:var(--cream);color:var(--navy);border:2px solid var(--gold);border-radius:10px 10px 10px 2px;padding:8px 12px;box-shadow:0 4px 0 #0d1022;font-weight:700;font-size:.88rem;line-height:1.35;display:flex;flex-direction:column;gap:5px}
@@ -1729,7 +1735,7 @@ function ariaAsk(list,onGo){ // Laika te frena antes de pasar el sol
 }
 let hudOpen=false;try{hudOpen=localStorage.getItem('ares-hud')==='1'}catch(e){}
 function setHud(o){hudOpen=o;try{localStorage.setItem('ares-hud',o?'1':'0')}catch(e){}$('#resMore').hidden=!o;$('#hudTog').textContent=o?'▴ Ver menos':'▾ Ver más datos';$('#hudTog').setAttribute('aria-expanded',o)}
-function render(){
+function render(){if(S)$('#bAria').classList.toggle('hint',!S.ariaTap);
   const s=S,f=flows(s);flowsCache=f;
   $('#solLbl').innerHTML=`SOL ${s.sol}<small>${s.name.toUpperCase()} · ${s.pop} EN MARTE</small>`;
   const pills=[];
@@ -2118,7 +2124,19 @@ function drawStory(){
 let pickedDiff=0,diffSeen=false;
 function startDiff(){show('diff');
   $('#diffGrid').innerHTML=DIFF.map((d,i)=>`<button class="crewCard" data-d="${i}"><span class="face">${d.i}</span><b>${d.n}</b><span>${d.txt}</span></button>`).join('');
-  $('#diffGrid').querySelectorAll('.crewCard').forEach(b=>{b.classList.toggle('sel',diffSeen&&+b.dataset.d===pickedDiff);b.onclick=()=>{pickedDiff=+b.dataset.d;diffSeen=true;beep(500,.04);startCrew()}});
+  $('#diffGrid').querySelectorAll('.crewCard').forEach(b=>{b.classList.toggle('sel',diffSeen&&+b.dataset.d===pickedDiff);b.onclick=()=>{const d=+b.dataset.d;beep(500,.04);if(d===2)return confirmHard();pickedDiff=d;diffSeen=true;startCrew()}});
+}
+function confirmHard(){ // el modo difícil cambia mucho el juego: mejor confirmarlo
+  const v=sheet(`<div class="sheetHead"><span class="big">☄️</span><div><h2>¿Estás seguro?</h2><p>El modo difícil es un gran reto.</p></div></div>
+    <ul style="margin:0;padding-left:20px;line-height:1.5">
+      <li>Las <b>preguntas</b> son mucho más difíciles: pensadas para 14 años o más.</li>
+      <li>Todo cuesta un 50% más, hay más desastres y los colonos gastan más.</li>
+      <li>Laika casi no te dará consejos.</li>
+      <li>Meta: 50 colonos.</li></ul>
+    <div class="stack" style="width:100%"><button class="btn" id="hYes">Sí, quiero el reto</button><button class="btn ghost" id="hNo">Mejor elijo otra</button></div>`,null,{nogl:1});
+  v.dataset.lock=1;ghostUntil=performance.now()+350;
+  v.querySelector('#hYes').onclick=()=>{closeSheet();pickedDiff=2;diffSeen=true;beep(500,.04);startCrew()};
+  v.querySelector('#hNo').onclick=()=>{closeSheet();beep(400,.04)};
 }
 function startCrew(){
   show('crew');pickedCrew=[];$('#bLaunch').disabled=true;ghostUntil=performance.now()+350;   // un doble toque no elige a nadie sin querer
@@ -2166,7 +2184,7 @@ $('#bNext').onclick=()=>{if($('#veil')||placing)return;hush();
   const fresh=lastWarn.filter(x=>x.c&&!S.ack.includes(x.k)&&(!hard()||x.lv===2));          // solo lo importante que aún no has visto
   if(fresh.length)ariaAsk(fresh,()=>{S.ack=[...new Set([...S.ack,...lastWarn.map(x=>x.k)])];nextSol()});else nextSol()};
 $('#bBuild').onclick=openBuildMenu;
-$('#bAria').onclick=()=>{hush();openAria()};
+$('#bAria').onclick=()=>{hush();if(S&&!S.ariaTap){S.ariaTap=1;save();$('#bAria').classList.remove('hint')}openAria()};
 $('#bMenu').onclick=openMenu;
 
 $('#bEndMain').onclick=()=>{S=null;try{localStorage.removeItem(SAVE)}catch(e){}toTitle()};
