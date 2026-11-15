@@ -70,3 +70,8 @@ El refugio de regolito no necesita conexión con la base.
 - Las tormentas solares usan erupciones reales del catálogo DONKI de la NASA (CCMC, Goddard): fecha, clase GOES (A, B, C, M, X) y región activa. Cuanto más fuerte la clase, más daño hacen sin refugio.
 - La antena anuncia la clase de la erupción antes de que llegue; el cuaderno de ciencia guarda las erupciones vividas y hay un logro, *Cazador de erupciones*.
 - Para añadir más erupciones, pega la respuesta JSON de DONKI en `DONKI_RAW` dentro de `index.html`.
+
+## ¿Ciencia real o ficción?
+Cada edificio, investigación y dato curioso lleva una etiqueta: ✅ **Real hoy** (existe y ya se usa), 🧪 **En pruebas** (probado en pequeño o en la Tierra) o 🔮 **Idea para el futuro** (todavía no existe). Laika lo explica la primera vez que construyes algo de cada tipo.
+
+Cada refugio de regolito protege a 12 personas: en una tormenta solar, los colonos que no caben sufren daño.

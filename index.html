@@ -208,6 +208,8 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.0
 .say .gl,.fact .gl{text-decoration-color:#b8862a}
 details summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center}
 .mlist details{padding:6px 8px;border-radius:5px;background:var(--navy-2)}
+.stTag{display:inline-block;margin-left:6px;vertical-align:middle;font-family:var(--body);letter-spacing:.02em}
+.st-real{background:#86d98f;color:#13311a}.st-prueba{background:#f2c14e;color:#3a2a06}.st-futuro{background:#b79ce8;color:#241540}
 .amenu{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .amenu button{background:var(--navy-2);border:2px solid var(--navy-3);border-radius:6px;padding:10px;text-align:left;font-weight:800;box-shadow:var(--bevel);display:flex;flex-direction:column;gap:2px}
 .amenu button small{font-weight:700;color:var(--muted);font-size:.74rem}
@@ -361,25 +363,29 @@ const CREW_SIZE=5;
 // e: energía (+produce / -consume). p: producción por sol. pr: prioridad eléctrica. un: misión que lo desbloquea.
 // fp: lado de la huella en baldosas, o [ancho en i, largo en j] si es rectangular. img: sprite. s: escala del sprite sobre la huella. dy: ajuste vertical. ph: marcador temporal.
 const B={
-  base:{n:'Base central',i:'🛰️',img:'base',fp:6,anc:{k:.521,ox:-123,oy:-17},ports:[[-1,3],[6,2],[3,-1],[2,6]],gate:true,cost:0,e:-1,cap:6,pr:0,desc:'El corazón de la colonia: mando, comunicaciones y camas para 6 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
-  corridor:{n:'Pasillo presurizado',i:'🚇',img:'pasillo',fp:1,s:1,dy:.1,cost:2,e:0,un:0,desc:'Une los edificios para caminar sin traje. Cada 3 pasillos sube el ánimo.',fact:'Las esclusas y pasillos tienen cortinas electrostáticas que quitan el polvo de los trajes.'},
-  solar:{n:'Panel solar',i:'🔆',img:'solar',fp:2,s:.95,dy:.05,cost:10,e:7,un:0,desc:'Da energía solo de día: de noche hace falta batería. Con tormentas de polvo produce mucho menos.',fact:'Las tormentas de polvo pueden durar semanas y tapan el Sol: los paneles solares producen mucho menos.'},
-  moxie:{n:'Planta MOXIE',i:'🫧',ports:[[0,3]],img:'moxie',fp:[1,3],s:1,dy:.05,cost:15,e:-3,p:{o2:6},pr:1,un:1,desc:'Fabrica oxígeno a partir del CO₂ del aire marciano.',fact:'En 2021 el experimento MOXIE del rover Perseverance fabricó oxígeno con el dióxido de carbono de Marte.'},
-  ice:{n:'Extractor de hielo',i:'🧊',img:'extractor',fp:3,s:1,dy:.04,cost:15,e:-3,p:{agua:8},pr:2,un:3,need:'ice',desc:'Perfora, derrite y limpia el hielo del subsuelo. Debe tocar hielo.',fact:'Hay hielo bajo el polvo y en los polos de Marte. Para beberlo hay que extraerlo, derretirlo y purificarlo.'},
-  miner:{n:'Excavadora minera',i:'🚜',img:'excavadora',fp:2,s:1,dy:.05,cost:12,e:-2,p:{mat:4},pr:8,un:4,desc:'Perfora y recoge regolito para construir. Sobre roca saca el doble.',fact:'El suelo de Marte tiene mucho óxido de hierro: por eso el planeta es rojo. Con él se fabrican ladrillos.'},
-  battery:{n:'Batería',i:'🔋',ports:[[0,2]],img:'bateria',fp:2,s:1,dy:.04,cost:15,e:0,store:30,pr:0,un:0,desc:'Guarda 30 de energía del día para usarla de noche.',fact:'Guardar energía es clave para sobrevivir a la noche y a las tormentas de polvo.'},
-  bio:{n:'Bio-laboratorio',i:'🧫',ports:[[3,1]],img:'laboratorio',inside:'laboratorio_interior',fp:3,s:1,dy:.03,cost:20,e:-3,p:{comida:2},pr:4,un:5,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
-  farm:{n:'Invernadero',i:'🌱',ports:[[1,3]],img:'invernadero',fp:3,s:1,dy:.03,cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:6,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
-  shelter:{n:'Refugio de regolito',i:'⛰️',ports:[[1,3],[3,1]],img:'refugio',fp:3,s:1.05,dy:.1,cost:25,e:0,pr:0,un:7,crater:true,desc:'Búnker medio enterrado. Protege de la radiación. ¡Se puede construir dentro de un cráter!',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
-  antenna:{n:'Antena',i:'📡',ports:[[1,2],[2,1]],img:'antena',fp:2,s:.8,dy:.03,cost:20,e:-1,pr:5,un:8,desc:'Guía a las naves con nuevos colonos y anuncia el clima (tormentas y frío) 1 o 2 soles antes.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
-  habitat:{n:'Hábitat',i:'🏠',ports:[[1,3],[3,1]],img:'habitat',inside:'habitat_interior',fp:3,s:1,dy:.03,cost:30,e:-2,cap:6,pr:2,un:9,desc:'Casa para 6 colonos. Sobre un tubo de lava caben 12.',fact:'Los tubos de lava son cuevas que dejaron los volcanes. Protegen de la radiación y de los micrometeoritos.'},
-  mess:{n:'Comedor',i:'🍽️',ports:[[2,1]],img:'comedor',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:9,desc:'Cocina y sala común. Comer juntos sube mucho el ánimo.',fact:'La convivencia en espacios pequeños es difícil. Compartir comidas ayuda a trabajar en equipo.'},
-  gym:{n:'Gimnasio',i:'🏋️',ports:[[2,0],[1,-1]],img:'gimnasio',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:9,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
-  repair:{n:'Taller de robots',i:'🦾',ports:[[2,0]],img:'taller',fp:2,s:1,dy:.03,cost:25,e:-2,pr:7,un:10,desc:'Sus robots reducen a la mitad el desgaste de todos los edificios y limpian el polvo de los paneles.',fact:'Los robots con sensores LiDAR hacen los trabajos más peligrosos fuera de la base.'},
-  vfarm:{n:'Granja vertical',i:'🥬',ports:[[1,3]],img:'granja',fp:3,s:1,dy:.03,cost:45,e:-6,p:{comida:16,agua:-3},pr:3,un:10,req:'farm',desc:'Torres hidropónicas con luz LED. Mucha comida en poco espacio.',fact:'Las granjas verticales reciclan casi toda el agua y pueden cultivar con luz LED día y noche.'},
-  reactor:{n:'Microrreactor nuclear',i:'⚛️',ports:[[2,3]],img:'reactor',fp:3,s:.88,dy:.03,cost:60,e:25,un:10,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
-  shield:{n:'Escudo magnético',i:'🧲',img:'escudo',fp:3,s:1,dy:.04,cost:90,e:-8,pr:5,un:11,desc:'Anula las tormentas solares, desvía los meteoritos y protege la colonia. Necesita energía todo el sol.',fact:'Marte no tiene un campo magnético global como la Tierra. Un escudo artificial desvía las partículas del Sol.'}
+  base:{st:'prueba',n:'Base central',i:'🛰️',img:'base',fp:6,anc:{k:.521,ox:-123,oy:-17},ports:[[-1,3],[6,2],[3,-1],[2,6]],gate:true,cost:0,e:-1,cap:6,pr:0,desc:'El corazón de la colonia: mando, comunicaciones y camas para 6 personas.',fact:'Una base necesita energía para el soporte vital, la luz, la calefacción y las comunicaciones.'},
+  corridor:{st:'real',n:'Pasillo presurizado',i:'🚇',img:'pasillo',fp:1,s:1,dy:.1,cost:2,e:0,un:0,desc:'Une los edificios para caminar sin traje. Cada 3 pasillos sube el ánimo.',fact:'Las esclusas y pasillos tienen cortinas electrostáticas que quitan el polvo de los trajes.'},
+  solar:{st:'real',n:'Panel solar',i:'🔆',img:'solar',fp:2,s:.95,dy:.05,cost:10,e:7,un:0,desc:'Da energía solo de día: de noche hace falta batería. Con tormentas de polvo produce mucho menos.',fact:'Las tormentas de polvo pueden durar semanas y tapan el Sol: los paneles solares producen mucho menos.'},
+  moxie:{st:'prueba',n:'Planta MOXIE',i:'🫧',ports:[[0,3]],img:'moxie',fp:[1,3],s:1,dy:.05,cost:15,e:-3,p:{o2:6},pr:1,un:1,desc:'Fabrica oxígeno a partir del CO₂ del aire marciano.',fact:'En 2021 el experimento MOXIE del rover Perseverance fabricó oxígeno con el dióxido de carbono de Marte.'},
+  ice:{st:'prueba',n:'Extractor de hielo',i:'🧊',img:'extractor',fp:3,s:1,dy:.04,cost:15,e:-3,p:{agua:8},pr:2,un:3,need:'ice',desc:'Perfora, derrite y limpia el hielo del subsuelo. Debe tocar hielo.',fact:'Hay hielo bajo el polvo y en los polos de Marte. Para beberlo hay que extraerlo, derretirlo y purificarlo.'},
+  miner:{st:'prueba',n:'Excavadora minera',i:'🚜',img:'excavadora',fp:2,s:1,dy:.05,cost:12,e:-2,p:{mat:4},pr:8,un:4,desc:'Perfora y recoge regolito para construir. Sobre roca saca el doble.',fact:'El suelo de Marte tiene mucho óxido de hierro: por eso el planeta es rojo. Con él se fabrican ladrillos.'},
+  battery:{st:'real',n:'Batería',i:'🔋',ports:[[0,2]],img:'bateria',fp:2,s:1,dy:.04,cost:15,e:0,store:30,pr:0,un:0,desc:'Guarda 30 de energía del día para usarla de noche.',fact:'Guardar energía es clave para sobrevivir a la noche y a las tormentas de polvo.'},
+  bio:{st:'prueba',n:'Bio-laboratorio',i:'🧫',ports:[[3,1]],img:'laboratorio',inside:'laboratorio_interior',fp:3,s:1,dy:.03,cost:20,e:-3,p:{comida:2},pr:4,un:5,desc:'Bacterias especiales limpian el suelo tóxico y cultivan espirulina.',fact:'El suelo marciano tiene percloratos, sustancias tóxicas. Bacterias modificadas pueden comérselas y dejar el suelo listo para cultivar.'},
+  farm:{st:'prueba',n:'Invernadero',i:'🌱',ports:[[1,3]],img:'invernadero',fp:3,s:1,dy:.03,cost:25,e:-4,p:{comida:9,agua:-2},pr:3,un:6,req:'bio',desc:'Cultiva trigo enano, soja y patatas. Necesita agua y energía.',fact:'Las plantas necesitan agua, luz, energía y calor. En Marte crecen dentro de invernaderos cerrados.'},
+  shelter:{st:'prueba',n:'Refugio de regolito',i:'⛰️',ports:[[1,3],[3,1]],img:'refugio',fp:3,s:1.05,dy:.1,cost:25,e:0,pr:0,un:7,crater:true,desc:'Búnker medio enterrado. Protege de la radiación a 12 personas. ¡Se puede construir dentro de un cráter!',fact:'Una capa de 3 a 5 metros de regolito bloquea gran parte de la radiación del espacio.'},
+  antenna:{st:'real',n:'Antena',i:'📡',ports:[[1,2],[2,1]],img:'antena',fp:2,s:.8,dy:.03,cost:20,e:-1,pr:5,un:8,desc:'Guía a las naves con nuevos colonos y anuncia el clima (tormentas y frío) 1 o 2 soles antes.',fact:'Un mensaje tarda entre 4 y 24 minutos en viajar entre Marte y la Tierra. ¡No se puede hablar en directo!'},
+  habitat:{st:'prueba',n:'Hábitat',i:'🏠',ports:[[1,3],[3,1]],img:'habitat',inside:'habitat_interior',fp:3,s:1,dy:.03,cost:30,e:-2,cap:6,pr:2,un:9,desc:'Casa para 6 colonos. Sobre un tubo de lava caben 12.',fact:'Los tubos de lava son cuevas que dejaron los volcanes. Protegen de la radiación y de los micrometeoritos.'},
+  mess:{st:'real',n:'Comedor',i:'🍽️',ports:[[2,1]],img:'comedor',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:9,desc:'Cocina y sala común. Comer juntos sube mucho el ánimo.',fact:'La convivencia en espacios pequeños es difícil. Compartir comidas ayuda a trabajar en equipo.'},
+  gym:{st:'real',n:'Gimnasio',i:'🏋️',ports:[[2,0],[1,-1]],img:'gimnasio',fp:2,s:1,dy:.03,cost:20,e:-2,pr:6,un:9,desc:'Mantiene fuertes huesos y músculos. Sube la salud y el ánimo.',fact:'En Marte la gravedad es el 38% de la terrestre. Sin ejercicio, los huesos y músculos se debilitan.'},
+  repair:{st:'prueba',n:'Taller de robots',i:'🦾',ports:[[2,0]],img:'taller',fp:2,s:1,dy:.03,cost:25,e:-2,pr:7,un:10,desc:'Sus robots reducen a la mitad el desgaste de todos los edificios y limpian el polvo de los paneles.',fact:'Los robots con sensores LiDAR hacen los trabajos más peligrosos fuera de la base.'},
+  vfarm:{st:'real',n:'Granja vertical',i:'🥬',ports:[[1,3]],img:'granja',fp:3,s:1,dy:.03,cost:45,e:-6,p:{comida:16,agua:-3},pr:3,un:10,req:'farm',desc:'Torres hidropónicas con luz LED. Mucha comida en poco espacio.',fact:'Las granjas verticales reciclan casi toda el agua y pueden cultivar con luz LED día y noche.'},
+  reactor:{st:'prueba',n:'Microrreactor nuclear',i:'⚛️',ports:[[2,3]],img:'reactor',fp:3,s:.88,dy:.03,cost:60,e:25,un:10,desc:'Da mucha energía de día, de noche y en tormentas.',fact:'Los microrreactores nucleares dan electricidad constante, incluso durante las tormentas de polvo globales.'},
+  shield:{st:'futuro',n:'Escudo magnético',i:'🧲',img:'escudo',fp:3,s:1,dy:.04,cost:90,e:-8,pr:5,un:11,desc:'Anula las tormentas solares, desvía los meteoritos y protege la colonia. Necesita energía todo el sol.',fact:'Marte no tiene un campo magnético global como la Tierra. Un escudo artificial desvía las partículas del Sol.'}
 };
+// ¿Existe hoy? Distingue la ciencia real de la ciencia ficción
+const ST={real:['✅','Real hoy'],prueba:['🧪','En pruebas'],futuro:['🔮','Idea para el futuro']};
+const stTag=st=>st?`<span class="tagTemp stTag st-${st}" title="${{real:'Existe y ya se usa.',prueba:'Se ha probado en pequeño o en la Tierra, pero aún no a escala de una colonia.',futuro:'Es una propuesta o un concepto; todavía no existe.'}[st]}">${ST[st][0]} ${ST[st][1]}</span>`:'';
+const factSt=f=>{const b=Object.values(B).find(b=>b.fact===f);if(b)return b.st;const r=RESEARCH.find(r=>r.f===f);return r&&r.st};
 const dim=t=>{const f=B[t].fp;return Array.isArray(f)?f:[f,f]};
 const BUILD_ORDER=['solar','corridor','moxie','ice','miner','battery','bio','farm','shelter','antenna','habitat','mess','gym','repair','vfarm','reactor','shield'];
 const MANIFEST=[
@@ -682,15 +688,15 @@ const LV=b=>Math.pow(1.5,(b.lv||1)-1), CM=b=>Math.pow(1.2,(b.lv||1)-1);
 const paidOf=b=>b.paid??(B[b.t].cost+((b.lv||1)>=2?B[b.t].cost:0)+((b.lv||1)>=3?Math.ceil(B[b.t].cost*1.6):0));   // obra + mejoras
 const upCost=b=>Math.ceil((B[b.t].cost||35)*((b.lv||1)===1?1:1.6));
 const RESEARCH=[
-  {id:'perov',n:'Celdas de perovskita',i:'🔆',c:35,d:3,t:'Los paneles solares producen un 20% más.',f:'Las celdas de perovskita-silicio son ligeras, flexibles y muy eficientes.',hq:'Las celdas de perovskita son más finas que las de silicio. Con el mismo Sol, ¿qué crees que pasará?',ha:['Producirán más energía','Producirán menos energía'],hc:0,hr:'Producen un 20% más: la perovskita aprovecha partes de la luz que el silicio casi no capta.'},
-  {id:'dust',n:'Paneles antipolvo',i:'🌪️',c:30,d:3,t:'Las tormentas quitan menos energía a los paneles y los desgastan la mitad.',f:'Las superficies electrostáticas repelen el polvo fino de Marte.',hq:'¿Qué crees que protegerá mejor los paneles del polvo?',ha:['Una carga eléctrica que lo repela','Una capa pegajosa que lo atrape'],hc:0,hr:'La carga electrostática empuja el polvo fuera. Una capa pegajosa se llenaría enseguida y taparía la luz.'},
-  {id:'drip',n:'Riego por goteo',i:'💧',c:25,d:3,t:'Invernaderos y granjas gastan la mitad de agua.',f:'Dar el agua gota a gota en la raíz evita casi toda la evaporación.',hq:'Si damos el agua gota a gota en la raíz, ¿qué crees que pasará con las plantas?',ha:['Crecerán igual con la mitad de agua','Crecerán la mitad de rápido'],hc:0,hr:'Crecen igual: casi toda el agua de riego normal se evapora o se escapa sin llegar a la raíz.'},
-  {id:'bore',n:'Perforación térmica',i:'🧊',c:30,d:3,t:'Los extractores de hielo sacan un 30% más de agua.',f:'Las sondas térmicas derriten el hielo bajo tierra sin tener que excavarlo todo.',hq:'Para sacar el hielo enterrado, ¿qué método crees que dará más agua?',ha:['Derretirlo bajo tierra con calor','Excavarlo y subirlo en bloques'],hc:0,hr:'Derretirlo bajo tierra da un 30% más: no se pierde hielo al romperlo y se mueve mucha menos roca.'},
-  {id:'ruth',n:'Catalizadores de rutenio',i:'🫧',c:30,d:3,t:'Las plantas MOXIE fabrican un 30% más de oxígeno.',f:'Los catalizadores aceleran las reacciones químicas sin gastarse.',hq:'Un catalizador acelera una reacción química. ¿Qué crees que le pasará al rutenio?',ha:['Se podrá usar una y otra vez','Se gastará cada sol'],hc:0,hr:'Un catalizador ayuda a la reacción sin gastarse, así que MOXIE fabrica un 30% más sin reponerlo.'},
-  {id:'freeze',n:'Liofilizado de comida',i:'🍞',c:20,d:2,t:'La comida guardada se estropea la mitad.',f:'Liofilizar es congelar y quitar el agua: así la comida dura años.',hq:'Si quitamos casi toda el agua de la comida congelada, ¿cuánto crees que durará?',ha:['Mucho más tiempo','Mucho menos tiempo'],hc:0,hr:'Dura muchísimo más: sin agua, los microbios que la estropean no pueden crecer.'},
-  {id:'aero',n:'Aislamiento de aerogel',i:'🔥',c:35,d:3,t:'La calefacción gasta un 30% menos.',f:'El aerogel de sílice es casi todo aire atrapado y aísla muchísimo.',hq:'El aerogel es casi todo aire. Comparado con una pared maciza, ¿cómo crees que aislará del frío?',ha:['Mejor que la pared','Peor que la pared'],hc:0,hr:'Aísla mejor: el aire atrapado en poros diminutos casi no deja pasar el calor.'},
-  {id:'tial',n:'Aleaciones de titanio',i:'🔩',c:40,d:4,t:'Todos los edificios se desgastan un 25% menos.',f:'Las aleaciones de titanio-aluminio son ligeras y resisten muy bien el frío.',hq:'Con un frío de −100 °C, ¿qué crees que aguantará más sin romperse?',ha:['Una aleación de titanio','El acero normal de la Tierra'],hc:0,hr:'El titanio aguanta mejor: el acero normal se vuelve quebradizo con frío extremo.'},
-  {id:'rad',n:'Medicina antirradiación',i:'💊',c:25,d:3,t:'Las tormentas solares hacen la mitad de daño.',f:'Algunos medicamentos ayudan al cuerpo a reparar el daño de la radiación.',hq:'¿Crees que un medicamento puede reducir el daño de la radiación?',ha:['Sí, ayuda a reparar el cuerpo','No, solo sirve un escudo'],hc:0,hr:'Sí: algunos medicamentos ayudan a las células a reparar el daño. El escudo y el refugio siguen siendo lo mejor.'}
+  {id:'perov',st:'prueba',n:'Celdas de perovskita',i:'🔆',c:35,d:3,t:'Los paneles solares producen un 20% más.',f:'Las celdas de perovskita-silicio son ligeras, flexibles y muy eficientes.',hq:'Las celdas de perovskita son más finas que las de silicio. Con el mismo Sol, ¿qué crees que pasará?',ha:['Producirán más energía','Producirán menos energía'],hc:0,hr:'Producen un 20% más: la perovskita aprovecha partes de la luz que el silicio casi no capta.'},
+  {id:'dust',st:'prueba',n:'Paneles antipolvo',i:'🌪️',c:30,d:3,t:'Las tormentas quitan menos energía a los paneles y los desgastan la mitad.',f:'Las superficies electrostáticas repelen el polvo fino de Marte.',hq:'¿Qué crees que protegerá mejor los paneles del polvo?',ha:['Una carga eléctrica que lo repela','Una capa pegajosa que lo atrape'],hc:0,hr:'La carga electrostática empuja el polvo fuera. Una capa pegajosa se llenaría enseguida y taparía la luz.'},
+  {id:'drip',st:'real',n:'Riego por goteo',i:'💧',c:25,d:3,t:'Invernaderos y granjas gastan la mitad de agua.',f:'Dar el agua gota a gota en la raíz evita casi toda la evaporación.',hq:'Si damos el agua gota a gota en la raíz, ¿qué crees que pasará con las plantas?',ha:['Crecerán igual con la mitad de agua','Crecerán la mitad de rápido'],hc:0,hr:'Crecen igual: casi toda el agua de riego normal se evapora o se escapa sin llegar a la raíz.'},
+  {id:'bore',st:'prueba',n:'Perforación térmica',i:'🧊',c:30,d:3,t:'Los extractores de hielo sacan un 30% más de agua.',f:'Las sondas térmicas derriten el hielo bajo tierra sin tener que excavarlo todo.',hq:'Para sacar el hielo enterrado, ¿qué método crees que dará más agua?',ha:['Derretirlo bajo tierra con calor','Excavarlo y subirlo en bloques'],hc:0,hr:'Derretirlo bajo tierra da un 30% más: no se pierde hielo al romperlo y se mueve mucha menos roca.'},
+  {id:'ruth',st:'real',n:'Catalizadores de rutenio',i:'🫧',c:30,d:3,t:'Las plantas MOXIE fabrican un 30% más de oxígeno.',f:'Los catalizadores aceleran las reacciones químicas sin gastarse.',hq:'Un catalizador acelera una reacción química. ¿Qué crees que le pasará al rutenio?',ha:['Se podrá usar una y otra vez','Se gastará cada sol'],hc:0,hr:'Un catalizador ayuda a la reacción sin gastarse, así que MOXIE fabrica un 30% más sin reponerlo.'},
+  {id:'freeze',st:'real',n:'Liofilizado de comida',i:'🍞',c:20,d:2,t:'La comida guardada se estropea la mitad.',f:'Liofilizar es congelar y quitar el agua: así la comida dura años.',hq:'Si quitamos casi toda el agua de la comida congelada, ¿cuánto crees que durará?',ha:['Mucho más tiempo','Mucho menos tiempo'],hc:0,hr:'Dura muchísimo más: sin agua, los microbios que la estropean no pueden crecer.'},
+  {id:'aero',st:'real',n:'Aislamiento de aerogel',i:'🔥',c:35,d:3,t:'La calefacción gasta un 30% menos.',f:'El aerogel de sílice es casi todo aire atrapado y aísla muchísimo.',hq:'El aerogel es casi todo aire. Comparado con una pared maciza, ¿cómo crees que aislará del frío?',ha:['Mejor que la pared','Peor que la pared'],hc:0,hr:'Aísla mejor: el aire atrapado en poros diminutos casi no deja pasar el calor.'},
+  {id:'tial',st:'real',n:'Aleaciones de titanio',i:'🔩',c:40,d:4,t:'Todos los edificios se desgastan un 25% menos.',f:'Las aleaciones de titanio-aluminio son ligeras y resisten muy bien el frío.',hq:'Con un frío de −100 °C, ¿qué crees que aguantará más sin romperse?',ha:['Una aleación de titanio','El acero normal de la Tierra'],hc:0,hr:'El titanio aguanta mejor: el acero normal se vuelve quebradizo con frío extremo.'},
+  {id:'rad',st:'prueba',n:'Medicina antirradiación',i:'💊',c:25,d:3,t:'Las tormentas solares hacen la mitad de daño.',f:'Algunos medicamentos ayudan al cuerpo a reparar el daño de la radiación.',hq:'¿Crees que un medicamento puede reducir el daño de la radiación?',ha:['Sí, ayuda a reparar el cuerpo','No, solo sirve un escudo'],hc:0,hr:'Sí: algunos medicamentos ayudan a las células a reparar el daño. El escudo y el refugio siguen siendo lo mejor.'}
 ];
 const hasR=(s,id)=>!!(s.rs&&s.rs.done.includes(id));
 // Las mecánicas difíciles llegan poco a poco, con las misiones y los soles
@@ -1018,7 +1024,11 @@ const EVENTS=[
       x:`El Sol ha lanzado una erupción de clase <b>${fl.cls}</b>${big?': de las más fuertes que existen':mild?': de las más suaves, pero hay que tener cuidado':''}. Su radiación llegará pronto. ${flareTxt(fl)}`,
       fact,
       o:safe?[
-        {l:'Todos al refugio de regolito',s:'Seguros, pero hoy no se trabaja.',fx:s=>{s.mat=Math.max(0,s.mat-8);s.ach.shelter=1;return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}},
+        {l:'Todos al refugio de regolito',s:(()=>{const cap=12*count(S,'shelter'),out=Math.max(0,S.pop-cap);return out?`Caben ${cap} personas: ${out} se quedarán fuera.`:'Seguros, pero hoy no se trabaja.'})(),
+          fx:s=>{s.mat=Math.max(0,s.mat-8);const cap=12*count(s,'shelter'),out=Math.max(0,s.pop-cap);   // cada refugio protege a 12 personas
+            if(!out){s.ach.shelter=1;return 'La tripulación espera a salvo bajo metros de regolito. Nadie se ha hecho daño.'}
+            const dmg=Math.round((has(s,'med')?14:20)*hit*(hasR(s,'rad')?.5:1)*Math.min(1,out/s.pop*1.5));s.salud-=dmg;
+            return `En los refugios solo caben ${cap} personas. ${out} colono(s) se quedaron fuera y la radiación les ha afectado (−${dmg} de salud). Hacen falta más refugios.`}},
         {l:'Seguir trabajando fuera',s:`Arriesgado: una clase ${fl.cls} ${big?'es muy peligrosa':mild?'hace poco daño':'hace bastante daño'}.`,fx:s=>{s.salud-=Math.round((has(s,'med')?14:20)*hit*(hasR(s,'rad')?.5:1));return `La radiación de la erupción ${fl.cls} ha afectado a la tripulación. La salud baja.`}}
       ]:[
         {l:'Esconderse dentro de la base',s:'No hay refugio: protege poco.',fx:s=>{s.salud-=Math.round((has(s,'med')?12:18)*hit*(hasR(s,'rad')?.5:1));return `Las paredes de la base protegen poco de una erupción ${fl.cls}. Necesitas un refugio de regolito.`}}
@@ -1507,6 +1517,7 @@ const ACH=[
   {id:'legend',i:'☄️',n:'Leyenda de Marte',d:'Gana una partida en dificultad Difícil.',max:1,v:s=>W(s)&&s.diff===2?1:0},
   {id:'flawless',i:'💎',n:'Misión impecable',d:'Gana en Difícil sin que la salud baje nunca de 70.',max:1,v:s=>W(s)&&s.diff===2&&s.ach.minSalud>=70?1:0},
   {id:'collector',i:'🏆',n:'Coleccionista',d:'Consigue 25 logros.',max:25,v:()=>Object.keys(P.d).length},
+  {id:'pet',i:'🐾',n:'La mejor amiga del hombre',d:'Acaricia a Laika.',max:1,v:()=>P.pet?1:0},
   {id:'frontier',i:'🌠',n:'Next Frontier',d:'Consigue todos los demás logros.',max:1,v:()=>0}]}
 ];
 const ACH_ALL=ACH.flatMap(g=>g.items);
@@ -1595,6 +1606,10 @@ const RAMBLE=['¡Y eso no es todo! Si lo piensas, cada molécula que usamos aqu�
 const OPEN_HARD={alarmada:['Comandante. Urgente.','Alerta. Esto es grave y te toca resolverlo.'],preocupada:['Comandante, esto debiste preverlo.','Mal asunto. Atiende.'],triste:['Malas noticias. Sin adornos.'],
   feliz:['Bien. Era lo esperado.','Correcto, Comandante. Sigue así.'],sorprendida:['Novedad. Atiende.'],pensativa:['Piénsalo bien, Comandante.'],explicando:['Escucha, solo lo diré una vez.'],normal:['Comandante.']};
 const IDLE_HARD=['Sin novedades. No te confíes.','Todo en orden. De momento.','Revisa el desgaste, Comandante. Yo no voy a recordártelo siempre.','Un sol tranquilo no es un sol de descanso.'];
+const ST_LAIKA={ // [fácil, normal, difícil]
+  real:['Esto ya existe de verdad, Comandante: hoy mismo se usa en la Tierra o en el espacio. ¡Ciencia real!','Esto es tecnología real: ya existe y se usa hoy.','Tecnología real. Funciona hoy. Sin excusas.'],
+  prueba:['Esto ya se ha probado, pero solo en pequeño o en la Tierra. Nadie lo ha usado aún en una colonia de verdad. ¡Seremos los primeros!','Esto está en pruebas: funciona en pequeño o en laboratorios, pero no a escala de una colonia.','En pruebas. Funciona en laboratorio; aquí lo veremos. No te fíes del todo.'],
+  futuro:['Ojo, Comandante: esto todavía es una idea. ¡Quizá la inventes tú!','Ojo: esto aún es una idea para el futuro. Todavía no existe, aunque los científicos lo estudian.','Esto no existe todavía, Comandante. Es una idea. Si quieres que funcione, invéntala.']};
 const datoCurioso=f=>`Dato curioso: ${f}`+(!hard()&&Math.random()<.35?` ${pick(RAMBLE).replace(/…$/,'')}… perdón, me emocioné.`:'');
 // Tutorial por pasos: cada consejo sale una sola vez, cuando toca
 const TIPS={
@@ -1734,7 +1749,7 @@ function buildMenu(ti,tj,head){
     else if(S.mat<b.cost)why=`Faltan ${b.cost-S.mat} 🧱`;
     return `<button class="card${why?' no':''}" data-b="${k}" ${why?'data-why="'+why+'"':''}>
       <span class="thumb">${locked?'❔':`<img src="${thumb(k)}" alt="">`}</span>
-      <b>${locked?'???':b.n}</b>${b.ph&&!locked?'<span class="tagTemp">IMAGEN PROVISIONAL</span>':''}
+      <b>${locked?'???':b.n}</b>${locked?'':stTag(b.st)}
       <span class="stats"><span>🧱 ${b.cost}</span>${locked?'':costTxt(b)}</span>
       ${why?`<span class="why">${why}</span>`:`<span class="desc">${b.desc}</span>`}</button>`}).join('');
   const v=sheet(`${head}<div class="sec">¿Qué quieres construir? · tienes ${S.mat} 🧱</div><div class="buildGrid">${cards}</div>`);
@@ -1787,6 +1802,7 @@ function build(k,i,j){
   learn(b.fact);addLog(`Sol ${S.sol}: ${bt?`empieza la obra de ${b.n} (${bt} sol${bt>1?'es':''})`:`construido ${b.n}`}.`);beep(440,.08);setTimeout(()=>beep(660,.1),90);
   checkMissions();render();
   const obra=bt?`${b.i} Obra de <b>${b.n}</b> en marcha: estará lista en ${bt} sol${bt>1?'es':''}.`:`${b.i} <b>${b.n}</b> en pie.`;
+  S.stSeen=S.stSeen||[];if(b.st&&!S.stSeen.includes(b.st)){S.stSeen.push(b.st);const L=ST_LAIKA[b.st][S.diff||0];setTimeout(()=>say(`${ST[b.st][0]} <b>${ST[b.st][1]}</b>. ${L}`,b.st==='futuro'?'sorprendida':'explicando'),2600)}
   S.saidB=S.saidB||[];if(!S.saidB.includes(k)){S.saidB.push(k);say(`${obra} ${datoCurioso(b.fact)}`,'explicando')}else say(obra,'normal');if(S.stats.built<=4)tut('nextsol');
   const nm=updateMechs(S);
   S.qBuilt=S.qBuilt||[];if(BUILD_TOPIC[k]&&!S.qBuilt.includes(k)){S.qBuilt.push(k);nm.push(quizEvent(BUILD_TOPIC[k]))}
@@ -1820,7 +1836,7 @@ function openBuilding(k){
   if(canUp)btns.unshift(`<button class="btn" id="bUp">Mejorar a nivel ${(t.lv||1)+1} (${upCost(t)} 🧱)</button>`);
   if(t.t!=='base')btns.push(`<button class="btn ghost" id="bDel">Desmontar (+${Math.floor(paidOf(t)/2)} 🧱)</button>`);
   const fpT=footprint(t);
-  let cap='';if(b.cap)cap=`<span>👥 Camas: ${Math.round(b.cap*LV(t)*(t.t==='habitat'&&fpT.includes('tube')?2:1))}</span>`;
+  let cap=t.t==='shelter'?'<span>🛡️ Protege a 12 personas</span>':'';if(b.cap)cap=`<span>👥 Camas: ${Math.round(b.cap*LV(t)*(t.t==='habitat'&&fpT.includes('tube')?2:1))}</span>`;
   const pic=b.ph?SPR[t.t].url:imgSrc(b.inside||b.img);
   const wc=w>=60?'var(--bad)':w>=35?'var(--warn)':'var(--good)';
   const conn=!isB?'':linked?'<p class="hint">🔗 Conectado a la base.</p>':`<p class="hint" style="color:var(--warn)">🔌 Sin conexión con la base: produce un 40% menos, gasta un 50% más de energía y se desgasta antes. ${(b.ports||[]).length?'Lleva un pasillo hasta su puerta (se marcan en dorado al colocar pasillos).':'Pon un pasillo conectado pegado a él.'}</p>`;
@@ -1829,8 +1845,8 @@ function openBuilding(k){
   if(t.t==='bio'&&!mech(S,'research'))resHtml='<div class="sec">Investigación</div><p class="hint">🔒 La investigación se desbloquea en el sol 6.</p>';
   else if(t.t==='bio'){const rs=S.rs,cur=rs.cur&&RESEARCH.find(r=>r.id===rs.cur);
     resHtml=`<div class="sec">Investigación</div><p class="hint">Método científico: 1) haces una predicción, 2) el experimento dura unos soles, 3) comparas el resultado con lo que predijiste.</p>${cur?`<div class="meter">${cur.i} ${cur.n}<span class="track"><i style="width:${Math.min(100,rs.prog/cur.d*100)}%;background:var(--glass)"></i></span>${Math.floor(rs.prog)}/${cur.d} soles</div><p class="hint">Tu hipótesis: «${cur.ha[rs.pred??0]}»</p>`:'<p class="hint">Elige un proyecto. Avanza cada sol si el bio-laboratorio tiene energía todo el sol (más rápido con más nivel).</p>'}
-      <div class="mlist">${RESEARCH.map(r=>{const done=rs.done.includes(r.id);return `<div class="${done?'done':''}"><span>${done?'✅':r.i}</span><span style="flex:1"><b>${r.n}</b><br><span class="hint">${r.t}</span></span>${done||cur?'':`<button class="btn ghost" data-rs="${r.id}" style="padding:6px 10px;font-size:.8rem;flex:none">${r.c} 🧱 · ${r.d} soles</button>`}</div>`}).join('')}</div>`}
-  const v=sheet(`<div class="sheetHead"><div><h2>${b.n}${NOUP.has(t.t)?'':` · Nv ${t.lv||1}`}</h2><p>${st}${b.inside?' · vista interior':''}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
+      <div class="mlist">${RESEARCH.map(r=>{const done=rs.done.includes(r.id);return `<div class="${done?'done':''}"><span>${done?'✅':r.i}</span><span style="flex:1"><b>${r.n}</b>${stTag(r.st)}<br><span class="hint">${r.t}</span></span>${done||cur?'':`<button class="btn ghost" data-rs="${r.id}" style="padding:6px 10px;font-size:.8rem;flex:none">${r.c} 🧱 · ${r.d} soles</button>`}</div>`}).join('')}</div>`}
+  const v=sheet(`<div class="sheetHead"><div><h2>${b.n}${NOUP.has(t.t)?'':` · Nv ${t.lv||1}`}</h2>${stTag(b.st)}<p>${st}${b.inside?' · vista interior':''}</p></div><button class="close" data-close aria-label="Cerrar">✕</button></div>
     <img class="bimg" src="${pic}" alt="${b.n}">
     <p class="info">${b.desc}</p><div class="row" style="flex-wrap:nowrap"><button class="btn ghost" id="bWhy" style="font-size:.85rem;padding:8px 12px;align-self:flex-start">¿Por qué?</button>${t.t==='base'?'<button class="btn" id="bWho" style="font-size:.85rem;padding:8px 12px;flex:none">🤖 ¿Quién eres?</button>':''}</div>
     <div class="ariaSay" id="whyTxt" hidden><img src="${faceSrc('explicando')}" alt="" style="width:60px;height:80px"><div class="say"><span class="who">LAIKA</span><p>${WHY[t.t]||''}</p></div></div><div class="statline">${costTxt(b)}${cap}${t.t==='miner'&&fpT.includes('rock')?'<span class="up">Sobre roca ×2</span>':''}</div>
@@ -1927,8 +1943,20 @@ function openAria(){
       <button id="aDict">📚 Diccionario<small>${GLOSARIO.filter(g=>P.gl.includes(g.t)).length}/${GLOSARIO.length} palabras</small></button>
       <button id="aTips">💬 Repasar consejos<small>Lo que te he ido explicando</small></button>
     </div><div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`);
+  // doble toque en su retrato: la acaricias
+  const av=v.querySelector('.ariaSay img');let lastTap=0;
+  av.style.cursor='pointer';
+  av.addEventListener('pointerup',()=>{const now=performance.now();if(now-lastTap<450){lastTap=0;petLaika(v)}else lastTap=now});
   v.querySelector('#aMant').onclick=()=>{closeSheet();doMaint()};
   v.querySelector('#aNote').onclick=openNotebook;v.querySelector('#aAch').onclick=openAch;v.querySelector('#aLog').onclick=openRegistro;v.querySelector('#aTips').onclick=openTips;v.querySelector('#aDict').onclick=openDict;
+}
+function petLaika(v){
+  const msgs=[['¡Ji, ji! ¿Me estás acariciando, Comandante? Nadie lo había hecho nunca. Los rovers no tienen manos… ¡Gracias! Esto me ha alegrado todo el sol.','¡Ay, otra vez! Me haces cosquillas en los circuitos. ¡Me encanta!'],
+    ['¡Oh! ¿Eso ha sido una caricia? Gracias, Comandante. Ahora entiendo por qué a los perros de la Tierra les gusta tanto.','Gracias otra vez, Comandante. Me pone de muy buen humor.'],
+    ['¿…Una caricia? Esto no está en el protocolo, Comandante. …Pero gracias. No se lo digas a nadie.','Ejem. Ya está bien. …Bueno, uno más.']][S.diff||0];
+  const p=v.querySelector('.ariaSay .say p');v.querySelector('.ariaSay img').src=faceSrc('feliz');
+  if(p)p.textContent=P.pet?msgs[1]:msgs[0];beep(880,.08);setTimeout(()=>beep(1175,.12),90);
+  if(!P.pet){P.pet=1;saveP();checkAch()}
 }
 function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filter(x=>x.exp),ok=qs.filter(x=>x.ok).length;
   const item=x=>`<div class="${x.ok?'':'cur'}"><span>${x.ok?'✅':'❌'}</span><span><b>${x.q}</b><br><span class="hint">Respuesta: ${x.a}. ${x.e}</span></span></div>`;
@@ -1936,7 +1964,7 @@ function openNotebook(){const L=(S&&S.qlog)||[],qs=L.filter(x=>!x.exp),ex=L.filt
     `<div class="sec">Preguntas que respondiste</div><div class="mlist">${qs.map(item).join('')||'<div><span>•</span><span>Todavía no has respondido ninguna pregunta.</span></div>'}</div>
     ${(S&&S.flSeen&&S.flSeen.length)?`<div class="sec">Erupciones solares reales (NASA DONKI)</div><div class="mlist">${S.flSeen.map(k=>FLARES.find(f=>f.k===k)).filter(Boolean).map(f=>`<div><span>☀️</span><span><b>Clase ${f.cls}${f.est?' (estimada)':''}</b> · ${flareDate(f.d)}${f.ar?` · región ${f.ar}`:''}${f.n?`<br><span class="hint">${f.n}</span>`:''}</span></div>`).join('')}</div>`:''}
     ${ex.length?`<div class="sec">Experimentos (método científico)</div><div class="mlist">${ex.map(item).join('')}</div>`:''}
-    <div class="sec">Datos descubiertos</div><div class="log">${((S&&S.facts)||[]).map(f=>`<div>🔬 ${f}</div>`).join('')||'<div>Construye y vive aventuras para descubrir datos sobre Marte.</div>'}</div>
+    <div class="sec">Datos descubiertos</div><div class="log">${((S&&S.facts)||[]).map(f=>`<div>🔬 ${f} ${stTag(factSt(f))}</div>`).join('')||'<div>Construye y vive aventuras para descubrir datos sobre Marte.</div>'}</div>
     <div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
 function openRegistro(){const crew=S.crew.map(id=>CREW.find(c=>c.id===id)).map(c=>`${c.face} ${c.name}`).join(' · ');
   ariaSheet('normal',`<h2>📜 Registro</h2><p>Tripulación de ${S.name}: ${crew}.</p>`,`<div class="log">${S.log.slice(0,40).map(l=>`<div>${l}</div>`).join('')}</div><div class="stack" style="width:100%"><button class="btn ghost" data-close>Cerrar</button></div>`)}
