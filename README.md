@@ -1,4 +1,4 @@
-# Mission Mars · Project Ares 2050
+# Mars Mission · Project Ares 2050
 
 Educational mobile game (for kids aged 7 to 12) about founding the first human colony on Mars.
 
